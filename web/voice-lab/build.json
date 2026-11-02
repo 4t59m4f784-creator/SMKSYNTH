@@ -1,8 +1,8 @@
 {
-  "version": "3.0.1-dp1",
-  "firmware_identity": "SMK-37 Pro_19616",
-  "branch": "feature/drum-pads-dp1",
-  "base_source_commit": "e85cc5cc4cc6d32668cea5506c0df2ef1f6d9d36",
+  "version": "3.0.1-dp2",
+  "firmware_identity": "SMK-37 Pro_19617",
+  "branch": "fix/seq-octave-transpose-dp2",
+  "base_source_commit": "64cfd0f226a0365809783ad1440043552981605e",
   "storage_layout": "SMK16P1",
   "hardware_tested": false,
   "pattern_slots": 16,
@@ -19,12 +19,12 @@
       4
     ]
   },
-  "wasm_sha256": "5370aaab5f7b8c23bd35e3edbde8d48d0bcf7a499bfde6af402c0c33b1164c56",
-  "firmware_sha256": "0c64901bd087e102c9a867843b37affee3968e439ca62068a35f604a35a584a5",
-  "app_bytes": 161324,
+  "wasm_sha256": "0a5254e5398a7610d4ae6e5813df534261c1ff8c05249824698c133e25d107ff",
+  "firmware_sha256": "8556048ed59e61fbc3d70f87f5e8bdd0f9c1ec77d9fb74b23777ae42e3794986",
+  "app_bytes": 161692,
   "static_ram_bytes": 82896,
   "pool_bytes": 325984,
   "update_preserves_recognized_bank": true,
   "backup_protocol": "B2R1",
-  "physical_validation": "pending"
+  "physical_validation": "DP1 drum pads approved by owner; DP2 fixes pending"
 }

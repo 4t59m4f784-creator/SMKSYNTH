@@ -1,0 +1,1 @@
+PASS: exact DP2/DP1 pins and CRCs; five accepted origins, foreign rejection, guarded DP2 install/DP1 return, interruption-bound resume. No physical USB.

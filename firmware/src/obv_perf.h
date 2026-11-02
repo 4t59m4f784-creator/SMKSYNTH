@@ -273,7 +273,7 @@ static uint16_t keyboard_pad_led(uint32_t p){
 static uint32_t pf_page_request;
 static void pf_nav(uint32_t bank){
  pf_seq_mode=0;pf_manual_seq=bank;pb_cancel();kb_pad_down=0;
- layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();transpose_keys=0;
+ layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();
  pf_page_request=(bank==3u?PG_KEYBOARD:bank==4u?PG_DSOUND:PG_PERFORM)+1u;
  pf_redraw();dirty_hdr=1;
 }
@@ -289,7 +289,7 @@ static uint32_t pf_home_down,pf_home_t,pf_home_long;
 static uint32_t pf_home_poll(uint32_t b,uint32_t rel){
  if(b>>BTN_HOME&1u){pf_home_down=1;pf_home_t=fm1_ms;pf_home_long=preset_home_cancel?2u:layer?2u:0u;if(preset_home_cancel){preset_home_cancel=0;b&=~(1u<<BTN_HOME);}if(!pf_home_long)b&=~(1u<<BTN_HOME);}
  if(pf_home_down&&(fm1_in.buttons>>BTN_HOME&1u)&&fm1_ms-pf_home_t>=700u&&pf_home_long!=1u){
-  pf_home_long=1;pf_seq_mode=0;layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();transpose_keys=0;pf_page_request=PG_PERFORM+1u;pf_redraw();dirty_hdr=1;
+  pf_home_long=1;pf_seq_mode=0;layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();pf_page_request=PG_PERFORM+1u;pf_redraw();dirty_hdr=1;
  }
  if(rel>>BTN_HOME&1u){if(pf_home_down&&!pf_home_long)b|=1u<<BTN_HOME;pf_home_down=0;}
  return b;
@@ -322,3 +322,4 @@ static uint32_t perf_header_slot(void) {
     uint32_t t=seq_trk%NTRK,i=pf_active[t];
     return i<8u&&(pf_store.used>>i&1u)&&pf_matches(i,t)?i+1u:0u;
 }
+

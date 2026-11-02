@@ -16,7 +16,8 @@ button(4);key(11,true);key(11,false);assert.equal(e.ex.sim_seq_transpose(),-1); 
 button(5);enc(5);assert.equal(e.ex.sim_seq_transpose(),-1);assert.equal(e.frame().track,1);
 enc(2);assert.equal(e.ex.sim_seq_transpose(),0);enc(1);assert.equal(e.ex.sim_seq_transpose(),1);
 enc(0,-1);assert.equal(e.ex.sim_transpose_keys(),0);assert.equal(e.ex.sim_seq_transpose(),1);
-enc(0);key(7,true);button(12);assert.equal(e.ex.sim_transpose_keys(),0);const latched=e.ex.sim_seq_transpose();key(7,false);assert.equal(e.ex.sim_seq_transpose(),latched);assert.equal(e.ex.sim_melodic_busy(),0);
+enc(0);key(7,true);button(12);assert.equal(e.ex.sim_transpose_keys(),1);const latched=e.ex.sim_seq_transpose();key(7,false);assert.equal(e.ex.sim_seq_transpose(),latched);assert.equal(e.ex.sim_melodic_busy(),0);
+enc(3,-1);assert.equal(e.ex.sim_transpose_keys(),0);
 // DRUM-X context has the same page, without replacing its drum grid.
 e.input({t:'drums',part:1,kit:1});e.advance(200);button(15);assert(e.frame().drumGrid);
 for(let i=0;i<5;i++)button(15);assert.equal(e.ex.sim_seq_view(),5);enc(0);key(2,true);key(2,false);assert.equal(e.ex.sim_seq_transpose(),2);assert.equal(e.ex.sim_melodic_busy(),0);

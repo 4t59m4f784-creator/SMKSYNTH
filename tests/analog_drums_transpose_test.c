@@ -33,8 +33,8 @@ int main(void){
  clean();page=PG_SEQ;seq_view=SV_TRANSPOSE;seq_trk=0;transpose_keys=1;rec=REC_READY;
  original=pat;capture(48);assert(ctl_seq_transpose==0);capture(50);assert(ctl_seq_transpose==2);capture(47);assert(ctl_seq_transpose==-1);
  assert(!gates()&&!memcmp(&pat,&original,sizeof pat));assert(!nheld[0]&&!rec_open[47].t);
- note_in(1,55,100);assert(transpose_captured[55]);page=PG_PERFORM;obv_context_refresh();assert(!transpose_keys&&ctl_seq_transpose==7);
- note_in(0,55,0);render(2);assert(!transpose_captured[55]&&!gates());rec=REC_OFF;
+ note_in(1,55,100);assert(transpose_captured[55]);page=PG_PERFORM;obv_context_refresh();assert(transpose_keys&&ctl_seq_transpose==7);
+ note_in(0,55,0);render(2);assert(!transpose_captured[55]&&!gates());rec=REC_OFF;transpose_keys=0;
  /* Already-held live notes retain release ownership after focus/mode changes. */
  note_in(1,60,100);render(1);assert(gates());page=PG_SEQ;seq_view=SV_TRANSPOSE;transpose_keys=1;
  seq_trk=1;note_in(0,60,0);render(1);assert(!gates());
