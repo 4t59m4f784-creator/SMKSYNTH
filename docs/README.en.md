@@ -4,6 +4,10 @@
 
 Its sound comes from OberVave and JIANT's DRUM-X engine. SMKSYNTH focuses on the instrument around them: persistent pad banks, instant favourite sounds, four parts, split/layer configurations, sequencing and scene recall on a compact 37-key keyboard.
 
+## MIDI keyboard input
+
+The simulator accepts MIDI input with velocity, sustain, pitch bend and modulation. Start audio, click **Connect MIDI keyboard**, and choose an input. Use a Web MIDI browser such as desktop Chrome or Edge. [Connection and playing guide](SIMULATOR-MIDI.md#english).
+
 ## Performance features demonstration
 
 [Watch a brief SMKSYNTH demonstration on YouTube](https://www.youtube.com/watch?v=Ax-RqjtUFjc).

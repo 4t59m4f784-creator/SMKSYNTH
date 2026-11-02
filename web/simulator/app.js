@@ -1,3 +1,4 @@
+import {MidiInputController} from './midi.js?v=midi-1';
 // SPDX-License-Identifier: GPL-3.0-only
 const $=s=>document.querySelector(s),key='smksynth-1.0.0';
 let port,context,node,gain,worker,on=false,starting=false,muted=false,state,baseline,store;
@@ -7,6 +8,18 @@ const b64=b=>{let s='';for(const v of new Uint8Array(b))s+=String.fromCharCode(v
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)).buffer;
 try{const data=localStorage.getItem(key);if(data)store=unb64(data);}catch{}
 function send(m){if(on)port.postMessage(m);}
+
+const midiMessages={unsupported:'Este navegador não oferece entrada Web MIDI. Abra o simulador em HTTPS no Chrome ou Edge do computador.',permission:'Autorize o acesso MIDI no navegador.',choose:'Escolha uma entrada MIDI.',empty:'Nenhum teclado MIDI encontrado. Conecte um teclado ou uma interface MIDI.',opening:'Conectando entrada MIDI…',connected:'Entrada MIDI conectada: ',off:'Entrada MIDI desativada.',disconnected:'Teclado MIDI desconectado. Notas liberadas.',denied:'Acesso MIDI não autorizado. Verifique a permissão deste site no navegador e tente novamente.',error:'Não foi possível abrir a entrada MIDI. Feche outros aplicativos MIDI e tente novamente.'};
+const midi=new MidiInputController({navigator,secureContext:window.isSecureContext,send,isRunning:()=>on,isListening:()=>!document.hidden,
+ onStatus:(code,name='')=>{$('#midiStatus').textContent=(window.smksynthText||((s)=>s))(midiMessages[code])+name;},
+ onPorts:(ports,id)=>{const select=$('#midiInput');select.replaceChildren(new Option((window.smksynthText||((s)=>s))('Nenhuma entrada selecionada'),''));for(const p of ports)select.add(new Option(p.name,p.id));select.value=id;select.disabled=!ports.length;},
+ onNote:(note,down)=>{keyEls[note-48]?.classList.toggle('midi-down',down);},
+ onWheel:(kind,value)=>{if(kind==='mod')$('#mod').value=value;else $('#pitch').value=280+Math.round(value*510/16383);}
+});
+$('#midiConnect').onclick=async()=>{const b=$('#midiConnect');b.disabled=true;try{await midi.connect();}finally{b.disabled=false;}};
+$('#midiInput').onchange=e=>void midi.select(e.target.value);
+if(!window.isSecureContext||!navigator.requestMIDIAccess){$('#midiConnect').disabled=true;$('#midiStatus').textContent=midiMessages.unsupported;}
+
 const image=$('#screen').getContext('2d'),pixels=image.createImageData(240,240);
 function frame(m){state=m;const md=document.querySelector('.dial[aria-label="Master"]');if(md&&Number.isFinite(m.master)){md.setAttribute('aria-valuenow',m.master);md.style.transform=`rotate(${m.master/1023*270-135}deg)`;}if(m.fb){for(let i=0;i<57600;i++){const v=m.fb[i],j=i*4;pixels.data[j]=(v>>11)*255/31;pixels.data[j+1]=((v>>5)&63)*255/63;pixels.data[j+2]=(v&31)*255/31;pixels.data[j+3]=255;}image.putImageData(pixels,0,0);}
  for(let p=0;p<16;p++){padEls[p].classList.toggle('kbd-play-active',m.bank===3&&p%8===7&&Math.floor(p/8)===m.keyboardRow);const v=m.pads[p],r=(v>>8)&255,g=(v>>16)&255,b=v&255;padEls[p].style.setProperty('--c',`rgb(${r},${g},${b})`);padEls[p].setAttribute('aria-pressed',String(m.bank===3?(p%8===7&&Math.floor(p/8)===m.keyboardRow):m.drumGrid&&!m.drumRec?!!(m.drumSteps>>p&1):m.bank===2?p+1===m.pattern:p===m.track&&p<4&&!m.bank));}
@@ -24,16 +37,16 @@ function frame(m){state=m;const md=document.querySelector('.dial[aria-label="Mas
  else if(m.patternPending)$('#savedState').textContent='Pare o sequenciador e solte as notas para concluir a gravação';
  else if(m.pending)$('#savedState').textContent='Favorito capturado · aguardando gravação do firmware';
 }
-function receive({data:m}){if(m.t==='frame')frame(m);else if(m.t==='ready'){on=true;starting=false;$('#screenOverlay').hidden=true;$('#power').textContent='Em execução';$('#power').disabled=true;$('#panic').disabled=false;$('#replay').disabled=false;$('#mute').disabled=!m.audio;log(m.audio?'SMKSYNTH 1.0.0 executando · áudio ativo · memória independente do teclado':'SMKSYNTH 1.0.0 executando · modo de interface sem áudio neste navegador');send({t:'velocity',v:+$('#velocity').value});}
+function receive({data:m}){if(m.t==='frame')frame(m);else if(m.t==='ready'){on=true;midi.release();starting=false;$('#screenOverlay').hidden=true;$('#power').textContent='Em execução';$('#power').disabled=true;$('#panic').disabled=false;$('#replay').disabled=false;$('#mute').disabled=!m.audio;log(m.audio?'SMKSYNTH 1.0.0 executando · áudio ativo · memória independente do teclado':'SMKSYNTH 1.0.0 executando · modo de interface sem áudio neste navegador');send({t:'velocity',v:+$('#velocity').value});}
  else if(m.t==='store'){store=m.data;try{localStorage.setItem(key,b64(store));$('#savedState').textContent='Memória local atualizada';}catch{log('A memória funciona nesta sessão; o navegador bloqueou o armazenamento local. Exporte para preservar.');}if(m.tag==='export')download();if(m.tag==='restart')location.reload();}
  else if(m.t==='error'){log('Erro no simulador: '+m.message);on=false;starting=false;$('#power').disabled=false;$('#power').textContent='Tentar novamente';}}
 async function start(){if(on||starting)return;starting=true;log('Carregando o código da SMKSYNTH 1.0.0…');try{const audioMode=window.isSecureContext&&window.AudioWorkletNode;let resumed;if(audioMode){context=new AudioContext({sampleRate:44100,latencyHint:'interactive'});resumed=context.resume();}const response=await fetch('obervave-voice.wasm');if(!response.ok)throw Error('Falha ao carregar WebAssembly');const wasm=await response.arrayBuffer();if(!store){const seed=await fetch('factory-session.bin');if(!seed.ok)throw Error('Exemplos de fábrica indisponíveis');store=await seed.arrayBuffer();}
- if(audioMode){await resumed;if(context.sampleRate!==44100)throw Error('Esta saída de áudio não suporta 44,1 kHz.');await context.audioWorklet.addModule('worklet.js');node=new AudioWorkletNode(context,'obervave-smk37',{numberOfInputs:0,outputChannelCount:[2],processorOptions:{wasm,store}});port=node.port;port.onmessage=receive;node.onprocessorerror=()=>log('O processamento de áudio parou. Reinicie o simulador.');gain=context.createGain();node.connect(gain).connect(context.destination);}
- else{worker=new Worker('worker.js',{type:'module'});port=worker;worker.onmessage=receive;worker.postMessage({t:'init',wasm,store});}}
+ if(audioMode){await resumed;if(context.sampleRate!==44100)throw Error('Esta saída de áudio não suporta 44,1 kHz.');await context.audioWorklet.addModule('worklet.js?v=midi-1');node=new AudioWorkletNode(context,'obervave-smk37',{numberOfInputs:0,outputChannelCount:[2],processorOptions:{wasm,store}});port=node.port;port.onmessage=receive;node.onprocessorerror=()=>log('O processamento de áudio parou. Reinicie o simulador.');gain=context.createGain();node.connect(gain).connect(context.destination);}
+ else{worker=new Worker('worker.js?v=midi-1',{type:'module'});port=worker;worker.onmessage=receive;worker.postMessage({t:'init',wasm,store});}}
  catch(e){starting=false;log('Não foi possível iniciar: '+e.message);if(context)await context.close();}}
 $('#power').onclick=start;
 $('#mute').onclick=()=>{muted=!muted;gain.gain.setTargetAtTime(muted?0:1,context.currentTime,.01);$('#mute').textContent=muted?'Ativar som':'Silenciar';};
-function releaseAll(){for(const entry of [...held.values()])entry();held.clear();for(const el of [...padEls,...keyEls,...buttonEls.values()])el.classList.remove('down');send({t:'panic'});}
+function releaseAll(){midi.release();for(const entry of [...held.values()])entry();held.clear();for(const el of [...padEls,...keyEls,...buttonEls.values()])el.classList.remove('down');}
 $('#panic').onclick=releaseAll;window.addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});
 function hold(el,down,up){let active=false;const end=()=>{if(!active)return;active=false;el.classList.remove('down');up();};el.addEventListener('pointerdown',e=>{if(!on){log('Clique em Iniciar simulador para usar o painel.');return;}e.preventDefault();el.setPointerCapture(e.pointerId);active=true;el.classList.add('down');down();held.set(el,end);});for(const event of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(event,()=>{end();held.delete(el);});el.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat&&on){e.preventDefault();active=true;el.classList.add('down');down();}});el.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();end();}});el.addEventListener('contextmenu',e=>e.preventDefault());}
 function hardware(parent,b,label){const el=document.createElement('button');el.className='hw';el.textContent=label;el.dataset.button=b;el.setAttribute('aria-label',label);hold(el,()=>send({t:'btn',b,down:true}),()=>send({t:'btn',b,down:false}));parent.append(el);buttonEls.set(b,el);}

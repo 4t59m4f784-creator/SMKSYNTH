@@ -21,6 +21,10 @@ Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequ�
 
 — **Marcus Padrini** · direção do projeto, fluxo de performance, seleção de sons, patterns e testes no instrumento
 
+## Teclado MIDI no simulador
+
+O simulador aceita entrada MIDI com velocity, sustain, pitch bend e modulação. Inicie o áudio, clique em **Conectar teclado MIDI** e escolha a entrada. Use um navegador com Web MIDI, como Chrome ou Edge no computador. [Como conectar e tocar](docs/SIMULATOR-MIDI.md).
+
 ## Demonstração dos recursos de performance
 
 [Assista à breve demonstração do SMKSYNTH no YouTube](https://www.youtube.com/watch?v=Ax-RqjtUFjc).
