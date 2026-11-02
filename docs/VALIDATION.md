@@ -2,7 +2,7 @@
 
 ## Estado
 
-DP2 aprovada por Marcus no SMK‑37 Pro. A 1.0.0 conserva a base funcional, acrescentando o seed musical e o perfil de primeira instalação. **Primeira instalação física V016 → 1.0.0 por USB e retorno físico ainda pendentes antes de tornar público.** Teste de flash simulada não comprova USB real, alimentação ou CPU do chip.
+DP2 aprovada por Marcus no SMK‑37 Pro. A 1.0.0 conserva a base funcional, acrescentando o seed musical e o perfil de primeira instalação. **Primeira instalação física V016 → 1.0.0 por USB e retorno físico ainda não confirmados.** Teste de flash simulada não comprova USB real, alimentação ou CPU do chip.
 
 ## Conteúdo
 

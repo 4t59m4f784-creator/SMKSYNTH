@@ -21,6 +21,7 @@ jobs:
         run: |
           node tests/release_installer_test.mjs
           node tests/release_demo_wasm_test.mjs
+          node tests/release_i18n_test.mjs
       - name: Native routing and sequencer regression
         run: |
           mkdir -p build

@@ -2,7 +2,7 @@
 
 **O SMK‑37 Pro como instrumento de performance.**
 
-[Site e instalação](https://smksynth.padrini.chatgpt.site/) · [Simulador](https://smksynth.padrini.chatgpt.site/simulator/) · [Backup e restauração](https://smksynth.padrini.chatgpt.site/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
+[Site e instalação](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Simulador](https://4t59m4f784-creator.github.io/SMKSYNTH/simulator/) · [Backup e restauração](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
 
 Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
@@ -49,7 +49,7 @@ Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. T
 
 1. Guarde seu trabalho. Se já usa SMKSYNTH, exporte o banco antes de retornar ao firmware oficial.
 2. Instale a V016 para **SMK‑37 Pro**, obtida na [página oficial M‑VAVE](https://www.cuvave.com/appdownload), usando M‑UPGRADE.
-3. Abra o [instalador SMKSYNTH](https://smksynth.padrini.chatgpt.site/install/) em Chrome/Edge no computador, com cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
+3. Abra o [instalador SMKSYNTH](https://4t59m4f784-creator.github.io/SMKSYNTH/install/) em Chrome/Edge no computador, com cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
 4. Consulte a identidade, confira a confirmação e aguarde a identidade final `SMK-37 Pro_19618`.
 5. O primeiro boot abre Pattern 1, parado. PLAY toca o exemplo; KNOB BANK → Patterns dá acesso a P1–P5. Os oito favoritos estão nos pads inferiores de Performance.
 
@@ -59,9 +59,9 @@ Este pacote prepara o banco de fábrica: **não é um atualizador que preserve o
 
 ## Fonte, validação e estado do lançamento
 
-A experiência DP2 foi testada e aprovada por Marcus no SMK‑37 Pro. A 1.0.0 acrescenta conteúdo de fábrica e o pacote de primeira instalação. **M‑VAVE V016 → 1.0.0** foi testado com o arquivo oficial fornecido, em flash simulada, incluindo interrupções. Sua confirmação por USB no instrumento real permanece pendente antes do lançamento público.
+A experiência DP2 foi testada e aprovada por Marcus no SMK‑37 Pro. A 1.0.0 acrescenta conteúdo de fábrica e o pacote de primeira instalação. **M‑VAVE V016 → 1.0.0** foi testado com o arquivo oficial fornecido, em flash simulada, incluindo interrupções. A primeira instalação por USB no instrumento real ainda não foi confirmada; consulte os limites de validação antes de instalar.
 
-Repositório e site de revisão permanecem privados até a aprovação da publicação. Nenhuma release pública ou tag de lançamento foi criada nesta preparação.
+Distribuição pública 1.0.0. Site, instalador, simulador e backup têm seletor PT / EN. [Downloads da release](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.0.0).
 
 - [Validação e hashes](docs/VALIDATION.md)
 - [Build a partir das fontes](docs/BUILD.md)

@@ -53,6 +53,6 @@ $('confirmation').addEventListener('close',async()=>{
  finally{busy=false;refresh()}
 });
 window.addEventListener('beforeunload',e=>{if(busy){e.preventDefault();e.returnValue=''}});
-$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-dp2-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-1.0.0-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 refresh();fetchPackages();
 

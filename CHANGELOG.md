@@ -9,4 +9,4 @@
 - Simulador com o mesmo conteúdo; backup reconhece 19618.
 - README, créditos, guias, fontes, hashes e evidências.
 
-O pacote inicial foi validado em simulação. Primeira instalação física por USB pendente antes de publicar. Checkpoints técnicos de origem permanecem documentados no repositório.
+O pacote inicial foi validado em simulação. Primeira instalação física por USB ainda não confirmada. Checkpoints técnicos de origem permanecem documentados no repositório.
