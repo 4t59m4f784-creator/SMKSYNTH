@@ -1,0 +1,4 @@
+PASS: three new DP2 page link targets and module entrypoints exist; DP1 and DP2 firmware match pinned SHA256/model/CRCs; source ZIP available; no author bank bundled.
+PASS: native 240x240 display inspected; KEY TR fits the K4 label and shows ON in Performance.
+PASS: browser preview loads actual final WASM, opens SEQ TRANSPOSE, enables KEYS and returns via PATCH; Performance visibly retains KEY TR / ON.
+LIMIT: HTTP preview correctly refuses installer hashing without secure context; independent Node tests exercise package crypto/pins. Browser preview runs interface Worker without AudioWorklet. Actual AudioWorklet process tested in Node; physical audio/USB/CPU not tested.

@@ -313,6 +313,21 @@ static void keyboard_play_note(uint32_t on,uint32_t note,uint32_t vel){
  }
  fm1_irq_on();
 }
+/* The selected part's actual live pitch: physical OCT and split/layer offsets
+ * have already been applied by keyboard_play_note. MIDI input stays absolute. */
+static int keyboard_input_pitch(uint32_t raw,uint32_t *pitch){
+ const kb_press_t*p=&kb_press[raw&127u];
+ for(unsigned i=0;i<p->count;i++)if(p->route[i].part==seq_trk%NTRK){*pitch=p->route[i].note;return 1;}
+ return 0;
+}
+static uint8_t keyboard_stored_pitch(unsigned t,unsigned heard){
+ return (uint8_t)clampi((int32_t)heard-(obv_patch_engine(&live_p[t])==OBV_DRUMS?0:pat.trk[t].transp),1,127);
+}
+static int performance_transpose_control(void){return page==PG_PERFORM&&!layer&&transpose_keys;}
+static void transpose_keys_set(uint32_t on){
+ transpose_keys=(uint8_t)!!on;
+ /* Notes captured before OFF still own their note-offs; offset stays latched. */
+}
 static int rec_keys(void) { return !ed_patch(P_ARP_MODE)->v[P_ARP_MODE]; }   /* (feeding an arp: its notes are recorded) */
 
 /* ---- the mixer: the settings (saved) into the engine; mute and solo as one mask of silent tracks */
@@ -742,7 +757,6 @@ static int obv_drums_selected(void){return obv_patch_engine(&live_p[seq_trk%NTRK
 
 static void obv_context_refresh(void)
 {
-    if(!is_seq_page(page)||seq_view!=SV_TRANSPOSE||layer)transpose_keys=0;
     obv_patch_sanitize(&live_p[seq_trk%NTRK]);
     uint32_t id=obv_patch_engine(&live_p[seq_trk%NTRK]);
     if(id==OBV_DRUMS){
@@ -1086,7 +1100,9 @@ static void draw_page(void)
         k[i].present = 0;
         k[i].bip = 0;
         k[i].value[0] = 0;
-        if(page==PG_KEYBOARD&&!layer){keyboard_knob(&k[i],i);}
+        if(i==3u&&performance_transpose_control()){
+            k[i].label="KEY TR";k[i].present=1;k[i].v=1;k[i].max=1;scat(k[i].value,"ON");
+        }else if(page==PG_KEYBOARD&&!layer){keyboard_knob(&k[i],i);}
         else if(page==PG_DSOUND && obv_drums_selected() && !layer){
             uint32_t l=drum_ui_lane[seq_trk%NTRK]%8u;const uint8_t *v=ed_patch(0)->v;
             static const char *const label[4]={"SOUND","LEVEL","DECAY","PITCH"};
@@ -1260,7 +1276,7 @@ static void seq_turn(uint32_t knob, int32_t e)
         step_t *st = seq_step(t, (uint32_t)step_held);
         step_turned = 1;
         if (knob == 0) {                        /* NOTE: the chord moves; an empty step gets the pen */
-            if (!st->note[0]) { step_clear(st); st->note[0] = (uint8_t)pen; }
+            if (!st->note[0]) { step_clear(st); st->note[0] = keyboard_stored_pitch(t,pen); }
             else for (k = 0; k < SEQ_CHORD && st->note[k]; k++) st->note[k] = (uint8_t)clampi(st->note[k] + sg, 1, 127);
             st->ratch &= (uint8_t)~STEP_OFF;
         } else if (knob == 1) st->vel = LEVEL_VEL[clampi((int32_t)level_of(st->vel) + sg, 0, 3)];
@@ -1341,7 +1357,7 @@ static void seq_key_down(uint32_t k)
             uint32_t m;
             static char msg[24];
             undo_save();
-            if (!a->note[0]) { step_clear(a); a->note[0] = (uint8_t)pen; }
+            if (!a->note[0]) { step_clear(a); a->note[0] = keyboard_stored_pitch(t,pen); }
             a->ratch &= (uint8_t)~STEP_OFF;
             for (m = (uint32_t)step_held; m <= n; m++) {
                 step_t *st = seq_step(t, m);
@@ -1364,7 +1380,7 @@ static void seq_key_down(uint32_t k)
                 uint32_t q;
                 undo_save();
                 step_clear(st);
-                for (q = 0; q < (pen_n ? pen_n : 1u) && q < SEQ_CHORD; q++) st->note[q] = pen_n ? pen_chord[q] : (uint8_t)pen;
+                for (q = 0; q < (pen_n ? pen_n : 1u) && q < SEQ_CHORD; q++) st->note[q] = keyboard_stored_pitch(t,pen_n ? pen_chord[q] : pen);
                 STEP_NEW_VEL(st);               /* (SMK-37: the velocity of the key or pad that set it) */
                 step_turned = 1;                /* (kept when it is let go) */
                 pat_edited = 1;
@@ -1479,7 +1495,8 @@ static void entry_note(uint32_t on, uint32_t note, uint32_t vel)
         if (entry_n && !--entry_n && len) seq_cursor_set(t, (seq_cur[t] + 1u) % len);   /* all let go: the next step */
         return;
     }
-    if (!entry_active() || entry_on_note[note]) return;
+    uint32_t pitch;
+    if (!entry_active() || entry_on_note[note] || !keyboard_input_pitch(note,&pitch)) return;
     if (seq_cur[t] >= len) seq_cursor_set(t, 0);
     st = seq_step(t, seq_cur[t]);
     if (!entry_n) {                             /* the first key: the step's notes are replaced */
@@ -1488,9 +1505,10 @@ static void entry_note(uint32_t on, uint32_t note, uint32_t vel)
         for (k = 0; k < SEQ_CHORD; k++) st->note[k] = 0;
         if (st->gate >= GATE_TIE) st->gate = 96;
         st->ratch &= (uint8_t)~STEP_OFF;
+        st->nudge = 0; /* Explicit step entry is on the grid, including reused steps. */
         st->vel = (uint8_t)(vel ? vel : 100u);
     }
-    step_add(st, (uint32_t)clampi((int32_t)note - (obv_patch_engine(&live_p[t])==OBV_DRUMS?0:pat.trk[t].transp), 1, 127), st->vel);
+    step_add(st, (uint32_t)clampi((int32_t)pitch - (obv_patch_engine(&live_p[t])==OBV_DRUMS?0:pat.trk[t].transp), 1, 127), st->vel);
     entry_on_note[note] = 1;
     entry_n++;
     pat_edited = 1;
@@ -1682,7 +1700,7 @@ static void seq_view_turn(uint32_t knob, int32_t e)
     int32_t sg = e > 0 ? 1 : -1;
     step_t *st;
     if(seq_view==SV_TRANSPOSE){
-        if(knob==0)transpose_keys=e>0;
+        if(knob==0)transpose_keys_set(e>0);
         else if(knob==1)ctl_seq_transpose=clampi(ctl_seq_transpose+e,-48,79);
         else if(knob==2)ctl_seq_transpose=0;
         return;
@@ -1738,7 +1756,7 @@ static void seq_view_turn(uint32_t knob, int32_t e)
     if (SV_EFF == SV_STEPS && knob == 1) {      /* NOTE: the chord moves; an empty step gets the last notes played */
         if (!st->note[0]) {
             step_clear(st);
-            for (k = 0; k < (pen_n ? pen_n : 1u) && k < SEQ_CHORD; k++) st->note[k] = pen_n ? pen_chord[k] : (uint8_t)pen;
+            for (k = 0; k < (pen_n ? pen_n : 1u) && k < SEQ_CHORD; k++) st->note[k] = keyboard_stored_pitch(t,pen_n ? pen_chord[k] : pen);
         } else for (k = 0; k < SEQ_CHORD && st->note[k]; k++) st->note[k] = (uint8_t)clampi(st->note[k] + sg, 1, 127);
         st->ratch &= (uint8_t)~STEP_OFF;
     } else if (!st->note[0]) { say("EMPTY STEP: PLAY A NOTE"); return; }
@@ -2083,12 +2101,13 @@ static void note_in(uint32_t on, uint32_t note, uint32_t vel)
 {
     uint32_t t;
     note &= 127u;
+    unsigned had_pen=panel_live_note[note]==1u;
     if(!on && transpose_captured[note]){transpose_captured[note]=0;return;}
-    if(on && transpose_keys && is_seq_page(page) && seq_view==SV_TRANSPOSE && !layer){
+    if(on && transpose_keys && !layer){
         /* A repeated key that previously played live must release its old owner. */
         if(panel_live_note[note]){keyboard_play_note(0,note,0);panel_live_note[note]=0;
             for(t=0;t<NTRK;t++)ctl_live_hold[t][note>>5]&=~(1u<<(note&31u));
-            keyboard_record(0,note,0);entry_note(0,note,0);if(notes_down)notes_down--;}
+            keyboard_record(0,note,0);entry_note(0,note,0);if(had_pen&&notes_down)notes_down--;}
         transpose_captured[note]=1;ctl_seq_transpose=(int32_t)note-48+(keyboard_physical?12*panel_octave():0);
         dirty_page=dirty_steps=1;return;
     }
@@ -2099,18 +2118,21 @@ static void note_in(uint32_t on, uint32_t note, uint32_t vel)
     if (!on) for (t = 0; t < NTRK; t++) ctl_live_hold[t][note >> 5 & 3u] &= ~(1u << (note & 31u));   /* (let go: the sequencer's again) */
     keyboard_record(on,note,vel);
     if (on) {
-        pen_add(note);
+        uint32_t pitch;
+        if(!keyboard_input_pitch(note,&pitch)){panel_live_note[note]=2;return;}
+        pen_add(pitch);
         if (step_held < 0) entry_note(1, note, vel);
         else if (!rec) {                        /* a held step takes what is played: the first note starts the chord */
             step_t *sp = seq_step(seq_trk, (uint32_t)step_held);
             uint32_t q;
-            if (!step_midi++) { for (q = 0; q < SEQ_CHORD; q++) sp->note[q] = 0; sp->ratch &= (uint8_t)~STEP_OFF; }
-            for (q = 0; q < SEQ_CHORD && sp->note[q] && sp->note[q] != note; q++) ;
-            if (q < SEQ_CHORD && !sp->note[q]) { sp->note[q] = (uint8_t)note; sp->vel = (uint8_t)vel; }
+            if (!step_midi++) { for (q = 0; q < SEQ_CHORD; q++) sp->note[q] = 0; sp->ratch &= (uint8_t)~STEP_OFF; sp->nudge=0; }
+            pitch=(uint32_t)clampi((int32_t)pitch-(obv_drums_selected()?0:pat.trk[seq_trk].transp),1,127);
+            for (q = 0; q < SEQ_CHORD && sp->note[q] && sp->note[q] != pitch; q++) ;
+            if (q < SEQ_CHORD && !sp->note[q]) { sp->note[q] = (uint8_t)pitch; sp->vel = (uint8_t)vel; }
             pat_edited = 1;
         }
     } else {
-        if (notes_down) notes_down--;
+        if (had_pen && notes_down) notes_down--;
         entry_note(0, note, 0);
     }
 }
@@ -2418,7 +2440,8 @@ static void panel_encoders(void)
             int32_t p = obv_page_param(page,k);
             if ((e = fm1_enc_take(ENC_KNOB1 + k)) == 0) continue;
             if (e > 1 || e < -1) e *= 3;        /* a fast turn goes further */
-            if(page==PG_KEYBOARD&&!layer){keyboard_turn(k,e);dirty_hdr=1;}
+            if(k==3u&&performance_transpose_control()){transpose_keys_set(e>0);dirty_hdr=dirty_steps=1;}
+            else if(page==PG_KEYBOARD&&!layer){keyboard_turn(k,e);dirty_hdr=1;}
             else if(page==PG_DSOUND && obv_drums_selected() && !layer){
                 uint32_t t=seq_trk%NTRK,l=drum_ui_lane[t]%8u;
                 if(!k)drum_ui_lane[t]=(uint8_t)clampi((int32_t)l+(e>0?1:-1),0,7);
@@ -3065,3 +3088,4 @@ static void app_main(void)
         }
     }
 }
+

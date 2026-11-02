@@ -1,0 +1,16 @@
+{
+  "dp2": {
+    "name": "SMKSYNTH DP2 \u00b7 Oitavas e Transpose",
+    "product": "SMK-37 Pro_19617",
+    "size": 651819,
+    "sha": "8556048ed59e61fbc3d70f87f5e8bdd0f9c1ec77d9fb74b23777ae42e3794986",
+    "url": "./firmware/obervave-3.0.1-dp2-smk37.fwsc"
+  },
+  "dp1": {
+    "name": "Voltar \u00e0 DP1 aprovada",
+    "product": "SMK-37 Pro_19616",
+    "size": 651819,
+    "sha": "0c64901bd087e102c9a867843b37affee3968e439ca62068a35f604a35a584a5",
+    "url": "./firmware/obervave-3.0.1-dp1-smk37.fwsc"
+  }
+}
