@@ -1,5 +1,7 @@
-# Reporting a security issue
+# Reportar problemas
 
-Do not include private bank files, access tokens or personal data in a public issue. If GitHub private vulnerability reporting is enabled for the future repository, use its Security tab. No private security contact has been designated yet; this setting is a publication prerequisite.
+Não publique credenciais ou dados pessoais em issues. Em falhas com risco de perda de dados, pare a operação e preserve arquivo/log. Descreva modelo, versão e reprodução mínima, omitindo seu banco completo.
 
-For ordinary playback or installation bugs, use the issue template. Firmware and browser tools are community software; only the documented hardware and update paths are offered. Keep copies of bank files before updating or restoring.
+O instalador exige origem M‑VAVE V016 / SMK‑37 Pro e verifica o pacote; o loader limita suas janelas e verifica a imagem. Isso não substitui backup, alimentação estável ou testes físicos.
+
+Os bancos são processados localmente no navegador e transferidos por USB-MIDI. A prévia privada pode exigir a conta autorizada enquanto o lançamento estiver em revisão.

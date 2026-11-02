@@ -1,60 +1,78 @@
 # SMKSYNTH
 
-**A performance synthesizer for the M-VAVE SMK-37 Pro.**
+**O SMK‑37 Pro como instrumento de performance.**
 
-[Português](README.pt-BR.md) · [Installation](docs/INSTALLATION.md) · [Backup & restore](docs/BACKUP.md) · [Build](docs/BUILD.md) · [Credits](CREDITS.md)
+[Site e instalação](https://smksynth.padrini.chatgpt.site/) · [Simulador](https://smksynth.padrini.chatgpt.site/simulator/) · [Backup e restauração](https://smksynth.padrini.chatgpt.site/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
 
-In terms of sound, SMKSYNTH brings together the excellent [OberVave](https://github.com/zvenson/obervave) synthesizer and the DRUM-X engine from the equally excellent [JIANT](https://github.com/juanjiant-bit/JIANT).
+Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
-But an instrument is more than its sound. The idea behind this project is to turn the M-VAVE SMK-37 into an instrument built for performance, adding features and rethinking an experience that makes use of its pads and controls.
+Porém, um instrumento é muito mais que o som. A ideia aqui é transformar o M‑VAVE SMK‑37 Pro em um instrumento voltado para a performance, criando recursos e reimaginando uma experiência que usa os pads e controles do teclado.
 
-Switch easily between parts, save favorite sounds and recall them with a single tap, record sequences, create layers and splits, and save scenes to recall your settings during a performance.
+Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequências, faça layers e splits, salve cenas e recupere seu conjunto com um botão. Os pads são o coração do SMKSYNTH: este projeto traduz minha visão de um instrumento para performance nesse formato compacto de 37 teclas.
 
-The pads are the heart of SMKSYNTH. With this project, I set out to implement my vision of an ideal performance instrument in this compact, 37-key format.
+— **Marcus Padrini** · conceito de performance, adaptações, seleção de sons e patterns
 
-> **Publication review — not a public release.** This package uses B2 (`SMK-37 Pro_19615`), whose export and restore have been tested on Marcus's physical keyboard. The public factory collection is being selected. First installation from stock firmware is not yet supported by the included B2 installer. No public repository, release or Pages address has been created by this package.
+![Tela real do sequenciador SMKSYNTH](docs/images/sequence.png)
 
-## Pad bank guides
+## O que está incluído
 
-[Performance & favorites](docs/pad-banks/01-performance-favoritos.png) · [SPLIT / LAYER](docs/pad-banks/02-split-layer.png) · [Scenes & patterns](docs/pad-banks/03-cenas-patterns.png)
+| Recurso | SMKSYNTH 1.0.0 |
+|---|---|
+| Partes | Quatro, com seleção de ANALOG ou DRUM-X por parte |
+| Synth ANALOG | OberVave; oito vozes compartilhadas |
+| Bateria | DRUM-X; oito instrumentos por kit |
+| Performance | Favoritos, sends por parte, split/layer e transpose de sequências pelas teclas |
+| Sequenciador | Quatro tracks; até 256 steps por track; gravação ao vivo ou passo a passo |
+| Patterns/cenas | 16 posições; sequência, sons, mixer e configurações de teclado por pattern |
+| Conteúdo inicial | Cinco patterns de Marcus Padrini e oito favoritos |
+| Presets | Banco da base mantido; nenhum preset de usuário extra instalado |
+| Salvamento | Manual; backup/restauração pelo navegador |
 
-The illustrated guides are in Portuguese; editable SVG files are in `docs/pad-banks/`.
+Os sons editados das cenas e favoritos ficam nos próprios snapshots, sem depender de presets extras. Patterns 6–16 começam livres. O tempo inicial dos exemplos é 90 BPM.
 
-## Play, program, perform
+## Pads persistentes
 
-| Feature | Current base |
-| --- | --- |
-| Parts | Four, A–D |
-| ANALOG | Eight melodic voices shared across parts; two oscillators, filters, envelopes, LFO and arpeggiator |
-| DRUM-X | Eight synthesized drum instruments; five kits; no third-party samples |
-| Sequencing | Four tracks, up to 256 steps per track, automation and synchronized pattern changes |
-| Patterns | 16 saved positions with sounds, mix and scenes |
-| Presets & favorites | 99 program positions and eight favorites; manual saving |
-| Keyboard | Per-part octave; SINGLE, SPLIT and LAYER, with two saved keyboard configurations |
-| Effects | Chorus, delay and reverb sends; drive and master processing |
-| Backup | USB-MIDI export and complete restore in a browser; `.smksynth` files |
-| Simulator | Browser performance simulator of the approved P16.2 musical base |
+KNOB BANK escolhe o banco de pads. PLAY, REC, seleção de engine e mudança de página não tomam essa escolha automaticamente. SEQ acessa explicitamente os steps do sequenciador.
 
-**Save deliberately.** BT saves presets. Patterns are saved through the pattern pads, with a separate overwrite confirmation. PLAY and REC preserve the selected pad bank. See [the quick guide](docs/QUICKSTART.md).
+| Banco | Uso |
+|---|---|
+| Performance / Favoritos | Pads superiores: partes A–D, delay/reverb e −/+ preset. Inferiores: oito favoritos. Toque recupera; segure para memorizar. |
+| Split / Layer | Duas configurações independentes; escolha partes, SINGLE/SPLIT/LAYER e a linha tocada. |
+| Patterns / Save | Toque carrega um dos 16 patterns; segure para salvar. Posição ocupada pede confirmação. |
+| Drum Pads | Entra no ciclo apenas com DRUM-X selecionado. Oito pads superiores tocam/gravam bateria com velocity; inferiores reservados. |
 
-## Browser tools
+Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. Trocar para ANALOG preserva esse banco, inativo. Selecionar uma voz de bateria, sozinho, **não** transforma os pads em bateria.
 
-The `site/` folder contains a self-contained static website with three entry points:
+## Instalação: M‑VAVE oficial V016 obrigatória
 
-- **Installer:** updates existing SMKSYNTH identities 19613/19614/19615 to B2/19615. It refuses unsupported origins.
-- **Backup / restore:** exports saved device data, restores a complete bank and resumes an interrupted restore with the same file.
-- **Simulator:** plays the P16.2 musical base without installing anything. Its browser-session files are separate from hardware `.smksynth` backups; it does not simulate B2 USB transfers.
+**Instalação inicial somente para SMK‑37 Pro executando M‑VAVE oficial V016, identidade `SMK-37 Pro_016`.** Elite, MKE-P37, FM-1, outras versões e firmwares alternativos são recusados pelo instalador.
 
-The website is prepared for a GitHub project subpath. See [publication instructions](publication/REVIEW.pt-BR.md). The included manual Pages workflow does not publish on push.
+1. Guarde seu trabalho. Se já usa SMKSYNTH, exporte o banco antes de retornar ao firmware oficial.
+2. Instale a V016 para **SMK‑37 Pro**, obtida na [página oficial M‑VAVE](https://www.cuvave.com/appdownload), usando M‑UPGRADE.
+3. Abra o [instalador SMKSYNTH](https://smksynth.padrini.chatgpt.site/install/) em Chrome/Edge no computador, com cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
+4. Consulte a identidade, confira a confirmação e aguarde a identidade final `SMK-37 Pro_19618`.
+5. O primeiro boot abre Pattern 1, parado. PLAY toca o exemplo; KNOB BANK → Patterns dá acesso a P1–P5. Os oito favoritos estão nos pads inferiores de Performance.
 
-## Releases and source
+Este pacote prepara o banco de fábrica: **não é um atualizador que preserve o banco de uma versão anterior do SMKSYNTH**. Uma transferência interrompida pode ser retomada pelo mesmo instalador, navegador e pacote. A primeira instalação não é atômica; o loader mantém a retomada até concluir. O firmware oficial M‑VAVE não é redistribuído aqui.
 
-B2 firmware SHA-256: `50054674cc3db57c971321b9f94993099f1a5505125917dd23400588914a5685`.
+[Instruções completas, recuperação e retorno à M‑VAVE](docs/INSTALLATION.md).
 
-This review keeps the tested firmware unchanged. Source, build/install scripts, component notices and validation evidence are included. Public version naming, tag, first-install path and factory collection are not finalized. Do not rename a newly compiled binary as this tested build without new validation.
+## Fonte, validação e estado do lançamento
 
-[Build instructions](docs/BUILD.md) · [Compatibility](docs/COMPATIBILITY.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md).
+A experiência DP2 foi testada e aprovada por Marcus no SMK‑37 Pro. A 1.0.0 acrescenta conteúdo de fábrica e o pacote de primeira instalação. **M‑VAVE V016 → 1.0.0** foi testado com o arquivo oficial fornecido, em flash simulada, incluindo interrupções. Sua confirmação por USB no instrumento real permanece pendente antes do lançamento público.
 
-## Credits and license
+Repositório e site de revisão permanecem privados até a aprovação da publicação. Nenhuma release pública ou tag de lançamento foi criada nesta preparação.
 
-SMKSYNTH project direction and performance workflow: **Marcus Padrini** (proposed credit for review). Original copyrights remain with their respective authors. See [CREDITS.md](CREDITS.md), [LICENSING.md](LICENSING.md) and the complete [GPL version 3](LICENSE). Code is GPL-3.0-only except separately identified components. No Mellotron recordings or SMKTRON samples are included. This is an independent community project; it is not an official M-VAVE release.
+- [Validação e hashes](docs/VALIDATION.md)
+- [Build a partir das fontes](docs/BUILD.md)
+- [Mudanças](CHANGELOG.md)
+- [Contribuir](CONTRIBUTING.md)
+- [Guia de uso](docs/USER_GUIDE.md)
+
+O simulador executa o mesmo código C de síntese, sequenciamento e interface em WebAssembly. Tem memória independente e começa com os mesmos cinco patterns e oito favoritos da instalação.
+
+## Créditos e licença
+
+OberVave e Dinghy: **zvenson**. JIANT / DRUM-X: **Juan Ignacio Antonucci (Juan Jiant)** e colaboradores. Felucca: **Leo Kuroshita / Hügelton Instruments**. SLOOP: **isod89** e colaboradores. Port/ferramentas SMK-37: **M. Geisler / genkigenki** e colaboradores. SMKSYNTH: **Marcus Padrini**.
+
+Firmware e adaptações sob **GPL-3.0-only**. Consulte [LICENSE](LICENSE), [CREDITS](CREDITS.md) e [LICENSING](LICENSING.md) para atribuições e licenças de componentes. Não há samples de terceiros nesta distribuição. Projeto independente, sem vínculo ou endosso da M‑VAVE ou dos autores dos projetos de origem.

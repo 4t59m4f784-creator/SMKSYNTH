@@ -1,14 +1,8 @@
-# SMKSYNTH licensing and provenance
-
-Current review base: B2 / 19615, with ANALOG and DRUM-X. VOICE is not an active engine. The inherited licensing record below remains intact. Its AD1 and experimental-checkpoint sections document earlier stages, not the current release status.
-
-SMKSYNTH modifications: performance controls, manual saving, 16-pattern storage, per-part keyboard octaves, SPLIT/LAYER workflow, branding and B1/B2 backup/update/restore integration. See CHANGELOG.md and CREDITS.md. Existing file copyrights and GPL-3.0-only notices are preserved.
-
-Distribute corresponding source and build/install information with each firmware. SDK components in the tested package have their separately retained Apache-2.0 notice. This repository does not include the JieLi compiler; obtain it using the documented toolchain procedure. No third-party samples or Mellotron tapes are included.
-
-## Inherited licensing record
-
 # Licensing
+
+## SMKSYNTH 1.0.0
+
+The approved DP2 runtime is retained: OberVave ANALOG and JIANT DRUM-X, with the original notices below. SMKSYNTH performance adaptations and example content are by Marcus Padrini. The factory distribution contains five patterns/scenes and eight favourite snapshots, with no extra user preset bank or third-party samples. Corresponding source and component licences accompany the firmware. This is a stock-V016 first-install package, not the bank-preserving DP2 updater. Historical checkpoint provenance follows.
 
 ## Current SMKSYNTH AD1
 

@@ -1,47 +1,44 @@
-# Build and validation
+# Build reproduzível
 
-## Sources and tools
+Firmware: SMKSYNTH 1.0.0 / `SMK-37 Pro_19618`. Base musical/interface: DP2, commit `6c11279e6bfcfb627dfb54628dddc2ee8a653f58`. O código de síntese, sequenciador, interface e formatos dessa base foi preservado.
 
-The review contains the B2 firmware sources, loaders, HAL, generated tables, web clients and tests. Internal `obervave`/`obv_` names and release `3.0.1-b2` are retained for source and data compatibility.
+## Requisitos
 
-Hardware compilation uses the JieLi pi32v2 toolchain on Linux x86-64. See `tools/get_toolchain.sh`. Python 3 and Pillow are required by generation/graphics tools. Packaging needs the JieLi AC79 SDK files identified and hashed in `tools/build.py`; point `AC79_SDK` at an appropriate SDK checkout. The SDK blobs are not distributed as loose source files in this repository. Relevant notices accompany the packaged firmware.
+Linux x86-64 (ou o fluxo Docker descrito pelos scripts originais), toolchain JieLi `pi32v2`/`common`, Python 3 e SDK AC79NN. Para simulador: Zig e Binaryen `wasm-opt`. As referências e licenças dos componentes são as de LICENSING.md. O SDK não é substituído por arquivos aleatórios; o build confere hashes dos componentes usados.
+
+## Conteúdo de fábrica
+
+`factory/` contém somente os cinco patterns selecionados, suas cinco cenas, os oito favoritos e configurações iniciais limpas. Não inclui o backup privado integral ou os três presets de usuário encontrados nele. Dois patterns mantêm o prefixo SEQ4 legado, lido pelo caminho de compatibilidade normal do firmware.
 
 ```sh
-sh tools/get_toolchain.sh
-export JIELI_TOOLCHAIN="$HOME/.jieli/toolchain"
-# Set AC79_SDK to your local JieLi SDK checkout.
-python3 tools/build.py --voice-hardware --board smk37 --model pro --release 3.0.1-b2 --experimental-id 19615
+python3 tools/build_factory_bank.py factory factory
+python3 tests/release_factory_test.py
 ```
 
-Use the explicit command above. The inherited `./build.sh` wrapper defaults to the FM-1 unless passed board flags; it is retained as historical platform tooling and is not the SMKSYNTH quick-build entry point.
+Não é necessário ter o backup original para recompilar. `tools/prepare_factory_seed.c` documenta a normalização inicial: marca de edição das cenas/favoritos em relação aos presets da base, geração inicial dos favoritos e globals limpos com tempo de demonstração 90 BPM. Dados de notas, patches e mixer dos exemplos foram preservados.
 
-Output: `build/obervave-3.0.1-b2-smk37.fwsc`. Do not install this on a different target. On macOS the hardware build uses the existing Docker linux/amd64 route described in `tools/build.py`; that route has not been newly validated in this preparation.
+## Firmware
 
-## Simulator
+```sh
+export JIELI_TOOLCHAIN=/caminho/jieli-linux-toolchains
+python3 tools/build.py --voice-hardware --board smk37 --model pro \
+  --release 1.0.0 --identity 19618 --first-install \
+  --factory-bank factory/bank-SMK16P1.bin --sdk /caminho/SDK
+```
 
-Zig and Binaryen (`wasm-opt`) must be available. The current simulator entry point is **`tools/build_voice_sim.sh`**, not the inherited FM-1 `web/sim/build.sh` page. The retained `web/sim/sim.c` uses the same musical sources with host storage stubs.
+Saída: `build/obervave-1.0.0-smk37.fwsc`; nome de distribuição `SMKSYNTH-1.0.0-SMK37-Pro.fwsc`.
+
+O perfil `--first-install` usa o loader completo padrão da plataforma para preparar a área `0x4000..0x9CFFF`, incluindo o seed SMK16P1. O app mantém o perfil de armazenamento SMK16P1. Esse pacote é somente para a instalação inicial a partir de M‑VAVE V016, conferida pelo cliente. Não é o loader de atualizações DP2 que preservava um banco existente.
+
+O journal de restauração começa apagado em `0x55000..0x56FFF`; o seed ocupa `0x57000..0x9CFFF`. Nenhum boot-file CRC inclui essa área de dados. Cabeçalho, calibração e regiões protegidas do fabricante não são escritas. O fluxo de retomada do loader permanece o original, com comparação e verificação por setor.
+
+## Simulador e distribuição web
 
 ```sh
 sh tools/build_voice_sim.sh
-python3 tools/prepare_public_site.py
-python3 -m http.server --directory site 8000
+python3 tools/prepare_release_web.py
+node tests/release_demo_wasm_test.mjs
+node tests/release_installer_test.mjs
 ```
 
-`ZIG` must name an executable; `WASM_OPT` can point at the Binaryen executable. The review ships the approved prebuilt P16.2 musical WASM. Rebuilding from B2 compiles the shared musical base again; check regressions rather than claiming its bytes match the approved prebuilt file. The simulator does not validate the physical USB/flash protocol.
-
-## Tests
-
-```sh
-sh tests/run_sl1_tests.sh
-# Supply the exact compatible B1 package; it is not a substitute for B2.
-sh tests/run_backup_b2_tests.sh /absolute/path/to/obervave-3.0.1-b1-smk37.fwsc
-python3 tools/check_publication.py
-```
-
-The B2 suite uses Node.js, a C compiler with address/undefined-behavior sanitizers and Python. It tests the actual C protocol against the browser JS, legacy file compatibility, interrupted flash operations and update preservation. Source paths and web protocol tests remain unchanged.
-
-`docs/validation-b2/` contains the prior B2 validation logs. Those logs include historical workspace paths and an exact restoration test with Marcus's submitted bank; the bank itself is not included. They are historical evidence, not proof that CI or a new machine has passed.
-
-The publication preparation changes documentation and web presentation only. The B2 firmware SHA remains `50054674cc3db57c971321b9f94993099f1a5505125917dd23400588914a5685`. There is no claim of a new hardware build or byte-for-byte reproducible compiler output.
-
-The GitHub review branch tracks the exact prebuilt B2 firmware and P16.2 WASM. Website source-download ZIPs are generated by `prepare_public_site.py` before the manual Pages workflow; they are not stored as redundant binary copies in Git. Run the preparation command before `check_publication.py` on a fresh checkout.
+O simulador usa `factory/simulator-session.bin`, uma representação dos mesmos registros no formato de memória do host, separada da flash física. Os sites estáticos são montados por `tools/package_release.py`. O pacote de fontes e os hashes fazem parte da entrega. Consulte VALIDATION.md para limites e comandos dos testes.

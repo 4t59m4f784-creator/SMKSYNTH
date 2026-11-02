@@ -1,0 +1,2 @@
+PASS: browser presentation and navigation; final simulator boots curated factory data; P1-P5 filled and P6-P16 empty; no missing DOM bindings. All relative links and firmware/source hashes verified.
+LIMIT: local preview HTTP has no AudioWorklet / secure crypto; actual AudioWorklet and firmware pins tested in Node. Native first-install USB validation remains pending.

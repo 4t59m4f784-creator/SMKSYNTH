@@ -1,0 +1,1 @@
+PASS: exact supplied M-VAVE V016 (36 markers) -> seeded SMKSYNTH; 154 erase cutpoints +22 program cutpoints resume to identical app/bank; head/calibration/BT/USR/key_mac untouched; repeat idempotent. Physical USB not tested.

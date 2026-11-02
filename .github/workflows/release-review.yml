@@ -1,0 +1,28 @@
+name: Release review checks
+on:
+  push:
+    branches: [main, 'release/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate curated content and boot layout
+        run: |
+          python3 tests/release_factory_test.py
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.0-SMK37-Pro.fwsc
+      - name: Validate first-install guard and seeded simulator
+        run: |
+          node tests/release_installer_test.mjs
+          node tests/release_demo_wasm_test.mjs
+      - name: Native routing and sequencer regression
+        run: |
+          mkdir -p build
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/release-seq tests/seq_dp2_test.c
+          build/release-seq

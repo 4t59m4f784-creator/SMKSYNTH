@@ -1,9 +1,7 @@
-# Contributing
+# Contribuir
 
-Please include the hardware model, firmware identity, steps to reproduce, expected/actual behavior and whether the problem reproduces in the browser simulator. Attach a minimal example only if you are willing to share it publicly. Do not attach your full personal bank by default.
+Issues: informe modelo, versão/identidade e reprodução. Para sequenciador/áudio, acrescente tempo, parte/engine, PLAY/REC e SYNC. Compartilhe apenas um banco mínimo que deseje distribuir; não publique dados privados.
 
-Discuss storage/protocol changes before implementation. Keep record/layout compatibility explicit, validate bounds and CRCs, and test interrupted writes. Musical regressions should compare routing, sustain/note release, sequencer recording and representative ANALOG/DRUM-X audio. Never describe a simulated test as physical validation.
+PRs devem explicar problema e comportamento resultante, manter créditos/licenças e trazer validação proporcional. Separe DSP de interface. Preserve formatos e dados; não amplie janelas de calibração/flash por conveniência. Não inclua credenciais, bancos privados completos ou firmware proprietário do fabricante.
 
-Changes inherit the applicable project/component licenses. Retain original copyright notices and identify significant modifications. Submit focused pull requests explaining behavior, validation and known limits.
-
-The original checkpoint documents and fixtures are retained to support provenance and regression tests. The current README and `docs/INSTALLATION.md` are authoritative for supported usage.
+Veja [BUILD](docs/BUILD.md) e [VALIDATION](docs/VALIDATION.md). Primeiras instalações precisam de testes de interrupção e conferência física antes de serem declaradas validadas no hardware.

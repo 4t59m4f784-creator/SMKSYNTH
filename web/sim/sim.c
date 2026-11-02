@@ -10,8 +10,7 @@
  * millisecond resume it right there. One pass of the loop per millisecond of audio, as tests/host.c does.
  * The ISR is app_audio(256 frames) as on the device; sim_render serves the worklet's 128-frame quanta out of it. */
 #define BOARD_SMK37 1
-#define APP_VER "3.0.1-dp2"
-#define OBV_EXPERIMENTAL 1
+#define APP_VER "1.0.0"
 #define OBV_HOST 1
 #define OBV_WASM 1
 #include <stdint.h>

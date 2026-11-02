@@ -1,25 +1,35 @@
-# Installation and updating
+# Instalação SMKSYNTH 1.0.0
 
-## Supported today
+Modelo: **M‑VAVE SMK‑37 Pro**. Origem obrigatória: **oficial V016**, identidade `SMK-37 Pro_016`. Destino: `SMK-37 Pro_19618`. Outros modelos, V015/V017, nomes genéricos e firmwares alternativos são recusados.
 
-The included B2 installer accepts **SMK-37 Pro_19613, _19614 or _19615**. Target: **_19615**. It checks the package hash and device identity before writing. It does not provide a first installation from stock firmware, another developer's firmware, FM-1, Elite or MKE-P37. Do not bypass these checks.
+Obtenha firmware e M‑UPGRADE na [página oficial M‑VAVE](https://www.cuvave.com/appdownload), entrada SMK‑37 PRO / V016. O arquivo oficial analisado, fornecido por Marcus, tem SHA-256 `2d98ce72530e71d617384963423820536f094501299e2cfec0a8d3c3fb6bcfb0` e não é redistribuído. O dispositivo é consultado antes do comando de atualização.
 
-The first-install route is a **public-launch prerequisite**, to be prepared and tested separately. Until then, the review website labels this tool as an update for existing SMKSYNTH installations.
+Se já usa SMKSYNTH, salve edits no painel e exporte seu `.smksynth` antes de retornar à V016. O retorno ao firmware oficial e a instalação inicial podem substituir os dados SMKSYNTH. Não há mesclagem com o banco de fábrica.
 
-## Update an existing supported installation
+## Instalar
 
-1. Export a `.smksynth` backup using the current firmware's compatible tool. Keep the file on your computer.
-2. Use Chrome or Edge on a computer, USB data cable and stable power. Close other MIDI apps and tabs.
-3. Open the installer over HTTPS (or localhost for development), connect and read the detected identity.
-4. Review the destination build and confirm explicitly. Keep the cable, power and tab connected until identity 19615 is confirmed.
-5. Reconnect, verify your saved sounds and export a new backup.
+1. Instale a V016 pelo M‑UPGRADE conforme o fabricante e reinicie o teclado.
+2. Use Chrome/Edge no computador, HTTPS e cabo USB de dados. Feche DAWs, editores MIDI e outras abas de instalador/backup. Mantenha alimentação estável.
+3. Abra o instalador. Ele verifica SHA-256, identidade e CRCs antes de liberar a operação.
+4. Clique **Conectar e consultar** e confira `SMK-37 Pro_016`.
+5. Escolha **Instalar SMKSYNTH 1.0.0**. Confira origem, destino e preparação dos dados de fábrica; confirme.
+6. Mantenha a aba aberta até a reinicialização com `SMK-37 Pro_19618`.
+7. Pattern 1 abre parado, a 90 BPM. PLAY toca o exemplo. Em KNOB BANK → Patterns, P1–P5 trazem exemplos e P6–P16 estão livres. Oito favoritos nos pads inferiores de Performance.
 
-B2 preserves a recognized SMK16P1 bank. This path has automated interruption tests, and Marcus reported successful device export/restore with B2. Physical power-cut testing has not been reported; do not equate simulated interruption tests with physical certification.
+A instalação escreve a área da aplicação e prepara o banco SMK16P1. BTIF, calibração USRTRIM, USR, key_mac e o cabeçalho de boot ficam fora das janelas de escrita. A conferência foi feita em flash simulada com interrupções; a primeira instalação por USB ainda precisa ser confirmada no instrumento real.
 
-## Interrupted update or restore
+## Interrupção
 
-An interrupted firmware update and an interrupted bank restore use different recovery paths. Follow the page that started the operation. The B2 installer can resume its own recognized interrupted update; it is not a general rescue tool.
+Use o mesmo pacote, navegador e origem do site. A operação pendente é vinculada ao SHA-256 e à origem V016. A retomada só é liberada para `ota-SMK-37 Pro_900` com esse vínculo. Um loader encontrado sem operação conhecida não é autorizado automaticamente.
 
-If the instrument displays **RESTORE PENDING / RESUME VIA USB**, use the backup tool with the **same bank file**. Do not install another firmware or use an old P16.2/B1 installer while restoration is pending. See [BACKUP.md](BACKUP.md).
+Reconecte e consulte novamente. Se houver retomada, confirme e aguarde. Guarde o log se não concluir. Não inicie restauração de banco enquanto o firmware estiver pendente. A primeira instalação não é atômica: o loader permanece responsável pela retomada até terminar.
 
-Public instructions for return to stock/other firmware remain pending validation. The review does not include an unverified recovery binary.
+## Backup e restauração
+
+A ferramenta exporta os dados **salvos**, não edits ainda em RAM. Salve no painel antes. O arquivo inclui presets de usuário, favoritos, patterns/cenas e configurações salvas.
+
+Restauração substitui todo o banco, inclusive posições vazias; não é importação seletiva. Exporte o destino antes de confirmar. Com RESTORE PENDING, retome o mesmo arquivo e conclua antes de trocar firmware. Uma sessão de exportação expirada foi resolvida ao reiniciar o instrumento nos testes DP2; causa definitiva não reproduzida. Exportação incompleta não é apresentada como backup verificado.
+
+## Voltar à M‑VAVE
+
+Exporte o banco SMKSYNTH. Use M‑UPGRADE com o arquivo oficial V016 de SMK‑37 Pro, conforme o fabricante. Não use Elite/MKE/FM-1. Firmware não importa `.smksynth`; quando retornar ao SMKSYNTH, use restauração para recuperar seu trabalho. O retorno físico desta distribuição também deve ser conferido no instrumento.

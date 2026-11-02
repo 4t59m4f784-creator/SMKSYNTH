@@ -64,6 +64,7 @@ BOARD_DEFS = {"fm1": [], "smk37": ["-DBOARD_SMK37=1"]}       # the FM-1 build ge
 # smk37: the keyboard's model name (MODEL env or --model); one hardware, three names. pro adds no flag
 MODELS = {"pro": "SMK-37 Pro", "elite": "SMK-37 Elite", "mke": "MKE-P37"}
 SMK_DATA_FAMILY = "OBERVAV"         # the SMK store's owner tag (platform.c smk_owner_check): 1..7 of A-Z 0-9
+FIRST_INSTALL = False
 VOICE_HARDWARE = False
 VERSION = None                      # APP_VER for release builds
 
@@ -139,7 +140,8 @@ def ldr_wrap(image):
 def build_loader():
     LDR.mkdir(parents=True, exist_ok=True)
     src = FW / "loader"
-    flags = [*CFLAGS, *BOARD_DEFS[BOARD], "-Ifirmware/hal", "-Ifirmware/src"]
+    defs = [d for d in BOARD_DEFS[BOARD] if not (FIRST_INSTALL and d == "-DOBV_VOICE_HW=1")]
+    flags = [*CFLAGS, *defs, "-Ifirmware/hal", "-Ifirmware/src"]
     tc_all(("cc", "-c", src / "crt0_ldr.S", "-o", LDR / "crt0_ldr.o"),
            ("cc", *flags, "-c", src / "loader.c", "-o", LDR / "loader.o"))
     elf = LDR / "loader.elf"
@@ -299,7 +301,7 @@ def mmio_check():
 
 
 def main():
-    global PRODUCT, VERSION, BOARD, APP_SLOT, VOICE_HARDWARE
+    global PRODUCT, VERSION, BOARD, APP_SLOT, VOICE_HARDWARE, FIRST_INSTALL
     ap = argparse.ArgumentParser()
     ap.add_argument("--voice-hardware",action="store_true",help="VD1 SMK37 Pro prototype: isolated private store and bounded app file")
     ap.add_argument("--release", metavar="X.Y", help="release build: identity FM-1_95XY, version string X.Y")
@@ -310,10 +312,17 @@ def main():
     ap.add_argument("--sdk", type=Path, help="JieLi AC79 SDK checkout (default: $AC79_SDK)")
     ap.add_argument("--experimental-id", metavar="NUMBER",
                     help="SMK-only experimental identity; requires a suffixed --release, shown on the instrument")
+    ap.add_argument("--identity", help="Stable SMK-37 Pro identity, mutually exclusive with --experimental-id")
+    ap.add_argument("--factory-bank", type=Path, help="Validated curated SMK16P1 seed, for first installation only")
+    ap.add_argument("--first-install", action="store_true", help="Stock V016 first install; standard resumable full-area loader")
     a = ap.parse_args()
+    if a.identity and a.experimental_id: raise SystemExit("Choose one identity option")
+    if a.first_install != bool(a.factory_bank): raise SystemExit("--first-install requires --factory-bank and vice versa")
+    FIRST_INSTALL=a.first_install
+    if a.identity and (a.identity!="19618" or a.release!="1.0.0" or not FIRST_INSTALL): raise SystemExit("Stable profile is 1.0.0 / 19618 / first install")
     if not a.voice_hardware:
         raise SystemExit("OBERVAVE VOICE: installable builds require the explicit --voice-hardware profile")
-    if (a.board or os.environ.get("BOARD"))!="smk37" or (a.model or os.environ.get("MODEL") or "pro").lower()!="pro" or not a.experimental_id or not a.release or "-" not in a.release:
+    if (a.board or os.environ.get("BOARD"))!="smk37" or (a.model or os.environ.get("MODEL") or "pro").lower()!="pro" or not (a.experimental_id or a.identity) or not a.release or (not a.identity and "-" not in a.release):
         raise SystemExit("--voice-hardware requires --board smk37 --model pro --experimental-id NUMBER --release X.Y.Z-suffix")
     VOICE_HARDWARE=True
     BOARD = (a.board or os.environ.get("BOARD") or "fm1").lower().replace("-", "")
@@ -349,6 +358,9 @@ def main():
             raise SystemExit("experimental identity exceeds the 20-marker package identity")
         VERSION = a.release
         BOARD_DEFS[BOARD] = [*BOARD_DEFS[BOARD], "-DOBV_EXPERIMENTAL=1"]
+    if a.identity:
+        PRODUCT=MODELS[model]+"_"+a.identity
+        VERSION=a.release
     if VOICE_HARDWARE:
         # The private bank is not part of any boot-file CRC. Keep cfg/table below it.
         APP_SLOT=fm1pkg_make.APP_SLOT=0x50000
@@ -377,6 +389,11 @@ def main():
         # Beyond the encrypted short boot-file area all reserved bytes must be erased.
         if flash[0x55000:0x9D000]!=b"\xff"*0x48000:
             raise SystemExit("private data bank overlaps declared boot files")
+    if FIRST_INSTALL:
+        seed=a.factory_bank.read_bytes()
+        if len(seed)!=0x46000 or seed[:16]!=b"SMK37DATASMK16P1" or seed[0x42000:0x44000]!=b"\xff"*8192: raise SystemExit("Invalid factory seed / unexpected user presets")
+        if seed[4096+5*16384:0x41000] != b"\xff"*(11*16384): raise SystemExit("Factory seed may populate only patterns 1-5")
+        flash=bytearray(flash);flash[0x57000:0x9d000]=seed;flash=bytes(flash)
     pkg = fm1pkg_make.ufw(flash, ota, PRODUCT)
     (OUT / name).write_bytes(pkg)
     print(f"app      {OUT / 'obervave.bin'}  {len(img)} B")
