@@ -40,6 +40,8 @@ jobs:
           else
             echo 'Release v1.0.0 already exists; immutable downloads left unchanged.'
           fi
+          gh release upload v1.0.0 docs/pdf/*.pdf --clobber
+          gh release edit v1.0.0 --notes-file docs/RELEASE-1.0.0.md
   pages:
     needs: verify
     runs-on: ubuntu-latest

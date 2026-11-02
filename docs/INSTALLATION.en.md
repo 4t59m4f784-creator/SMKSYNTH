@@ -1,3 +1,5 @@
+> Update, 2026-11-02: Marcus confirmed physical USB first installation on his SMK-37 Pro. The records below also describe automated tests performed before that confirmation.
+
 # SMKSYNTH 1.0.0 installation
 
 [Português](INSTALLATION.md) · [English](INSTALLATION.en.md)
@@ -18,7 +20,7 @@ If you already use SMKSYNTH, save edits on the panel and export your `.smksynth`
 6. Keep the tab, cable and power connected until reboot and the target identity `SMK-37 Pro_19618` are confirmed.
 7. Pattern 1 opens stopped at 90 BPM. PLAY starts the example. KNOB BANK → Patterns provides P1–P5; P6–P16 are empty. The eight lower Performance pads recall favourites.
 
-The package writes the application area and initializes the SMK16P1 bank. It is **not** a bank-preserving update. Boot header, BTIF, USRTRIM calibration, USR and key_mac are outside its write windows. Simulated-flash interruption tests passed; physical USB first installation and return to stock have not yet been confirmed.
+The package writes the application area and initializes the SMK16P1 bank. It is **not** a bank-preserving update. Boot header, BTIF, USRTRIM calibration, USR and key_mac are outside its write windows. Simulated-flash interruption tests passed; physical USB first installation was subsequently confirmed by Marcus.
 
 ## Interrupted installation
 

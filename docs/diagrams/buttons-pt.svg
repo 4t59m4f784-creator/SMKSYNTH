@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="500" height="162" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 162" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>SMKSYNTH 1.0.0 / buttons</title>
+	<desc>Control reference / PT</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="500" height="162"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-162)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="1" y="124" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="44.0810546875" y="135" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,270) scale(1,-1)">PATCH</text>
+			<rect x="126" y="124" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="172.271484375" y="135" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,270) scale(1,-1)">PARA</text>
+			<rect x="251" y="124" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="295.032470703125" y="135" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,270) scale(1,-1)">SCALE</text>
+			<rect x="376" y="124" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="417.905517578125" y="135" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,270) scale(1,-1)">CHORD</text>
+			<rect x="1" y="85" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="50.754150390625" y="96" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,192) scale(1,-1)">ARP</text>
+			<rect x="126" y="85" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="151.23486328125" y="96" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,192) scale(1,-1)">NOTE REPEAT</text>
+			<rect x="251" y="85" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="294.109619140625" y="96" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,192) scale(1,-1)">GLOBE</text>
+			<rect x="376" y="85" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="411.443359375" y="96" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,192) scale(1,-1)">BT / SAVE</text>
+			<rect x="1" y="46" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="54.45654296875" y="57" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,114) scale(1,-1)">FX</text>
+			<rect x="126" y="46" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="175.859619140625" y="57" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,114) scale(1,-1)">SEQ</text>
+			<rect x="251" y="46" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="298.09326171875" y="57" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,114) scale(1,-1)">PLAY</text>
+			<rect x="376" y="46" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="426.158447265625" y="57" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,114) scale(1,-1)">REC</text>
+			<rect x="1" y="7" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="30.759033203124996" y="18" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,36) scale(1,-1)">KNOB BANK</text>
+			<rect x="126" y="7" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="153.4365234375" y="18" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,36) scale(1,-1)">FADER BANK</text>
+			<rect x="251" y="7" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="288.82080078125" y="18" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,36) scale(1,-1)">OCT - / +</text>
+			<rect x="376" y="7" width="120" height="31" rx="4" ry="0" style="stroke: rgb(72%,78%,85%); stroke-linecap: butt; stroke-width: 1; fill: rgb(94%,95%,98%); fill-rule: evenodd;"/>
+			<text x="423.68212890625" y="18" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 9px;fill: rgb(7%,13%,21%); stroke:none;" transform="translate(0,36) scale(1,-1)">&lt; / &gt;</text>
+		</g>
+	</g>
+</svg>

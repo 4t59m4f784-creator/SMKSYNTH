@@ -1,8 +1,10 @@
+> Atualização de 02/11/2026: Marcus confirmou a primeira instalação física por USB no SMK-37 Pro. Os registros abaixo descrevem também os testes automatizados realizados antes dessa confirmação.
+
 # Validação de lançamento 1.0.0
 
 ## Estado
 
-DP2 aprovada por Marcus no SMK‑37 Pro. A 1.0.0 conserva a base funcional, acrescentando o seed musical e o perfil de primeira instalação. **Primeira instalação física V016 → 1.0.0 por USB e retorno físico ainda não confirmados.** Teste de flash simulada não comprova USB real, alimentação ou CPU do chip.
+DP2 aprovada por Marcus no SMK‑37 Pro. A 1.0.0 conserva a base funcional, acrescentando o seed musical e o perfil de primeira instalação. A primeira instalação física V016 → 1.0.0 foi posteriormente confirmada por Marcus. Teste de flash simulada não comprova USB real, alimentação ou CPU do chip.
 
 ## Conteúdo
 

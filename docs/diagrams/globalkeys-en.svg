@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="500" height="119" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 119" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>SMKSYNTH 1.0.0 / globalkeys</title>
+	<desc>Control reference / EN</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="500" height="119"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-119)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0.0" y="24" width="30.0" height="71" style="stroke: rgb(15%,39%,63%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="10.760009765625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">F3</text>
+			<text x="11.13037109375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">A</text>
+			<rect x="31.25" y="24" width="30.0" height="71" style="stroke: rgb(15%,39%,63%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="41.31103515625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">G3</text>
+			<text x="42.43896484375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">B</text>
+			<rect x="62.5" y="24" width="30.0" height="71" style="stroke: rgb(15%,39%,63%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="72.87890625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">A3</text>
+			<text x="73.83056640625" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">C</text>
+			<rect x="93.75" y="24" width="30.0" height="71" style="stroke: rgb(15%,39%,63%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="104.1220703125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">B3</text>
+			<text x="104.599609375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">D</text>
+			<rect x="125.0" y="24" width="30.0" height="71" style="stroke: rgb(72%,18%,23%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="135.329345703125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">C4</text>
+			<text x="136.13037109375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">A</text>
+			<rect x="156.25" y="24" width="30.0" height="71" style="stroke: rgb(72%,18%,23%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="166.328125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">D4</text>
+			<text x="167.43896484375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">B</text>
+			<rect x="187.5" y="24" width="30.0" height="71" style="stroke: rgb(72%,18%,23%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="198.061767578125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">E4</text>
+			<text x="198.83056640625" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">C</text>
+			<rect x="218.75" y="24" width="30.0" height="71" style="stroke: rgb(72%,18%,23%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="229.510009765625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">F4</text>
+			<text x="229.599609375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">D</text>
+			<rect x="250.0" y="24" width="30.0" height="71" style="stroke: rgb(43%,27%,65%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="260.06103515625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">G4</text>
+			<text x="261.13037109375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">A</text>
+			<rect x="281.25" y="24" width="30.0" height="71" style="stroke: rgb(43%,27%,65%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="291.62890625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">A4</text>
+			<text x="292.43896484375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">B</text>
+			<rect x="312.5" y="24" width="30.0" height="71" style="stroke: rgb(43%,27%,65%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="322.8720703125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">B4</text>
+			<text x="323.83056640625" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">C</text>
+			<rect x="343.75" y="24" width="30.0" height="71" style="stroke: rgb(43%,27%,65%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="354.079345703125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">C5</text>
+			<text x="354.599609375" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">D</text>
+			<rect x="375.0" y="24" width="30.0" height="71" style="stroke: rgb(33%,39%,46%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="385.078125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">D5</text>
+			<text x="387.9248046875" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">-</text>
+			<rect x="406.25" y="24" width="30.0" height="71" style="stroke: rgb(33%,39%,46%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="416.811767578125" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">E5</text>
+			<text x="419.1748046875" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">-</text>
+			<rect x="437.5" y="24" width="30.0" height="71" style="stroke: rgb(33%,39%,46%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="448.260009765625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">F5</text>
+			<text x="450.4248046875" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">-</text>
+			<rect x="468.75" y="24" width="30.0" height="71" style="stroke: rgb(33%,39%,46%); stroke-linecap: butt; stroke-width: 1; fill: rgb(96%,96%,98%); fill-rule: evenodd;"/>
+			<text x="478.81103515625" y="77" style="font-family: DejaVu Sans, sans-serif; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,154) scale(1,-1)">G5</text>
+			<text x="472.80517578125" y="50" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">TAP</text>
+			<text x="34.4921875" y="7" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 8px;fill: rgb(15%,39%,63%); stroke:none;" transform="translate(0,14) scale(1,-1)">START / REC</text>
+			<text x="174.310546875" y="7" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 8px;fill: rgb(72%,18%,23%); stroke:none;" transform="translate(0,14) scale(1,-1)">MUTE</text>
+			<text x="299.76953125" y="7" style="font-family: DejaVu Sans, sans-serif; font-weight: bold; font-size: 8px;fill: rgb(43%,27%,65%); stroke:none;" transform="translate(0,14) scale(1,-1)">SOLO</text>
+			<text x="0" y="106" style="font-family: DejaVu Sans, sans-serif; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,212) scale(1,-1)">Hold GLOBE; physical key reference without octave shift.</text>
+		</g>
+	</g>
+</svg>

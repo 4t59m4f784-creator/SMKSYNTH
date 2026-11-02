@@ -1,3 +1,5 @@
+> Atualização de 02/11/2026: Marcus confirmou a primeira instalação física por USB no SMK-37 Pro. Os registros abaixo descrevem também os testes automatizados realizados antes dessa confirmação.
+
 # Instalação SMKSYNTH 1.0.0
 
 Modelo: **M‑VAVE SMK‑37 Pro**. Origem obrigatória: **oficial V016**, identidade `SMK-37 Pro_016`. Destino: `SMK-37 Pro_19618`. Outros modelos, V015/V017, nomes genéricos e firmwares alternativos são recusados.
@@ -16,7 +18,7 @@ Se já usa SMKSYNTH, salve edits no painel e exporte seu `.smksynth` antes de re
 6. Mantenha a aba aberta até a reinicialização com `SMK-37 Pro_19618`.
 7. Pattern 1 abre parado, a 90 BPM. PLAY toca o exemplo. Em KNOB BANK → Patterns, P1–P5 trazem exemplos e P6–P16 estão livres. Oito favoritos nos pads inferiores de Performance.
 
-A instalação escreve a área da aplicação e prepara o banco SMK16P1. BTIF, calibração USRTRIM, USR, key_mac e o cabeçalho de boot ficam fora das janelas de escrita. A conferência foi feita em flash simulada com interrupções; a primeira instalação por USB ainda precisa ser confirmada no instrumento real.
+A instalação escreve a área da aplicação e prepara o banco SMK16P1. BTIF, calibração USRTRIM, USR, key_mac e o cabeçalho de boot ficam fora das janelas de escrita. A conferência foi feita em flash simulada com interrupções; a primeira instalação física por USB foi posteriormente confirmada por Marcus.
 
 ## Interrupção
 

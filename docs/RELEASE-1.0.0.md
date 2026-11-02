@@ -6,7 +6,7 @@ Esta distribuição inclui cinco patterns de Marcus Padrini, oito favoritos e ne
 
 **Primeira instalação somente a partir do firmware oficial M‑VAVE SMK‑37 Pro V016 (`SMK-37 Pro_016`).** O pacote prepara/substitui o banco; exporte seu trabalho antes de retornar ao firmware oficial. Destino: `SMK-37 Pro_19618`.
 
-A base DP2 foi aprovada no instrumento. O novo perfil de primeira instalação passou por testes com a imagem V016 em flash simulada, incluindo interrupções e retomadas. **Primeira instalação física por USB e retorno ao firmware oficial ainda não confirmados.** Consulte a documentação antes de instalar.
+A base DP2 foi aprovada no instrumento. O novo perfil de primeira instalação passou por testes com a imagem V016 em flash simulada, incluindo interrupções e retomadas. Marcus confirmou posteriormente a primeira instalação física por USB no instrumento.
 
 [Site e ferramentas](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Instalação](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/INSTALLATION.md) · [Validação](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/VALIDATION.md)
 
@@ -18,7 +18,7 @@ Includes five patterns by Marcus Padrini, eight favourites and no extra personal
 
 **First installation requires official M‑VAVE SMK‑37 Pro V016 (`SMK-37 Pro_016`).** The package initializes/replaces the bank; export your work before returning to official firmware. Target: `SMK-37 Pro_19618`.
 
-The DP2 base was approved on hardware. The new first-install profile passed simulated-flash tests with the V016 image, including interruption/resume. **Physical USB first installation and return to official firmware have not yet been confirmed.** Read the documentation before installing.
+The DP2 base was approved on hardware. The new first-install profile passed simulated-flash tests with the V016 image, including interruption/resume. Marcus subsequently confirmed physical USB first installation on his instrument.
 
 [Website and tools](https://4t59m4f784-creator.github.io/SMKSYNTH/?lang=en) · [Installation](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/INSTALLATION.en.md) · [Validation](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/VALIDATION.en.md)
 
@@ -30,3 +30,9 @@ The DP2 base was approved on hardware. The new first-install profile passed simu
 - `RELEASE.json`: build identity and verification metadata / identidade e metadados de verificação.
 
 OberVave / zvenson and contributors · DRUM-X / JIANT · Felucca / Hügelton Instruments · SMKSYNTH / Marcus Padrini. GPL-3.0-only; component notices preserved. Independent project, without M‑VAVE or upstream endorsement.
+
+## Guias / Guides
+
+[Quick start PT](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/QUICKSTART.md) · [Quick start EN](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/QUICKSTART.en.md) · [Manual PT](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/MANUAL.md) · [Manual EN](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/MANUAL.en.md)
+
+PDFs dos guias nos arquivos da release. / Guide PDFs are included in the release assets.

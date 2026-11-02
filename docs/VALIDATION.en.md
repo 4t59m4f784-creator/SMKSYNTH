@@ -1,8 +1,10 @@
+> Update, 2026-11-02: Marcus confirmed physical USB first installation on his SMK-37 Pro. The records below also describe automated tests performed before that confirmation.
+
 # Release 1.0.0 validation
 
 [Português](VALIDATION.md) · [English](VALIDATION.en.md)
 
-Marcus approved the DP2 runtime on his SMK‑37 Pro. Version 1.0.0 preserves it, adding factory content and the first-install profile. **Physical V016 → 1.0.0 USB installation and return to stock have not yet been confirmed.** Simulated flash does not prove real USB transport, power stability or chip CPU behaviour.
+Marcus approved the DP2 runtime on his SMK‑37 Pro. Version 1.0.0 preserves it, adding factory content and the first-install profile. Marcus subsequently confirmed physical V016 → 1.0.0 USB first installation. Simulated flash does not prove real USB transport, power stability or chip CPU behaviour.
 
 ## Factory data
 

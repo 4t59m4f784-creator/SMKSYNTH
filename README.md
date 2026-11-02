@@ -4,6 +4,15 @@
 
 [Site e instalação](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Simulador](https://4t59m4f784-creator.github.io/SMKSYNTH/simulator/) · [Backup e restauração](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
 
+## Documentação
+
+| Documento | Português | English |
+|---|---|---|
+| Quick start - 4 páginas | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Quick-Start-EN.pdf) |
+| Manual completo - 19 páginas | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Manual-EN.pdf) |
+
+Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.0.0.
+
 Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
 Porém, um instrumento é muito mais que o som. A ideia aqui é transformar o M‑VAVE SMK‑37 Pro em um instrumento voltado para a performance, criando recursos e reimaginando uma experiência que usa os pads e controles do teclado.
@@ -59,7 +68,7 @@ Este pacote prepara o banco de fábrica: **não é um atualizador que preserve o
 
 ## Fonte, validação e estado do lançamento
 
-A experiência DP2 foi testada e aprovada por Marcus no SMK‑37 Pro. A 1.0.0 acrescenta conteúdo de fábrica e o pacote de primeira instalação. **M‑VAVE V016 → 1.0.0** foi testado com o arquivo oficial fornecido, em flash simulada, incluindo interrupções. A primeira instalação por USB no instrumento real ainda não foi confirmada; consulte os limites de validação antes de instalar.
+A experiência DP2 foi testada e aprovada por Marcus no SMK‑37 Pro. A 1.0.0 acrescenta conteúdo de fábrica e o pacote de primeira instalação. **M‑VAVE V016 → 1.0.0** foi testado com o arquivo oficial fornecido, em flash simulada, incluindo interrupções. A primeira instalação por USB foi confirmada por Marcus no instrumento real após a publicação.
 
 Distribuição pública 1.0.0. Site, instalador, simulador e backup têm seletor PT / EN. [Downloads da release](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.0.0).
 
