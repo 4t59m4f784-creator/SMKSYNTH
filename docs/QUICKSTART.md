@@ -11,6 +11,10 @@ Referência: firmware 1.0.0, SMK-37 Pro_19618.
 - Quick start / 3. Patterns e bateria
 - Quick start / 4. Gravar, salvar e recuperar
 
+## Desenvolvimento com IA
+
+Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os patterns e testou no instrumento. O ChatGPT (OpenAI) contribuiu com soluções técnicas e gerou e revisou código, ferramentas, documentação e gráficos. Engines originais: autores em CREDITS.md. Sem endosso da OpenAI.
+
 ## Quick start / 1. Primeiros passos
 
 SMKSYNTH 1.0.0 - M-VAVE SMK-37 Pro. Use este guia depois de instalar. Para primeira instalação, use somente o firmware oficial V016; a instalação substitui o banco. Salve e exporte seu trabalho antes de retornar ao firmware oficial.

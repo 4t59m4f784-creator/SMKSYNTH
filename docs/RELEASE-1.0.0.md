@@ -1,5 +1,7 @@
 ## Português
 
+O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e o fluxo de performance, orientou o trabalho, selecionou os sons, criou os cinco patterns e realizou os testes e a aprovação no instrumento. O ChatGPT, da OpenAI, contribuiu com propostas e soluções técnicas e gerou e revisou código das adaptações, ferramentas web, documentação e materiais gráficos sob sua orientação. As engines e os componentes de origem pertencem aos autores creditados abaixo. O projeto é independente e não tem vínculo ou endosso da OpenAI.
+
 O SMKSYNTH transforma o M‑VAVE SMK‑37 Pro em um instrumento de performance, combinando o sintetizador OberVave e a engine DRUM-X do JIANT com quatro partes, favoritos, sequências, layers/splits e cenas nos pads.
 
 Esta distribuição inclui cinco patterns de Marcus Padrini, oito favoritos e nenhum preset pessoal extra. P6–P16 ficam livres. Site, instalador, simulador e backup/restaurador têm seletor PT / EN.
@@ -11,6 +13,8 @@ A base DP2 foi aprovada no instrumento. O novo perfil de primeira instalação p
 [Site e ferramentas](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Instalação](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/INSTALLATION.md) · [Validação](https://github.com/4t59m4f784-creator/SMKSYNTH/blob/main/docs/VALIDATION.md)
 
 ## English
+
+SMKSYNTH was developed using AI. Marcus Padrini defined the goals and performance workflow, directed the work, selected the sounds, created the five patterns, and performed hardware testing and approval. ChatGPT, by OpenAI, contributed technical proposals and solutions and generated and revised code for the adaptations, web tools, documentation and graphics under his direction. The underlying engines and components are the work of the authors credited below. This independent project is not affiliated with or endorsed by OpenAI.
 
 SMKSYNTH turns the M‑VAVE SMK‑37 Pro into a performance instrument, combining OberVave synthesis and JIANT's DRUM-X engine with four parts, favourites, sequences, layers/splits and pad-based scenes.
 
@@ -29,7 +33,7 @@ The DP2 base was approved on hardware. The new first-install profile passed simu
 - `SHA256SUMS.txt`: SHA-256 checksums / hashes de conferência.
 - `RELEASE.json`: build identity and verification metadata / identidade e metadados de verificação.
 
-OberVave / zvenson and contributors · DRUM-X / JIANT · Felucca / Hügelton Instruments · SMKSYNTH / Marcus Padrini. GPL-3.0-only; component notices preserved. Independent project, without M‑VAVE or upstream endorsement.
+OberVave / zvenson and contributors · DRUM-X / JIANT · Felucca / Hügelton Instruments · SMKSYNTH direction and hardware validation / Marcus Padrini; technical proposals, adaptation code, tools, documentation and graphics / ChatGPT (OpenAI), under Marcus’s direction. GPL-3.0-only; component notices preserved. Independent project, without M‑VAVE or upstream endorsement.
 
 ## Guias / Guides
 

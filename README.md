@@ -19,7 +19,11 @@ Porém, um instrumento é muito mais que o som. A ideia aqui é transformar o M�
 
 Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequências, faça layers e splits, salve cenas e recupere seu conjunto com um botão. Os pads são o coração do SMKSYNTH: este projeto traduz minha visão de um instrumento para performance nesse formato compacto de 37 teclas.
 
-— **Marcus Padrini** · conceito de performance, adaptações, seleção de sons e patterns
+— **Marcus Padrini** · direção do projeto, fluxo de performance, seleção de sons, patterns e testes no instrumento
+
+## Desenvolvimento com IA
+
+O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e o fluxo de performance, orientou o trabalho, selecionou os sons, criou os cinco patterns e realizou os testes e a aprovação no instrumento. O ChatGPT, da OpenAI, contribuiu com propostas e soluções técnicas e gerou e revisou código das adaptações, ferramentas web, documentação e materiais gráficos sob sua orientação. As engines e os componentes de origem pertencem aos autores creditados abaixo. O projeto é independente e não tem vínculo ou endosso da OpenAI.
 
 ![Tela real do sequenciador SMKSYNTH](docs/images/sequence.png)
 
@@ -82,6 +86,6 @@ O simulador executa o mesmo código C de síntese, sequenciamento e interface em
 
 ## Créditos e licença
 
-OberVave e Dinghy: **zvenson**. JIANT / DRUM-X: **Juan Ignacio Antonucci (Juan Jiant)** e colaboradores. Felucca: **Leo Kuroshita / Hügelton Instruments**. SLOOP: **isod89** e colaboradores. Port/ferramentas SMK-37: **M. Geisler / genkigenki** e colaboradores. SMKSYNTH: **Marcus Padrini**.
+OberVave e Dinghy: **zvenson**. JIANT / DRUM-X: **Juan Ignacio Antonucci (Juan Jiant)** e colaboradores. Felucca: **Leo Kuroshita / Hügelton Instruments**. SLOOP: **isod89** e colaboradores. Port/ferramentas SMK-37: **M. Geisler / genkigenki** e colaboradores. Direção e validação do SMKSYNTH: **Marcus Padrini**. Soluções técnicas, código das adaptações, ferramentas e documentação produzidos com **ChatGPT / OpenAI**, sob sua orientação.
 
 Firmware e adaptações sob **GPL-3.0-only**. Consulte [LICENSE](LICENSE), [CREDITS](CREDITS.md) e [LICENSING](LICENSING.md) para atribuições e licenças de componentes. Não há samples de terceiros nesta distribuição. Projeto independente, sem vínculo ou endosso da M‑VAVE ou dos autores dos projetos de origem.

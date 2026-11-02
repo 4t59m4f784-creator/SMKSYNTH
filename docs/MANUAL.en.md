@@ -26,6 +26,10 @@ Reference: firmware 1.0.0, SMK-37 Pro_19618.
 - MIDI appendix / 2
 - MIDI appendix / 3
 
+## AI-assisted development
+
+Developed using AI: Marcus Padrini defined and directed the experience, created the patterns and tested on hardware. ChatGPT (OpenAI) contributed technical solutions and generated and revised code, tools, documentation and graphics. Original engines: authors in CREDITS.md. No OpenAI endorsement.
+
 ## 1. Overview and navigation
 
 Firmware 1.0.0 for M-VAVE SMK-37 Pro. Four parts A-D; ANALOG (OberVave) or DRUM-X per part. Eight shared ANALOG voices. 16 patterns; up to 256 steps per track and four notes per ANALOG step.
@@ -368,7 +372,7 @@ Memory is local to the browser/domain. Panel SAVE writes to that memory. Export 
 | Export session expired | Stop everything, wait for saves, reboot and reconnect before exporting again. An incomplete file is not a valid backup. |
 | Installer rejects firmware | First installation requires exactly SMK-37 Pro_016; other sources are blocked. |
 
-Independent project. ANALOG synthesis: OberVave/zvenson; DRUM-X: JIANT; SMKSYNTH concept/adaptations: Marcus Padrini. See repository CREDITS.md and LICENSING.md for all attributions. GPL-3.0-only.
+Independent project. ANALOG synthesis: OberVave/zvenson; DRUM-X: JIANT; SMKSYNTH direction and hardware tests: Marcus Padrini; technical solutions, adaptation code and documentation with ChatGPT (OpenAI), under his direction. See repository CREDITS.md and LICENSING.md for all attributions. GPL-3.0-only.
 
 ## MIDI appendix / 1
 
