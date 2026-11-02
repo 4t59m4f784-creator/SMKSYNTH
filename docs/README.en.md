@@ -4,6 +4,10 @@
 
 Its sound comes from OberVave and JIANT's DRUM-X engine. SMKSYNTH focuses on the instrument around them: persistent pad banks, instant favourite sounds, four parts, split/layer configurations, sequencing and scene recall on a compact 37-key keyboard.
 
+## Performance features demonstration
+
+[Watch a brief SMKSYNTH demonstration on YouTube](https://www.youtube.com/watch?v=Ax-RqjtUFjc).
+
 ## AI-assisted development
 
 SMKSYNTH was developed using AI. Marcus Padrini defined the goals and performance workflow, directed the work, selected the sounds, created the five patterns, and performed hardware testing and approval. ChatGPT, by OpenAI, contributed technical proposals and solutions and generated and revised code for the adaptations, web tools, documentation and graphics under his direction. The underlying engines and components are the work of the authors credited below. This independent project is not affiliated with or endorsed by OpenAI.

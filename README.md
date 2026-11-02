@@ -21,6 +21,10 @@ Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequ�
 
 — **Marcus Padrini** · direção do projeto, fluxo de performance, seleção de sons, patterns e testes no instrumento
 
+## Demonstração dos recursos de performance
+
+[Assista à breve demonstração do SMKSYNTH no YouTube](https://www.youtube.com/watch?v=Ax-RqjtUFjc).
+
 ## Desenvolvimento com IA
 
 O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e o fluxo de performance, orientou o trabalho, selecionou os sons, criou os cinco patterns e realizou os testes e a aprovação no instrumento. O ChatGPT, da OpenAI, contribuiu com propostas e soluções técnicas e gerou e revisou código das adaptações, ferramentas web, documentação e materiais gráficos sob sua orientação. As engines e os componentes de origem pertencem aos autores creditados abaixo. O projeto é independente e não tem vínculo ou endosso da OpenAI.
