@@ -33,11 +33,12 @@ assert.equal(e.ex.sim_pending(),0);assert(e.ex.sim_writes(3)>0);
 e=new Engine(bytes,e.store(true));e.advance(5000);
 e.input({t:'pad',p:8,v:100});e.advance(50);e.input({t:'pad',p:8,v:0});e.advance(100);
 assert.equal(e.ex.sim_engine_patch(0),2);assert.equal(e.ex.sim_engine(0),2);
-// PARA cycle to DRUM SOUND: pads acquire hit labels only on that page.
+// Sound edit pages preserve pads; only explicit KNOB BANK enters DRUM PADS.
 for(let n=0;n<2;n++){e.input({t:'btn',b:13,down:true});e.advance(80);e.input({t:'btn',b:13,down:false});e.advance(80);}
-assert.equal(e.ex.sim_drums_pad_mode(),1);
-e.input({t:'btn',b:12,down:true});e.advance(80);e.input({t:'btn',b:12,down:false});e.advance(80);
 assert.equal(e.ex.sim_drums_pad_mode(),0);
+for(let n=0;n<3;n++){e.input({t:'btn',b:0,down:true});e.advance(80);e.input({t:'btn',b:0,down:false});e.advance(80);}
+assert.equal(e.ex.sim_drums_pad_mode(),1);assert.equal(e.frame().bank,4);
+e.input({t:'btn',b:0,down:true});e.advance(80);e.input({t:'btn',b:0,down:false});e.advance(80);assert.equal(e.ex.sim_drums_pad_mode(),0);
 let Processor;
 globalThis.AudioWorkletProcessor=class{constructor(){this.port={postMessage(){},onmessage:null};}};
 globalThis.registerProcessor=(_name,ctor)=>{Processor=ctor;};globalThis.currentTime=0;
@@ -49,4 +50,4 @@ p.port.onmessage({data:{t:'drum-hit',part:0,lane:0,v:120}});let workletPeak=0;
 for(let b=0;b<500;b++){globalThis.currentTime=b*128/44100;const out=[[new Float32Array(128),new Float32Array(128)]];assert(p.process([],out));for(const ch of out[0])for(const v of ch){assert(Number.isFinite(v));workletPeak=Math.max(workletPeak,Math.abs(v));}}
 assert(workletPeak>0.01&&workletPeak<=1);
 console.log(JSON.stringify({result:'PASS',kits:5,instruments:8,nonzero_samples:samples,peak,worklet_peak:workletPeak,
- melodic_cards_used_by_drums:0,favourite_roundtrip:true,contextual_pads:true,browser_audio_output_tested:false,hardware_tested:false}));
+ melodic_cards_used_by_drums:0,favourite_roundtrip:true,explicit_drum_pads:true,browser_audio_output_tested:false,hardware_tested:false}));

@@ -1,0 +1,1 @@
+PASS: real WASM save/load 16 pads + selected parts, all16 occupancy, pad16 confirmation +4s timeout/no writes, 19-block reboot, old11-block remap preserving eight slot/favorite bytes, new slots empty, synchronized slot16 switch, unsupported size rejected.

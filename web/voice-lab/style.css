@@ -7,3 +7,5 @@
 .voice-tests{margin:24px 0;padding:18px;border:1px solid #303e56;border-radius:12px;background:#111927;color:#dce5ef}.voice-tests select{background:#1e293c;color:#eff6ff;padding:8px;border:1px solid #536888;border-radius:6px}.voice-tests p{max-width:85ch;line-height:1.5;color:#9faec8}
 
 #pads button.kbd-play-active{background:#fff;color:#10141c;border-color:#fff;box-shadow:0 0 14px #ffffffb0,inset 0 0 10px #fff;text-shadow:none;}
+
+.instrument[data-bank="4"] .pad{background:color-mix(in srgb,var(--c) 17%,#080c13);color:#e1d5ff}.instrument[data-bank="4"] .pad:disabled{color:#596477}

@@ -1,0 +1,12 @@
+firmware/src/obervave.c:145:33: warning: unused variable 'pat_save_t' [-Wunused-variable]
+static uint32_t pat_save_armed, pat_save_t, q_edited;   /* q_edited: the next pattern brings unsaved edits */    /* SAVE tapped in the sequencer: SAVE PATTERN? (again: saved) */
+                                ^
+1 warning generated.
+loader: image 8932 B at 0x1c0a800, bss end 0x1c0f710
+loader: ota.bin 7703 B
+  ok    .ram_text: 987 insns, no calls
+  ok    image 161324 B of 327680; RAM .data+.bss 82896 B of 98304; pool 325984 B of 344064
+  ok    register access: hal/ only (src/, loader/ clean)
+app      /workspace/scratch/5a9ceff86729/smksynth-dp1/repo/build/obervave.bin  161324 B
+loader   /workspace/scratch/5a9ceff86729/smksynth-dp1/repo/build/loader/ota.bin  7703 B
+package  /workspace/scratch/5a9ceff86729/smksynth-dp1/repo/build/obervave-3.0.1-dp1-smk37.fwsc  651819 B, identity SMK-37 Pro_19616, board smk37

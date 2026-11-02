@@ -45,7 +45,7 @@ int main(void){
  k=pat.keyboard;pf_snapshot(&pf_store.slot[0],0);pf_store.used=1;pf_recall(0,0);assert(!memcmp(&pat.keyboard,&k,sizeof k));
  obv_drums_choose(1,0);render(3);assert(!keyboard_active());pf_manual_seq=3;page=PG_KEYBOARD;pad(1,100);pad(1,0);assert(!memcmp(&pat.keyboard,&k,sizeof k));
  /* Dedicated drum pads bypass combinations and retain real-time recording. */
- init_parts();render(3);obv_drums_choose(2,0);render(3);combo(KB_LAYER);seq_trk=2;page=PG_DSOUND;pf_manual_seq=0;
+ init_parts();render(3);obv_drums_choose(2,0);render(3);combo(KB_LAYER);seq_trk=2;page=PG_DSOUND;pf_manual_seq=4;
  for(unsigned n=0;n<3;n++){pad(0,100);render(1);pad(0,0);render(1);}assert(drums_busy(2));assert(!gates(0,0)&&!gates(1,0));
  /* Combined voices keep the flag through mono handoff and engine fades. */
  off();init_parts();combo(KB_LAYER);live_p[0].v[P_MODE]=live_p[1].v[P_MODE]=M_MONO;note_in(1,60,100);note_in(1,64,100);render(1);note_in(0,64,0);render(1);for(unsigned i=0;i<NV;i++)if(vc[i].gate){assert(vc[i].note==60&&vc[i].key_combined);}note_in(0,60,0);render(1);assert(!gates(0,0)&&!gates(1,0));
