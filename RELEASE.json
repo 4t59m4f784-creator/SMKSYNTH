@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "identity": "SMK-37 Pro_19618",
+  "required_origin": "SMK-37 Pro_016",
+  "installation": "first-install-replaces-bank",
+  "runtime_base": "6c11279e6bfcfb627dfb54628dddc2ee8a653f58",
+  "factory_patterns": 5,
+  "favorites": 8,
+  "extra_user_presets": 0,
+  "tempo": 90,
+  "dp2_runtime_hardware_approved": true,
+  "first_install_hardware_approved": false,
+  "firmware_sha256": "47b625307c97dea73efbb5148076b091f1c1568ca1d1e3a2ae98d146b20d4c0d",
+  "wasm_sha256": "5b56475f0d1df16da029d4503c97cd841ba68f163f177a52e0633277bcf6c342",
+  "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
+  "app_bytes": 161660,
+  "static_ram_bytes": 82896,
+  "pool_bytes": 325984,
+  "loader_bytes": 7211
+}

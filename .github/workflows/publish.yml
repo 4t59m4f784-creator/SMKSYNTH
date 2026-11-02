@@ -1,0 +1,62 @@
+name: Publish SMKSYNTH
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: smksynth-publication
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify release and website
+        run: |
+          python3 tests/release_factory_test.py
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.0-SMK37-Pro.fwsc
+          node tests/release_installer_test.mjs
+          node tests/release_demo_wasm_test.mjs
+          node tests/release_i18n_test.mjs
+          cd releases/1.0.0 && sha256sum -c SHA256SUMS.txt
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish versioned firmware and corresponding source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view v1.0.0 >/dev/null 2>&1; then
+            gh release create v1.0.0 releases/1.0.0/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.0.0' --notes-file docs/RELEASE-1.0.0.md
+          else
+            echo 'Release v1.0.0 already exists; immutable downloads left unchanged.'
+          fi
+  pages:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble frozen release website
+        run: python3 tools/package_release.py build/public-site --reuse-release
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/public-site
+      - uses: actions/deploy-pages@v4
+        id: deployment

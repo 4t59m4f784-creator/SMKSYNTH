@@ -1,0 +1,16 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const root=new URL('../web/voice-lab/',import.meta.url);const {Engine}=await import('data:text/javascript;base64,'+fs.readFileSync(new URL('engine.js',root)).toString('base64'));const wasm=fs.readFileSync(new URL('obervave-voice.wasm',root));
+let e=new Engine(wasm);e.advance(5000);
+const b=n=>{e.input({t:'btn',b:n,down:true});e.advance(100);e.input({t:'btn',b:n,down:false});e.advance(120);};
+const enc=(n,steps=1)=>{e.input({t:'enc',e:n,steps});e.advance(70);};
+const key=(k,down)=>{e.input({t:'key',k,down});e.advance(30);};
+b(5);assert.equal(e.ex.sim_part_octave(0),1);b(15);b(15);assert.equal(e.ex.sim_seq_view(),1);
+key(0,true);key(4,true);assert.equal(e.ex.sim_step_note(0,0,0),60);assert.equal(e.ex.sim_step_note(0,0,1),64);
+b(4);key(0,false);key(4,false);key(2,true);key(2,false);assert.equal(e.ex.sim_step_note(0,1,0),50);
+for(let i=0;i<3;i++)b(15);assert.equal(e.ex.sim_seq_view(),5);enc(0);assert.equal(e.ex.sim_transpose_keys(),1);
+b(12);assert.equal(e.ex.sim_transpose_keys(),1);key(2,true);key(2,false);assert.equal(e.ex.sim_seq_transpose(),2);assert.equal(e.ex.sim_melodic_busy(),0);
+b(0);assert.equal(e.frame().bank,3);assert.equal(e.ex.sim_transpose_keys(),1);b(0);assert.equal(e.frame().bank,2);assert.equal(e.ex.sim_transpose_keys(),1);b(0);assert.equal(e.frame().bank,0);
+key(7,true);enc(3,-1);assert.equal(e.ex.sim_transpose_keys(),0);key(7,false);assert.equal(e.ex.sim_melodic_busy(),0);
+const shifted=e.ex.sim_seq_transpose();key(0,true);let heard=false;for(let i=0;i<150;i++){e.advance(8);heard ||= e.ex.sim_melodic_busy()>0;}assert(heard);key(0,false);assert.equal(e.ex.sim_seq_transpose(),shifted);
+for(let t=0;t<4;t++)assert.equal(e.ex.sim_writes(t),0);
+console.log('PASS: actual WASM panel, physical octave in step chords and mid-hold octave change, persistent transpose through PATCH and three banks, K4 OFF with captured release, latched offset, ordinary live notes after OFF, no automatic writes.');

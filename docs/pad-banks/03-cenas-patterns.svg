@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="3100" viewBox="0 0 2200 3100"><title>SMKSYNTH — Guia dos pad banks</title><rect width="2200" height="3100" fill="#090d14"/>
+<text x="100" y="70" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="43" font-weight="700" fill="#f0f3fa">SMK</text>
+<text x="204" y="70" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="43" font-weight="700" fill="#ff625b">SYNTH</text>
+<path d="M400,95 L480,95" stroke="#7ea8ff" stroke-width="5"/>
+<text x="1500" y="80" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="400" fill="#acb9cc">GUIA DE PERFORMANCE</text>
+<text x="100" y="166" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="27" font-weight="700" fill="#7ea8ff">PAD BANK 3</text>
+<text x="100" y="223" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="69" font-weight="700" fill="#f0f3fa">CENAS E PATTERNS</text>
+<text x="100" y="323" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="30" font-weight="400" fill="#acb9cc">Nome no firmware: PATTERNS / SAVE. Uma posição recupera o conjunto da performance.</text>
+<rect x="100" y="418" width="2000" height="80" rx="18" fill="#1a2333" stroke="none" stroke-width="2"/>
+<text x="128" y="441" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="27" font-weight="400" fill="#f0f3fa">KNOB BANK:  1 Performance/Favoritos  →  2 Split/Layer  →  3 Patterns/Save</text>
+<rect x="100" y="532" width="2000" height="220" rx="22" fill="#1c2430" stroke="#4d5b6d" stroke-width="2"/>
+<text x="130" y="548" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="17" font-weight="400" fill="#acb9cc">SMK-37 PRO · ESQUEMA FUNCIONAL</text>
+<path d="M140,593 L140,650" stroke="#68778d" stroke-width="3"/>
+<rect x="128" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<path d="M200,593 L200,650" stroke="#68778d" stroke-width="3"/>
+<rect x="188" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<path d="M260,593 L260,650" stroke="#68778d" stroke-width="3"/>
+<rect x="248" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<path d="M320,593 L320,650" stroke="#68778d" stroke-width="3"/>
+<rect x="308" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<rect x="458" y="575" width="156" height="84" rx="5" fill="#0b1422" stroke="#7ea8ff" stroke-width="2"/>
+<text x="472" y="586" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="18" font-weight="400" fill="#7ea8ff">SMKSYNTH</text>
+<text x="472" y="617" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="22" font-weight="700" fill="#f0f3fa">BANK 3</text>
+<rect x="695" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="757" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="819" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="881" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="943" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1005" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1067" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1129" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1335" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1407" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1479" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1551" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1623" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1695" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1767" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1839" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1335" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1407" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1479" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1551" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1623" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1695" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1767" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1839" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="140" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="222" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="304" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="386" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="468" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="550" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="632" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="714" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="796" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="878" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="960" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1042" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1124" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1206" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1288" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1370" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1452" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1534" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1616" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1698" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1780" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1862" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="204" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="286" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="450" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="532" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="614" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="778" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="860" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1024" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1106" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1188" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1352" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1434" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1598" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1680" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1762" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<text x="100" y="789" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="24" font-weight="400" fill="#acb9cc">MAPA DOS 16 PADS · LENDO DA ESQUERDA PARA A DIREITA</text>
+<rect x="100" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#7ea8ff" stroke-width="2"/>
+<text x="116" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#7ea8ff">01</text>
+<text x="116" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="116" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">01</text>
+<rect x="352" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="368" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">02</text>
+<text x="368" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="368" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">02</text>
+<rect x="604" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="620" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">03</text>
+<text x="620" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="620" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">03</text>
+<rect x="856" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="872" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">04</text>
+<text x="872" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="872" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">04</text>
+<rect x="1108" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1124" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">05</text>
+<text x="1124" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1124" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">05</text>
+<rect x="1360" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1376" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">06</text>
+<text x="1376" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1376" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">06</text>
+<rect x="1612" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1628" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">07</text>
+<text x="1628" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1628" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">07</text>
+<rect x="1864" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1880" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">08</text>
+<text x="1880" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1880" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">08</text>
+<rect x="100" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="116" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">09</text>
+<text x="116" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="116" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">09</text>
+<rect x="352" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="368" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">10</text>
+<text x="368" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="368" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">10</text>
+<rect x="604" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="620" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">11</text>
+<text x="620" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="620" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">11</text>
+<rect x="856" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="872" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">12</text>
+<text x="872" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="872" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">12</text>
+<rect x="1108" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1124" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">13</text>
+<text x="1124" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1124" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">13</text>
+<rect x="1360" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1376" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">14</text>
+<text x="1376" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1376" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">14</text>
+<rect x="1612" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1628" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">15</text>
+<text x="1628" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1628" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">15</text>
+<rect x="1864" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1880" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">16</text>
+<text x="1880" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PATTERN</text>
+<text x="1880" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">16</text>
+<text x="100" y="1231" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="23" font-weight="400" fill="#acb9cc">16 posições completas: pads superiores 1–8; pads inferiores 9–16. Cores ilustram um estado possível.</text>
+<rect x="100" y="1300" width="980" height="448" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="126" y="1333" width="5" height="35" rx="2" fill="#7ea8ff" stroke="none" stroke-width="2"/>
+<text x="150" y="1332" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">1 · TOQUE PARA RECUPERAR</text>
+<text x="136" y="1396" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Com transporte parado, a troca é imediata.</text>
+<text x="136" y="1438" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Com PLAY em execução, o pattern entra na próxima virada</text>
+<text x="136" y="1480" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">sincronizada. O pad de destino pisca azul enquanto aguarda.</text>
+<text x="136" y="1522" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Os sons e o mixer acompanham a troca. A parte selecionada</text>
+<text x="136" y="1564" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">salva também retorna; o SPLIT/LAYER ativo define o teclado.</text>
+<rect x="1120" y="1300" width="980" height="448" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="1146" y="1333" width="5" height="35" rx="2" fill="#ff625b" stroke="none" stroke-width="2"/>
+<text x="1170" y="1332" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">2 · SEGURE PARA SALVAR</text>
+<text x="1156" y="1396" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Segure o pad de destino por 0,7 s.</text>
+<text x="1156" y="1438" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Slot vazio: solicita a gravação do conjunto atual.</text>
+<text x="1156" y="1480" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Slot ocupado, inclusive o atual: abre OVERWRITE PATTERN e o</text>
+<text x="1156" y="1522" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">pad pisca vermelho.</text>
+<text x="1156" y="1564" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">É preciso soltar e tocar novamente no mesmo pad para</text>
+<text x="1156" y="1606" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">confirmar.</text>
+<rect x="100" y="1790" width="980" height="520" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="126" y="1823" width="5" height="35" rx="2" fill="#ffc778" stroke="none" stroke-width="2"/>
+<text x="150" y="1822" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">3 · CONFIRMAÇÃO EM 4 SEGUNDOS</text>
+<text x="136" y="1886" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">O segundo toque no mesmo pad confirma a substituição do</text>
+<text x="136" y="1928" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">que estava salvo.</text>
+<text x="136" y="1970" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Sem confirmação em até 4 s, cancela sem gravar. Tocar outro</text>
+<text x="136" y="2012" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">pad ou PATCH também cancela a confirmação.</text>
+<text x="136" y="2054" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Se a gravação estiver pendente, pare o transporte e aguarde</text>
+<text x="136" y="2096" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">as notas terminarem. Só desligue após a tela indicar a</text>
+<text x="136" y="2138" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">conclusão.</text>
+<rect x="1120" y="1790" width="980" height="520" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="1146" y="1823" width="5" height="35" rx="2" fill="#7ea8ff" stroke="none" stroke-width="2"/>
+<text x="1170" y="1822" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">4 · O QUE VAI NO CONJUNTO</text>
+<text x="1156" y="1886" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">• Sequências das quatro tracks e automações.</text>
+<text x="1156" y="1928" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">• Timbres das quatro partes e suas oitavas.</text>
+<text x="1156" y="1970" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">• Mixer, sends e parâmetros de efeitos.</text>
+<text x="1156" y="2012" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">• Duas configurações de SPLIT/LAYER e a linha ativa.</text>
+<text x="1156" y="2054" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">• Parte selecionada para tocar / editar.</text>
+<text x="1156" y="2096" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">A cena sonora acompanha o pattern: não é apenas um</text>
+<text x="1156" y="2138" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">favorito de uma parte.</text>
+<text x="100" y="2360" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="28" font-weight="700" fill="#f0f3fa">LEITURA DOS LEDs DOS PATTERNS</text>
+<rect x="100" y="2420" width="30" height="30" rx="6" fill="#ff625b" stroke="none" stroke-width="2"/>
+<text x="100" y="2475" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="20" font-weight="700" fill="#ff625b">VERMELHO DISCRETO</text>
+<text x="100" y="2513" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="25" font-weight="400" fill="#acb9cc">Slot salvo, não selecionado</text>
+<rect x="605" y="2420" width="30" height="30" rx="6" fill="#7ea8ff" stroke="none" stroke-width="2"/>
+<text x="605" y="2475" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="20" font-weight="700" fill="#7ea8ff">AZUL FORTE / MÉDIO</text>
+<text x="605" y="2513" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="25" font-weight="400" fill="#acb9cc">Selecionado / alterado</text>
+<rect x="1110" y="2420" width="30" height="30" rx="6" fill="#7ea8ff" stroke="none" stroke-width="2"/>
+<text x="1110" y="2475" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="20" font-weight="700" fill="#7ea8ff">AZUL PISCANDO</text>
+<text x="1110" y="2513" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="25" font-weight="400" fill="#acb9cc">Troca agendada</text>
+<rect x="1615" y="2420" width="30" height="30" rx="6" fill="#ff625b" stroke="none" stroke-width="2"/>
+<text x="1615" y="2475" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="20" font-weight="700" fill="#ff625b">VERMELHO PISCANDO</text>
+<text x="1615" y="2513" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="25" font-weight="400" fill="#acb9cc">Confirmação de overwrite</text>
+<rect x="100" y="2630" width="2000" height="185" rx="18" fill="#182030" stroke="#303c50" stroke-width="2"/>
+<text x="132" y="2653" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="700" fill="#ffc778">NÃO HÁ AUTOSAVE</text>
+<text x="132" y="2700" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="27" font-weight="400" fill="#acb9cc">Salvar presets por BT e salvar favoritos são ações separadas. Para guardar o conjunto de performance, salve o pattern pelo pad. Slot vazio:</text>
+<text x="132" y="2739" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="27" font-weight="400" fill="#acb9cc">vermelho muito discreto. Gravação pendente: branco.</text>
+<text x="100" y="2860" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="23" font-weight="400" fill="#acb9cc">KNOB BANK: toque troca o banco; segure 0,7 s para voltar à Performance/Favoritos.</text>
+<text x="100" y="2903" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="23" font-weight="400" fill="#acb9cc">PLAY e REC mantêm os pads. Somente SEQ assume o banco do sequenciador.</text>
+<path d="M100,2970 L2100,2970" stroke="#303c50" stroke-width="2"/>
+<text x="100" y="3001" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="22" font-weight="400" fill="#acb9cc">SMKSYNTH · BASE MUSICAL P16.2 / B2 · SMK-37 PRO</text>
+<text x="100" y="3042" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="21" font-weight="400" fill="#acb9cc">Base sonora: OberVave + DRUM-X / JIANT · Guia: Marcus Padrini</text>
+</svg>

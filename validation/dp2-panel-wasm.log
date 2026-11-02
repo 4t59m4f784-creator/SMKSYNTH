@@ -1,0 +1,1 @@
+PASS: actual WASM panel, physical octave in step chords and mid-hold octave change, persistent transpose through PATCH and three banks, K4 OFF with captured release, latched offset, ordinary live notes after OFF, no automatic writes.

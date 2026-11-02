@@ -1,0 +1,115 @@
+{
+  "format": "smksynth-curated-factory-v1",
+  "patterns": [
+    {
+      "slot": 1,
+      "parts": [
+        "INIT",
+        "ARP CHORD",
+        "SWEEP PAD",
+        "KICK"
+      ]
+    },
+    {
+      "slot": 2,
+      "parts": [
+        "DREAM ARP",
+        "FIFTHS LD",
+        "HORN SECT",
+        "KICK"
+      ]
+    },
+    {
+      "slot": 3,
+      "parts": [
+        "SOFT EP",
+        "ARP CHORD",
+        "HORN SECT",
+        "KICK"
+      ]
+    },
+    {
+      "slot": 4,
+      "parts": [
+        "FAT BASS",
+        "INIT",
+        "PULSE ORGN",
+        "808 BOOM"
+      ]
+    },
+    {
+      "slot": 5,
+      "parts": [
+        "FAT BASS",
+        "FAT BASS",
+        "PULSE ORGN",
+        "808 BOOM"
+      ]
+    }
+  ],
+  "empty_patterns": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "favorites": [
+    {
+      "slot": 1,
+      "name": "FAT BASS"
+    },
+    {
+      "slot": 2,
+      "name": "POLY BRASS"
+    },
+    {
+      "slot": 3,
+      "name": "POLY BRASS"
+    },
+    {
+      "slot": 4,
+      "name": "SWEEP PAD"
+    },
+    {
+      "slot": 5,
+      "name": "BIG BRASS"
+    },
+    {
+      "slot": 6,
+      "name": "SOFT EP"
+    },
+    {
+      "slot": 7,
+      "name": "PULSE ORGN"
+    },
+    {
+      "slot": 8,
+      "name": "INIT"
+    }
+  ],
+  "user_presets": 0,
+  "tempo": 90,
+  "files": {
+    "bank-SMK16P1.bin": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
+    "favorites-pfv2.bin": "3b68637c226845d39af9be8632d1fc78a731c820ae582d2ccae649b96ef15fb3",
+    "globals-set7.bin": "2265ca9a8fc438550af21f70d310a30456b3425390a080233cc4f87c0dfef067",
+    "pattern-01.scene380": "ddde546b1d18ef4a89384f2336c1637d590c856c4ce971d7394a25673cdaeb1d",
+    "pattern-01.seq4": "91424600279e340896499c899c91d1c1a94c0effb50a916f580790a5d8318063",
+    "pattern-02.scene380": "6f73c27a89ec417d771dbce042346069d6a18f89e9a7bde83585813b0bace890",
+    "pattern-02.seq4": "a0c7403b26c2d0040183abd79ea1aada2cfa170319978996bc91dbab850672b4",
+    "pattern-03.scene380": "0ed160ed56d414c7a504ced6fdda670d423daa0533c866d98552216b47cca6b1",
+    "pattern-03.seq4": "b5d1f34a432b095b886aaa988606dd381be78b74d4919d8af76aa8c5899a57dc",
+    "pattern-04.scene380": "19e69ecebfa892f896330a5081d6ba9a869e441a132810139dffdd620df324db",
+    "pattern-04.seq4": "398d4ef72ef602a982513c80912cf50466c4ea0d0c969435fbe7177c8f757925",
+    "pattern-05.scene380": "838a38343695240a0003048e4f76e38f3708f3f7d9a4cf876663b29b43e573f7",
+    "pattern-05.seq4": "8ca55d3df5f12da29730a19a93ef22a105fa580fe8f6337376ed69d6e143efd6",
+    "simulator-session.bin": "43a605bf320b51f77c33f71720ac46543cfd7fb186d95d57ddeacd2a8f790329"
+  }
+}

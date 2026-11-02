@@ -1,0 +1,2 @@
+PASS: browser client <-> actual C firmware protocol, B1 file, SHA rejection, RLE export/CRC, corrupted reply retry, interrupted staging/restart, bound resume, full restore, flash SHA/readback and reboot state.
+{"blankExport":{"commands":636,"retries":0,"rxBytes":18893,"txBytes":10812},"restoredBankExport":{"commands":635,"retries":0,"rxBytes":200451,"txBytes":10795},"restoreAndVerification":{"commands":1880,"retries":0,"rxBytes":414074,"txBytes":354938}}

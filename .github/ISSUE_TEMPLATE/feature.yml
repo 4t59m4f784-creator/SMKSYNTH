@@ -1,0 +1,13 @@
+name: Feature request / Sugestão
+description: Describe a musical need or workflow improvement
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Musical goal and proposed workflow
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Compatibility, controls or saved-data considerations

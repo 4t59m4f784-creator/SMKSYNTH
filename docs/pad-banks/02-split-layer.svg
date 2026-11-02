@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="3100" viewBox="0 0 2200 3100"><title>SMKSYNTH — Guia dos pad banks</title><rect width="2200" height="3100" fill="#090d14"/>
+<text x="100" y="70" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="43" font-weight="700" fill="#f0f3fa">SMK</text>
+<text x="204" y="70" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="43" font-weight="700" fill="#ff625b">SYNTH</text>
+<path d="M400,95 L480,95" stroke="#7ea8ff" stroke-width="5"/>
+<text x="1500" y="80" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="400" fill="#acb9cc">GUIA DE PERFORMANCE</text>
+<text x="100" y="166" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="27" font-weight="700" fill="#7ea8ff">PAD BANK 2</text>
+<text x="100" y="223" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="69" font-weight="700" fill="#f0f3fa">SPLIT / LAYER</text>
+<text x="100" y="323" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="30" font-weight="400" fill="#acb9cc">Prepare duas configurações de teclado e alterne entre elas durante a performance.</text>
+<rect x="100" y="418" width="2000" height="80" rx="18" fill="#1a2333" stroke="none" stroke-width="2"/>
+<text x="128" y="441" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="27" font-weight="400" fill="#f0f3fa">KNOB BANK:  1 Performance/Favoritos  →  2 Split/Layer  →  3 Patterns/Save</text>
+<rect x="100" y="532" width="2000" height="220" rx="22" fill="#1c2430" stroke="#4d5b6d" stroke-width="2"/>
+<text x="130" y="548" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="17" font-weight="400" fill="#acb9cc">SMK-37 PRO · ESQUEMA FUNCIONAL</text>
+<path d="M140,593 L140,650" stroke="#68778d" stroke-width="3"/>
+<rect x="128" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<path d="M200,593 L200,650" stroke="#68778d" stroke-width="3"/>
+<rect x="188" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<path d="M260,593 L260,650" stroke="#68778d" stroke-width="3"/>
+<rect x="248" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<path d="M320,593 L320,650" stroke="#68778d" stroke-width="3"/>
+<rect x="308" y="610" width="24" height="12" rx="2" fill="#d2dbe9" stroke="none" stroke-width="2"/>
+<rect x="458" y="575" width="156" height="84" rx="5" fill="#0b1422" stroke="#7ea8ff" stroke-width="2"/>
+<text x="472" y="586" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="18" font-weight="400" fill="#7ea8ff">SMKSYNTH</text>
+<text x="472" y="617" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="22" font-weight="700" fill="#f0f3fa">BANK 2</text>
+<rect x="695" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="757" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="819" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="881" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="943" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1005" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1067" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1129" y="586" width="30" height="30" rx="15" fill="#718198" stroke="none" stroke-width="2"/>
+<rect x="1335" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1407" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1479" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1551" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1623" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1695" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1767" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1839" y="579" width="52" height="30" rx="4" fill="#395681" stroke="none" stroke-width="2"/>
+<rect x="1335" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1407" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1479" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1551" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1623" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1695" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1767" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="1839" y="622" width="52" height="30" rx="4" fill="#7e383e" stroke="none" stroke-width="2"/>
+<rect x="140" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="222" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="304" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="386" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="468" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="550" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="632" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="714" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="796" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="878" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="960" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1042" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1124" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1206" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1288" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1370" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1452" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1534" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1616" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1698" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1780" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="1862" y="675" width="79" height="55" rx="2" fill="#d9dfeb" stroke="none" stroke-width="2"/>
+<rect x="204" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="286" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="450" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="532" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="614" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="778" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="860" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1024" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1106" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1188" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1352" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1434" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1598" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1680" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<rect x="1762" y="675" width="36" height="33" rx="2" fill="#11151c" stroke="none" stroke-width="2"/>
+<text x="100" y="789" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="24" font-weight="400" fill="#acb9cc">MAPA DOS 16 PADS · LENDO DA ESQUERDA PARA A DIREITA</text>
+<rect x="100" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#7ea8ff" stroke-width="2"/>
+<text x="116" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#7ea8ff">01</text>
+<text x="116" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="116" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">A</text>
+<rect x="352" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ffb281" stroke-width="2"/>
+<text x="368" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ffb281">02</text>
+<text x="368" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="368" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">B</text>
+<rect x="604" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#86d4ad" stroke-width="2"/>
+<text x="620" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#86d4ad">03</text>
+<text x="620" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="620" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">C</text>
+<rect x="856" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#e598d5" stroke-width="2"/>
+<text x="872" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#e598d5">04</text>
+<text x="872" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="872" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">D</text>
+<rect x="1108" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ffffff" stroke-width="2"/>
+<text x="1124" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ffffff">05</text>
+<text x="1124" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">SINGLE</text>
+<rect x="1360" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#7ea8ff" stroke-width="2"/>
+<text x="1376" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#7ea8ff">06</text>
+<text x="1376" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">SPLIT</text>
+<rect x="1612" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1628" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">07</text>
+<text x="1628" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">LAYER</text>
+<rect x="1864" y="845" width="235" height="171" rx="12" fill="#172134" stroke="#ffffff" stroke-width="2"/>
+<text x="1880" y="859" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ffffff">08</text>
+<text x="1880" y="908" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">TOCAR</text>
+<text x="1880" y="943" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">LINHA 1</text>
+<rect x="100" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#7ea8ff" stroke-width="2"/>
+<text x="116" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#7ea8ff">09</text>
+<text x="116" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="116" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">A</text>
+<rect x="352" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ffb281" stroke-width="2"/>
+<text x="368" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ffb281">10</text>
+<text x="368" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="368" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">B</text>
+<rect x="604" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#86d4ad" stroke-width="2"/>
+<text x="620" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#86d4ad">11</text>
+<text x="620" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="620" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">C</text>
+<rect x="856" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#e598d5" stroke-width="2"/>
+<text x="872" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#e598d5">12</text>
+<text x="872" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">PARTE</text>
+<text x="872" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">D</text>
+<rect x="1108" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ffffff" stroke-width="2"/>
+<text x="1124" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ffffff">13</text>
+<text x="1124" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">SINGLE</text>
+<rect x="1360" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#7ea8ff" stroke-width="2"/>
+<text x="1376" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#7ea8ff">14</text>
+<text x="1376" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">SPLIT</text>
+<rect x="1612" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ff625b" stroke-width="2"/>
+<text x="1628" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ff625b">15</text>
+<text x="1628" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">LAYER</text>
+<rect x="1864" y="1036" width="235" height="171" rx="12" fill="#172134" stroke="#ffffff" stroke-width="2"/>
+<text x="1880" y="1050" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="23" font-weight="700" fill="#ffffff">16</text>
+<text x="1880" y="1099" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">TOCAR</text>
+<text x="1880" y="1134" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="26" font-weight="700" fill="#f0f3fa">LINHA 2</text>
+<text x="100" y="1231" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="23" font-weight="400" fill="#acb9cc">Linha superior = configuração 1. Linha inferior = configuração 2. Pads 8 / 16 escolhem a ativa.</text>
+<rect x="100" y="1300" width="980" height="465" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="126" y="1333" width="5" height="35" rx="2" fill="#7ea8ff" stroke="none" stroke-width="2"/>
+<text x="150" y="1332" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">1 · ESCOLHA AS DUAS PARTES</text>
+<text x="136" y="1396" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Na mesma linha, segure um pad A–D e pressione outro A–D.</text>
+<text x="136" y="1438" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Isso cria um LAYER com duas partes ANALOG.</text>
+<text x="136" y="1480" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">A primeira parte será a região inferior no SPLIT; a segunda, a</text>
+<text x="136" y="1522" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">superior. A tecla do split pertence à região superior.</text>
+<text x="136" y="1564" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">DRUM-X não entra na combinação.</text>
+<rect x="1120" y="1300" width="980" height="465" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="1146" y="1333" width="5" height="35" rx="2" fill="#ffffff" stroke="none" stroke-width="2"/>
+<text x="1170" y="1332" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">2 · ESCOLHA COMO TOCAR</text>
+<text x="1156" y="1396" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">SINGLE — toca só a parte selecionada.</text>
+<text x="1156" y="1438" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">SPLIT — uma parte abaixo do ponto de divisão; a outra, a</text>
+<text x="1156" y="1480" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">partir dele.</text>
+<text x="1156" y="1522" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">LAYER — as duas partes em cada tecla.</text>
+<text x="1156" y="1564" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Pad 8 ativa a linha 1. Pad 16 ativa a linha 2. O seletor da linha</text>
+<text x="1156" y="1606" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">ativa fica branco forte.</text>
+<rect x="100" y="1810" width="980" height="565" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="126" y="1843" width="5" height="35" rx="2" fill="#7ea8ff" stroke="none" stroke-width="2"/>
+<text x="150" y="1842" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">3 · CONTROLES DA TELA</text>
+<text x="136" y="1906" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K1 — SINGLE / SPLIT / LAYER.</text>
+<text x="136" y="1948" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K2 / K3 — nível da primeira / segunda parte.</text>
+<text x="136" y="1990" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K4 — ponto de split.</text>
+<text x="136" y="2032" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K5 — alterna K2/K3 entre níveis e oitavas.</text>
+<text x="136" y="2074" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K6 — parte selecionada, inclusive para REC.</text>
+<text x="136" y="2116" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K7 — preset da parte selecionada.</text>
+<text x="136" y="2158" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">K8 — volume master.</text>
+<text x="136" y="2200" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Níveis: 0–100%. Oitava da camada: −2 a +2, somada à oitava</text>
+<text x="136" y="2242" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">própria da parte.</text>
+<rect x="1120" y="1810" width="980" height="565" rx="18" fill="#121b2a" stroke="#303c50" stroke-width="2"/>
+<rect x="1146" y="1843" width="5" height="35" rx="2" fill="#ffc778" stroke="none" stroke-width="2"/>
+<text x="1170" y="1842" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="34" font-weight="700" fill="#f0f3fa">4 · EDITAR ≠ ATIVAR</text>
+<text x="1156" y="1906" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Tocar os controles de uma linha seleciona essa linha para</text>
+<text x="1156" y="1948" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">edição. Isso não a ativa para tocar. A tela mostra EDIT 1/2 e</text>
+<text x="1156" y="1990" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">PLAY 1/2.</text>
+<text x="1156" y="2032" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Use 8 ou 16 para escolher qual combinação o teclado toca. Só</text>
+<text x="1156" y="2074" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">uma linha fica ativa.</text>
+<text x="1156" y="2116" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">Os níveis das camadas afetam o teclado ao vivo; não alteram</text>
+<text x="1156" y="2158" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">o mixer das sequências. REC grava somente a parte</text>
+<text x="1156" y="2200" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="400" fill="#acb9cc">selecionada.</text>
+<rect x="100" y="2420" width="2000" height="180" rx="18" fill="#182030" stroke="#303c50" stroke-width="2"/>
+<text x="132" y="2443" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="700" fill="#ffc778">SALVE O PATTERN PARA GUARDAR AS DUAS LINHAS</text>
+<text x="132" y="2490" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="27" font-weight="400" fill="#acb9cc">O pattern guarda as duas configurações, seus níveis e oitavas, ponto de split e qual linha está ativa. Use o banco 3 para salvar. Navegar entre</text>
+<text x="132" y="2529" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="27" font-weight="400" fill="#acb9cc">bancos não salva.</text>
+<rect x="100" y="2640" width="2000" height="180" rx="18" fill="#182030" stroke="#303c50" stroke-width="2"/>
+<text x="132" y="2663" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="29" font-weight="700" fill="#7ea8ff">POLIFONIA E NOTAS SEGURADAS</text>
+<text x="132" y="2710" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="27" font-weight="400" fill="#acb9cc">As 8 vozes ANALOG são compartilhadas. Um LAYER usa duas partes por tecla; UNISON e sequências também consomem vozes. Notas</text>
+<text x="132" y="2749" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="27" font-weight="400" fill="#acb9cc">seguradas mantêm seu destino ao trocar de linha.</text>
+<text x="100" y="2860" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="23" font-weight="400" fill="#acb9cc">KNOB BANK: toque troca o banco; segure 0,7 s para voltar à Performance/Favoritos.</text>
+<text x="100" y="2903" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="23" font-weight="400" fill="#acb9cc">PLAY e REC mantêm os pads. Somente SEQ assume o banco do sequenciador.</text>
+<path d="M100,2970 L2100,2970" stroke="#303c50" stroke-width="2"/>
+<text x="100" y="3001" dominant-baseline="text-before-edge" font-family="DejaVu Sans Mono" font-size="22" font-weight="400" fill="#acb9cc">SMKSYNTH · BASE MUSICAL P16.2 / B2 · SMK-37 PRO</text>
+<text x="100" y="3042" dominant-baseline="text-before-edge" font-family="DejaVu Sans" font-size="21" font-weight="400" fill="#acb9cc">Base sonora: OberVave + DRUM-X / JIANT · Guia: Marcus Padrini</text>
+</svg>

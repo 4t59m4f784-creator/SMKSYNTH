@@ -1,0 +1,19 @@
+  9600 ms  MIDI out 90 36 111
+  9600 ms  MIDI out 80 36 0
+  9600 ms  MIDI out 90 38 111
+  9600 ms  MIDI out 80 38 0
+  9600 ms  MIDI out 90 39 111
+  9600 ms  MIDI out 80 39 0
+  9600 ms  MIDI out 90 42 111
+  9600 ms  MIDI out 80 42 0
+  9600 ms  MIDI out 90 46 111
+  9600 ms  MIDI out 80 46 0
+  9600 ms  MIDI out 90 45 111
+  9600 ms  MIDI out 80 45 0
+  9600 ms  MIDI out 90 37 111
+  9600 ms  MIDI out 80 37 0
+  9600 ms  MIDI out 90 56 111
+  9600 ms  MIDI out 80 56 0
+  9700 ms  MIDI out 93 36 98
+  9700 ms  MIDI out 83 36 0
+PASS: conditional bank, persistent ownership/engine/page changes, 8 hits/velocity, reserved lower pads, violet70/white and actual sequence feedback, per-part feedback isolation, REC/original note-off+channel, inactive UI, long escape and unchanged saved layouts.

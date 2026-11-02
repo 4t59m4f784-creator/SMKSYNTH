@@ -1,0 +1,1 @@
+PASS: real WASM BT preset-only on SEQ, long save-as/cancel, slot chosen + preset writes, pad-only pattern save, separate tap overwrite, 4s timeout/no writes, D/C selected part recall and reboot, LAYER retained.

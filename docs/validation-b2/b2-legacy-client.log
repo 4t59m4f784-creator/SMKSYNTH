@@ -1,0 +1,2 @@
+PASS: JS protocol roundtrip4480 blocks, double read, CRC, cancel releases lock, inventory blank/user preset, corrupt record rejected.
+PASS: actual C firmware reply decoded by browser client.

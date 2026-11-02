@@ -1,0 +1,24 @@
+name: Bug report / Relatar problema
+description: Playback, interface, backup or installation problem
+body:
+  - type: input
+    id: identity
+    attributes:
+      label: Hardware and firmware identity
+      placeholder: SMK-37 Pro_19615
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps, expected result and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Browser / OS / USB setup / simulator reproduction
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or minimal example (omit personal banks and secrets)

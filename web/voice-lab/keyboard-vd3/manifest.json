@@ -1,0 +1,30 @@
+{
+  "pf12": {
+    "name": "Player PF12 · base preservada",
+    "product": "SMK-37 Pro_19552",
+    "size": 651327,
+    "sha": "934a048261d349d1995a980e03e48290937fd2d7b104389713fa359230a190cd",
+    "url": "./firmware/obervave-3.0.1-pf12-smk37.fwsc"
+  },
+  "pf9": {
+    "name": "Player PF9 · referência aprovada no teclado",
+    "product": "SMK-37 Pro_19549",
+    "size": 651327,
+    "sha": "2b9406fbecc61960e51d5da173c072107a81bb75c79fb5f35d06dd27f41f88f6",
+    "url": "./firmware/obervave-3.0.1-pf9-smk37.fwsc"
+  },
+  "vd2": {
+    "name": "Voice + Drums VD2 · teste das correções",
+    "product": "SMK-37 Pro_19602",
+    "size": 651327,
+    "sha": "45487ecd292bea0f749ccee6a9f5e59e3e07c38555d6cb8d90c9a1b215869540",
+    "url": "./firmware/obervave-3.0.1-vd2-smk37.fwsc"
+  },
+  "vd3": {
+    "name": "Voice + Drums VD3 · VOICE JIANT",
+    "product": "SMK-37 Pro_19603",
+    "size": 651327,
+    "sha": "d595206103e1319b0aa1b2f16aa3276feb9597640b8b14fe3edbbf598f63571b",
+    "url": "./firmware/obervave-3.0.1-vd3-smk37.fwsc"
+  }
+}

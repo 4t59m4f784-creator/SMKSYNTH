@@ -1,0 +1,11 @@
+SMKSYNTH — Infográficos dos três pad banks
+
+Base: fontes B2, SMK-37 Pro_19615; comportamento musical P16.2 aprovado.
+Diagramas funcionais; não são fotografias nem capturas da tela.
+
+Mapas: obv_perf.h (pf_event, pf_recall, pf_toggle, keyboard_pad, pb_event, pb_led); obv_smk.h (roteamento dos pads); obv_keyboard_config.h; obervave.c (keyboard_turn, psnd_t, pat_go, snd_capture).
+
+O terceiro banco é PATTERNS / SAVE, apresentado como Cenas e patterns. A cena sonora acompanha o pattern. Configurações de teclado são extensões do pattern.
+Arquivos PNG para compartilhar; SVG para edição. Cores indicam funções e estados qualitativos, não medições do brilho físico.
+
+Créditos: SMKSYNTH / Marcus Padrini; base sonora OberVave e DRUM-X do JIANT.

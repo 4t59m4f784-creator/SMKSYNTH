@@ -1,0 +1,1 @@
+PASS: exact DP1/B2 pins and CRCs; four accepted origins, foreign rejection, guarded DP1 install/B2 return, interruption-bound resume. No physical USB.

@@ -1,0 +1,16 @@
+{
+  "dp1": {
+    "name": "SMKSYNTH DP1 \u00b7 Drum Pads",
+    "product": "SMK-37 Pro_19616",
+    "size": 651819,
+    "sha": "0c64901bd087e102c9a867843b37affee3968e439ca62068a35f604a35a584a5",
+    "url": "./firmware/obervave-3.0.1-dp1-smk37.fwsc"
+  },
+  "b2": {
+    "name": "Voltar \u00e0 B2 validada",
+    "product": "SMK-37 Pro_19615",
+    "size": 651819,
+    "sha": "50054674cc3db57c971321b9f94993099f1a5505125917dd23400588914a5685",
+    "url": "./firmware/obervave-3.0.1-b2-smk37.fwsc"
+  }
+}
