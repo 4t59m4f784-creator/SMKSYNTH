@@ -1,0 +1,16 @@
+{
+  "b1": {
+    "name": "SMKSYNTH B1 · banco de trabalho + exportação",
+    "product": "SMK-37 Pro_19614",
+    "size": 651609,
+    "sha": "e6816772319ce942c25a2fa9fe6e27930bfe5caa3f0ffa27bcae23d91feea39e",
+    "url": "./firmware/obervave-3.0.1-b1-smk37.fwsc"
+  },
+  "p162": {
+    "name": "Retorno à P16.2 · APAGA o banco durante a reinstalação",
+    "product": "SMK-37 Pro_19613",
+    "size": 651327,
+    "sha": "d4576e42bc141ecf86e04290c15b4cffa35b0cf88c7251f06369e133468ab7f5",
+    "url": "./firmware/obervave-3.0.1-p16o1-smk37.fwsc"
+  }
+}

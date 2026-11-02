@@ -1,0 +1,15 @@
+{
+  "name": "OberVave Latency Fix",
+  "version": "3.0.1-lf1",
+  "product": "SMK-37 Pro_19531",
+  "firmware_bytes": 651327,
+  "firmware_sha256": "cad2e31fe611814804807332924615913718c17f7ed94528043142045adcd868",
+  "hardware_tested": false,
+  "base_commit": "bcddc4b08d819296b1e507d5fa9395eb0f2d88af",
+  "fix_snapshot": "e9dc9a76cc6caef75ba6d49dc85e2e8f2b627067",
+  "baseline_rebuild_matches_official": true,
+  "toolchain_archive_sha256": "a1545cddbc451a06bac43eb5cd96d831470c42a97c5c0b1f98879a20fc7647bd",
+  "app_bytes": 145028,
+  "ram_data_bss_bytes": 65840,
+  "pool_bytes": 318708
+}

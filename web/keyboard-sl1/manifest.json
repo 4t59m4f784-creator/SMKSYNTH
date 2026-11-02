@@ -1,0 +1,30 @@
+{
+  "sl1": {
+    "name": "SMKSYNTH SL1 · Split & Layer experimental",
+    "product": "SMK-37 Pro_19606",
+    "size": 651327,
+    "sha": "a5aaa1bddb4a413199151599b2f72e1b6f9bcd84859f1e462475a76d3b3a38cc",
+    "url": "./firmware/obervave-3.0.1-sl1-smk37.fwsc"
+  },
+  "ad1": {
+    "name": "SMKSYNTH AD1 · ANALOG + DRUM-X + SEQ TRANSPOSE",
+    "product": "SMK-37 Pro_19605",
+    "size": 651327,
+    "sha": "7d91de2be983bb3805e350e34f0bfbd78278fa01e833ffa499cceb86cefe784a",
+    "url": "./firmware/obervave-3.0.1-ad1-smk37.fwsc"
+  },
+  "pf12": {
+    "name": "Player PF12 · base preservada",
+    "product": "SMK-37 Pro_19552",
+    "size": 651327,
+    "sha": "934a048261d349d1995a980e03e48290937fd2d7b104389713fa359230a190cd",
+    "url": "./firmware/obervave-3.0.1-pf12-smk37.fwsc"
+  },
+  "pf9": {
+    "name": "Player PF9 · referência aprovada no teclado",
+    "product": "SMK-37 Pro_19549",
+    "size": 651327,
+    "sha": "2b9406fbecc61960e51d5da173c072107a81bb75c79fb5f35d06dd27f41f88f6",
+    "url": "./firmware/obervave-3.0.1-pf9-smk37.fwsc"
+  }
+}

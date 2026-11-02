@@ -1,0 +1,1 @@
+PASS: boot entries, app slot 320 KiB, app_area_head CRC, app/cfg_tool/EQ CRCs; all end below restore journal; simulated private saves/journal leave boot files unchanged. [('app.bin', '0x54120'), ('cfg_tool.bin', '0x5429f')]

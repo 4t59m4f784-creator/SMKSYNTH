@@ -1,0 +1,49 @@
+{
+  "version": "3.0.1-p16o1",
+  "branch": "smksynth-p16o1",
+  "base_source_commit": "093029ff96e4bca71b65b39c43a4be1ef11ed762",
+  "status": "P16.2 approved musical base; B2 USB not simulated",
+  "engines": [
+    "ANALOG",
+    "DRUM-X"
+  ],
+  "hardware_tested": true,
+  "keyboard_modes": [
+    "SINGLE",
+    "SPLIT",
+    "LAYER"
+  ],
+  "pattern_bytes": 14476,
+  "legacy_pattern_bytes": [
+    13416,
+    14448,
+    14460
+  ],
+  "scene_bytes": 380,
+  "live_keyboard_gain_only": true,
+  "REC": "selected member only",
+  "flash_image_bytes": 155388,
+  "static_ram_bytes": 82752,
+  "pool_bytes": 325984,
+  "melodic_voices": 8,
+  "firmware_identity": "SMK-37 Pro_19613",
+  "firmware_sha256": "d4576e42bc141ecf86e04290c15b4cffa35b0cf88c7251f06369e133468ab7f5",
+  "wasm_sha256": "a37f905483ed2e52271a38ceb86f0fe4b76120865e68e69dd757bfc2990164bb",
+  "wasm_bytes": 306265,
+  "local_session": "smksynth-p16",
+  "keyboard_installer": "../keyboard-b2/",
+  "source_reference": "PADS-OCTAVE-P16O1.md",
+  "keyboard_rows": 2,
+  "selected_row_saved": true,
+  "pattern_focus_saved": true,
+  "bt": "preset only",
+  "pattern_save": "pads only, hold + tap, 4s timeout",
+  "pattern_slots": 16,
+  "storage_layout": "SMK16P1",
+  "device_backup_implemented": false,
+  "update_preserves_experimental_saves": false,
+  "save_display": "opaque strips, event-driven, countdown row 1Hz",
+  "preset_target_preview": true,
+  "pad_ownership": "SEQ only; PLAY/REC preserve",
+  "patch_octave": "KBO1 reserved byte73, legacy0"
+}

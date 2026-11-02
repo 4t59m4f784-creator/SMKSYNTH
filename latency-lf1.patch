@@ -1,0 +1,144 @@
+--- a/firmware/hal/smk_input.h
++++ b/firmware/hal/smk_input.h
+@@ -57,6 +57,9 @@
+ #define SMK_DEB_RELEASE 4u        /* frames open in a row: a button release (~6 ms) */
+ #define SMK_DEB_PRESS 2u          /* frames closed in a row: a button press (~3 ms) */
+ #define SMK_KEY_REL 3u            /* frames with contact 1 open: a key release (~5 ms) */
++#ifndef SMK_KEY_TMAX_MS
++#define SMK_KEY_TMAX_MS 40u       /* first contact alone: one soft note after this interval */
++#endif
+ #define SMK_ENC_DIV 4             /* decoder counts a step: a detent is a whole quadrature cycle (the stock's 2
+                                    * gave two UI steps a click, as the FM-1 has one) */
+ enum { FM1_BTN_OCT_DOWN = 4, FM1_BTN_OCT_UP = 5 };
+@@ -343,6 +346,11 @@
+             s = 3u;
+         if (s == st) {
+             fm1_in.ks_rel[k] = 0;
++            if (st == 1u && now - fm1_in.ks_t1[k] >= SMK_KEY_TMAX_MS * 1000u * FM1_TICKS_PER_US) {
++                uint32_t T = 10u + SMK_KEY_TMAX_MS * 10u;
++                smk__key_event(k, smk_vel7(smk_curve(smk_trim_key[k], 0x3FFu - T)));
++                fm1_in.ks_stab[k] = 3;                    /* the eventual second contact must not retrigger */
++            }
+             continue;
+         }
+         if (s == 0u) {                                    /* contact 1 open: a release after a few frames */
+--- a/firmware/src/obervave.c
++++ b/firmware/src/obervave.c
+@@ -1858,6 +1858,9 @@
+     if (!idle_ok || busy) return;
+     busy = 1;
+     keys_in(1);
++#if BOARD_SMK37
++    smk_outer((uint32_t)(KEY0 + 12 * set.oct), 1, &dirty_steps);
++#endif
+     midi_in(1);
+     busy = 0;
+ }
+@@ -2020,6 +2023,9 @@
+     ctl_panic = 0;
+ 
+     ui_splash();
++#if BOARD_SMK37 && defined(OBV_EXPERIMENTAL)
++    say(APP_VER);                              /* visible boot label for the isolated test build */
++#endif
+     scope_state = 1;
+ 
+     for (;;) {
+--- a/firmware/src/obv_smk.h
++++ b/firmware/src/obv_smk.h
+@@ -70,12 +70,16 @@
+     scat(s, "]");
+ }
+ 
++/* Outer notes are also serviced during LCD drawing; pad editing remains in the main loop.
++ * Adapted from genkigenki's PR snapshot e9dc9a7; retain 3.0.1 note_in and MIDI_OUT_CH. */
++static void smk_outer(uint32_t base, uint32_t notes_only, uint32_t *dirty);
++static int32_t smk_ext_back = -1;
++
+ /* ---- the pads and the outer keys (main loop, after the keys) */
+ static void smk_pads(uint32_t base, uint32_t *dirty)
+ {
+     int32_t e;
+     uint32_t v;
+-    (void)base;
+     while ((e = smk_pad_take()) >= 0) {
+         uint32_t p = ((uint32_t)e >> 8) & 15u, vel = (uint32_t)e & 0xFFu, k = SMK_WK[p], q;
+         if (vel) {
+@@ -113,8 +117,24 @@
+         }
+         *dirty = 1;
+     }
+-    while ((e = smk_extkey_take()) >= 0) {      /* the outer keys: more notes, the keys' path */
+-        uint32_t kk = ((uint32_t)e >> 8) % FM1_NKEY, vel = (uint32_t)e & 0xFFu;
++    smk_outer(base, 0, dirty);
++    v = SMK_PAD_HELD;                           /* the step view comes and goes with a held pad */
++    if (v != smk_view_prev) { smk_view_prev = v; *dirty = 1; hints_key = 0xFFFFFFFFu; }
++}
++
++static void smk_outer(uint32_t base, uint32_t notes_only, uint32_t *dirty)
++{
++    int32_t e;
++    for (;;) {
++        uint32_t kk, vel;
++        if (smk_ext_back >= 0) { e = smk_ext_back; smk_ext_back = -1; }
++        else if ((e = smk_extkey_take()) < 0) break;
++        kk = ((uint32_t)e >> 8) % FM1_NKEY; vel = (uint32_t)e & 0xFFu;
++        /* EDIT/undo belongs to the main loop. Preserve FIFO order behind the deferred event. */
++        if (notes_only && (vel ? layer == L_EDIT : smk_ext_note[kk] && smk_ext_erase[kk])) {
++            smk_ext_back = e;
++            break;
++        }
+         if (vel) {
+             uint32_t n = (uint32_t)clampi((int32_t)base + (int32_t)kk - (int32_t)SMK_KEY_F3, 1, 127);
+             smk_ext_note[kk] = (uint8_t)n;
+@@ -139,8 +159,6 @@
+         }
+         if (notes_shown()) *dirty = 1;          /* (a note alone changes no knob page) */
+     }
+-    v = SMK_PAD_HELD;                           /* the step view comes and goes with a held pad */
+-    if (v != smk_view_prev) { smk_view_prev = v; *dirty = 1; hints_key = 0xFFFFFFFFu; }
+ }
+ 
+ /* ---- FADER BANK, < > (main loop, with the other buttons) */
+--- a/tools/build.py
++++ b/tools/build.py
+@@ -304,6 +304,8 @@
+     ap.add_argument("--model", choices=sorted(MODELS), default=None,
+                     help="smk37: the model name, pro (default), elite or mke (default: $MODEL, else pro)")
+     ap.add_argument("--sdk", type=Path, help="JieLi AC79 SDK checkout (default: $AC79_SDK)")
++    ap.add_argument("--experimental-id", metavar="NUMBER",
++                    help="SMK-only experimental identity; requires a suffixed --release, shown on the instrument")
+     a = ap.parse_args()
+     BOARD = (a.board or os.environ.get("BOARD") or "fm1").lower().replace("-", "")
+     if BOARD not in BOARD_PREFIX:
+@@ -328,6 +330,16 @@
+         PRODUCT = BOARD_PREFIX[BOARD] + m[1] + m[2]
+         VERSION = m[1] + "." + m[2] + (m[3] or "")
+         name = f"obervave-{a.release}{suffix}.fwsc"
++    if a.experimental_id is not None:
++        if BOARD != "smk37" or not a.release or "-" not in a.release:
++            raise SystemExit("--experimental-id requires --board smk37 and a suffixed --release")
++        if not re.fullmatch(r"[1-9][0-9]{2,4}", a.experimental_id):
++            raise SystemExit("--experimental-id must be a 3 to 5 digit positive identity")
++        PRODUCT = MODELS[model] + "_" + a.experimental_id
++        if len(PRODUCT) > 20:
++            raise SystemExit("experimental identity exceeds the 20-marker package identity")
++        VERSION = a.release
++        BOARD_DEFS[BOARD] = [*BOARD_DEFS[BOARD], "-DOBV_EXPERIMENTAL=1"]
+     fm1pkg_make.SDK = a.sdk
+     for rel, sha in SDK_SHA256.items():          # fail early without the SDK
+         if hashlib.sha256(fm1pkg_make.sdk_file(rel)).hexdigest() != sha:
+--- a/tests/run_tests.sh
++++ b/tests/run_tests.sh
+@@ -56,7 +56,10 @@
+         [ -f "$f" ] || continue
+         found=1
+         v=$(echo "$f" | sed -n 's/.*obervave-[0-9]\.\([0-9]\).*/\1/p'); v=${v:-0}
+-        run "SMK-37 package $f: layout, identity ${m#*:}$v, the loader marker" python3 tests/smk_pkg_test.py "$f" "${m#*:}$v"
++        want="${m#*:}$v"
++        # This isolated build deliberately has a distinct, pinned identity. Keep the strict check.
++        if [ "$f" = "build/obervave-3.0.1-lf1-smk37.fwsc" ]; then want="SMK-37 Pro_19531"; fi
++        run "SMK-37 package $f: layout, identity $want, the loader marker" python3 tests/smk_pkg_test.py "$f" "$want"
+     done
+ done
+ [ "$found" = 1 ] || echo "(no SMK-37 packages in build/: BOARD=smk37 sh build.sh first)"

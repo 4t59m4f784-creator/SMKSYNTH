@@ -1,0 +1,81 @@
+{
+  "project": "Obervave Voice + Drums",
+  "branch": "obervave-voice",
+  "checkpoint": "VD2",
+  "base": "modified PF12 (physical approval pending; PF9 is latest recorded hardware approval)",
+  "completed": [
+    "source audit",
+    "preserved PF12 branch",
+    "multiengine dispatch",
+    "VOICE vowel synthesis and eight presets",
+    "typed 80-byte patches",
+    "contextual VOICE UI",
+    "host persistence roundtrips",
+    "corrected audible ANALOG equivalence",
+    "WASM and AudioWorklet runtime tests",
+    "browser UI QA (without audio output)",
+    "DRUM-X synthesis, five kits / eight instruments",
+    "independent per-track drum pool",
+    "contextual drum edit / hit pads",
+    "drum patch / program / favourite / pattern roundtrips",
+    "audible VOICE checkpoint equivalence",
+    "eight-lane drum grid",
+    "eight simultaneous drum triggers per step",
+    "real-time eight-pad recording",
+    "DRS1 pattern extension with legacy read and save",
+    "pattern save/copy/reboot/queue and mask undo/shift/double",
+    "unchanged checkpoint-3 legacy drum groove",
+    "target pi32v2 build 3.0.1-vd1 / 19601",
+    "isolated hardware store with initial readback clone",
+    "automated install and PF12/PF9 return using real C loader in simulated NOR",
+    "pinned experimental installer and controller tests"
+  ],
+  "pending": [
+    "physical VD2 CPU/deadline and chord dropout retest",
+    "physical retrigger and wheel-retention retest",
+    "safe hardware polyphony and prolonged validation"
+  ],
+  "product_engines_available": [
+    "ANALOG",
+    "VOICE",
+    "DRUMS"
+  ],
+  "hardware_installation_enabled": true,
+  "published": true,
+  "jiant_reference_commit": "e924445ae0e7c64636f15bd0758418ee312ce7ee",
+  "analog_test_sha256": "4ae6e1508a661e6e362824033f358902a80a81fe527cbcf52b36117c5ed42932",
+  "invalidated_checkpoint1_test": "Previous equivalence test compared silence; replaced by non-silent test with a nonzero-sample assertion.",
+  "experimental_simulator_url": "https://obervave-voice-lab.padrini.chatgpt.site/",
+  "original_stable_published": false,
+  "drum_sequencer_simultaneous_notes_per_step": 8,
+  "host_drum_pool_bytes": 2688,
+  "publication_scope": "private simulator and experimental keyboard installer; stable unchanged",
+  "original_stable_modified": false,
+  "per_hit_velocity_chance_ratchet_nudge": false,
+  "drum_dynamics_scope": "per step",
+  "pattern_bytes": 14448,
+  "legacy_pattern_bytes": 13416,
+  "additional_pattern_ram_bytes_host": 4128,
+  "hardware_tested": false,
+  "target_resources_bytes": {
+    "image": 173668,
+    "main_ram": 74720,
+    "buffer_pool": 325900
+  },
+  "experimental_installer_url": "https://obervave-voice-lab.padrini.chatgpt.site/keyboard/",
+  "experimental_store_reinstalled": "reset on firmware reinstall/update; retained on power cycles; original stable bank unchanged",
+  "candidate_identity": "SMK-37 Pro_19602",
+  "VD1_physical_user_observations": [
+    "all drum lanes playable; repeated-hit clicks/loud spikes",
+    "polyphonic VOICE chords glitch/drop; mono VOICE stable with DRUMS and two ANALOG parts",
+    "VOICE physical wheel effect lost when selecting another part"
+  ],
+  "VD2_changes": [
+    "signed drum gain interpolation and independent new-hit gain attack",
+    "exact formant coefficient cache and inline resonators",
+    "skip unused analog oscillator/filter controls for VOICE",
+    "per-part physical vocal morph session latch"
+  ],
+  "candidate_installer_url": "https://obervave-voice-lab.padrini.chatgpt.site/keyboard-vd2/",
+  "host_wasm_vd2_tested": false
+}

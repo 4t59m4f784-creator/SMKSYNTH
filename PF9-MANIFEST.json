@@ -1,0 +1,97 @@
+{
+  "name": "OberVave Performance Manual",
+  "version": "3.0.1-pf9",
+  "product": "SMK-37 Pro_19549",
+  "firmware_bytes": 651327,
+  "firmware_sha256": "2b9406fbecc61960e51d5da173c072107a81bb75c79fb5f35d06dd27f41f88f6",
+  "hardware_tested": false,
+  "base": "PF8 + SMK physical wheel service in app_idle LCD yields",
+  "autosave": false,
+  "save_policy": {
+    "preset": "manual SAVE twice outside sequencer; program and globals/settings",
+    "pattern": "manual pattern SAVE or Bank 3 hold current; pattern snapshot and globals/settings",
+    "copy": "explicit copy or Bank 3 hold other; copied pattern and globals/settings",
+    "favourite": "hold 700 ms; favourite snapshot and sends only; preserves shared FX on recall",
+    "navigation": "no implicit flash write; save before switching or powering down",
+    "deferred_requests": "explicit saves wait for stop/quiet; require completion before power off",
+    "effects": "stored in pattern snapshot and global settings; loading a pattern restores its own saved FX"
+  },
+  "resources": {
+    "app_bytes": 150084,
+    "app_limit": 619520,
+    "ram_bytes": 68240,
+    "ram_limit": 98304,
+    "pool_bytes": 318708,
+    "pool_limit": 344064
+  },
+  "loader_sha256": "9171e2e62d560ec35cc7b0e346aa64cb74ec8db7b7925edd4c419c72bdf168d3",
+  "tests": {
+    "manual_persistence": "zero API writes on boot/edits/FX/octave/start-stop/pattern navigation; explicit preset/pattern/copy/favourite write and restart restore passed",
+    "performance": 245,
+    "contacts": 891,
+    "idle_dispatch": 332,
+    "smk_ui": 31,
+    "slot_led_checks": 36,
+    "control_checks": 2759,
+    "full_suite": "PF5 baseline passed; PF9 targeted native SMK/UI, LED states, WASM, manual-storage and package checks passed",
+    "physical_glitch_test": "pending"
+  },
+  "wheel_idle": {
+    "test": "real app_idle, synthetic 1ms yields over 50ms",
+    "PF8_updates": 0,
+    "PF9_updates": 50,
+    "PF8_gap_ms": 50,
+    "PF9_gap_ms": 1,
+    "physical_timing_measured": false,
+    "hardware_audio_tested": false,
+    "change": "smk_wheels() inside existing BOARD_SMK37/idle_ok/busy guards"
+  },
+  "boot_volume": {
+    "storage": "existing reserved rec_q byte, high bit valid, low 7 bits level",
+    "settings_bytes": 67,
+    "capture": "manual preset/pattern/copy settings commit only",
+    "recall": "boot only",
+    "max_adc_rounding_error": 4,
+    "fallback": 724
+  },
+  "bend": {
+    "adc": "Q8 fractional accumulator, integer raw interface",
+    "audio": "SMK only Q16 smoothing, tau 16 control blocks ~5.8ms",
+    "physical_test": "pending"
+  },
+  "led_states": {
+    "levels": {
+      "empty": 16,
+      "saved_inactive": 48,
+      "selected_saved": 240,
+      "selected_edited": 96
+    },
+    "denominator": 256,
+    "favourites": [
+      "blue",
+      "blue",
+      "red",
+      "red"
+    ],
+    "patterns": [
+      "red",
+      "red",
+      "blue",
+      "blue"
+    ],
+    "temporary_status": "existing save/queue/confirmation overrides preserved",
+    "pattern_dirty": "RAM flags and comparison, no flash access",
+    "navigation": {
+      "previous": "red",
+      "next": "same blue as favourites",
+      "idle": 32,
+      "pressed": 255,
+      "trigger": "held performance pad, release restores idle immediately"
+    },
+    "effects": {
+      "active": 176,
+      "inactive": 10,
+      "static": true
+    }
+  }
+}

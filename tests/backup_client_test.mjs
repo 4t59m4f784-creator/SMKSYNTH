@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';import {BackupClient} from '../web/backup-b1/client.js';import {crc32,inventory,SIZE} from '../web/backup-b1/bank.js';
+const pack=a=>{let n=0,bits=0,out=[];for(const v of a){n|=v<<bits;bits+=8;while(bits>=7){out.push(n&127);n>>>=7;bits-=7;}}if(bits)out.push(n);return out;};
+const bank=new Uint8Array(SIZE).fill(255);bank.set(new TextEncoder().encode('SMK37DATASMK16P1'));let pending,active=false,read=0;
+const link={send(w){let r=w.slice(1,-1),cmd=r[6],off=r[9]|r[10]<<7|r[11]<<14,data=[];if(cmd===1)data=[...new TextEncoder().encode('SMK16P1'),0,0x60,4,0];if(cmd===2)active=true;if(cmd===3){assert(active);read++;data=Array.from(bank.slice(off,off+128));}if(cmd===4)active=false;const c=crc32(data);pending=[240,...r.slice(0,6),cmd|64,r[7],r[8],0,r[9],r[10],r[11],data.length&127,data.length>>7,...pack(data),...pack([c&255,c>>>8&255,c>>>16&255,c>>>24]),247];return true;},async read(){const p=pending;pending=null;return p;}};
+const c=new BackupClient(link);const data=await c.export();assert.deepEqual(data,bank);assert.equal(read,SIZE/128*2);assert(!active);assert.equal(inventory(data).patterns,0);assert.equal(inventory(data).presets,0);
+const corrupt=bank.slice();corrupt[4096]=1;assert.throws(()=>inventory(corrupt),/corrompido/);await assert.rejects(()=>c.export(()=>{},()=>true),/cancelada/);assert(!active);
+// Build real sector/slot fixtures with valid checksums, then tamper.
+function record(at,magic,bytes){const d=new DataView(bank.buffer);d.setUint32(at,magic,true);d.setUint32(at+4,bytes.length,true);d.setUint32(at+8,crc32(bytes),true);bank.set(bytes,at+12);}
+const p=new Uint8Array(4056);new DataView(p.buffer).setUint32(0,0x50564f42,true);p[4]=1;p.set(new TextEncoder().encode('MY BASS   '),56+63);record(0x42000,0x59474e44,p);assert.equal(inventory(bank).presets,1);bank[0x42000+100]^=1;assert.throws(()=>inventory(bank),/inválido/);
+console.log('PASS: JS protocol roundtrip4480 blocks, double read, CRC, cancel releases lock, inventory blank/user preset, corrupt record rejected.');
+
+const fs=await import('node:fs');const actual=Array.from(fs.readFileSync(new URL('../build/b1-wire.bin',import.meta.url)));const cross=new BackupClient({send(){return true;},async read(){return actual;}});cross.seq=2;assert.deepEqual(await cross.command(3,0,128),Uint8Array.from({length:128},(_,i)=>i));console.log('PASS: actual C firmware reply decoded by browser client.');

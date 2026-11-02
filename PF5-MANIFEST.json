@@ -1,0 +1,37 @@
+{
+  "name": "OberVave Performance Manual",
+  "version": "3.0.1-pf5",
+  "product": "SMK-37 Pro_19545",
+  "firmware_bytes": 651327,
+  "firmware_sha256": "02da0adb9b070b1b6c798a0ee1c0941f26f7c14180193f64de2da453e344e116",
+  "hardware_tested": false,
+  "base": "PF3 + tested PF4 pattern bank + manual-only persistence",
+  "autosave": false,
+  "save_policy": {
+    "preset": "manual SAVE twice outside sequencer; program and globals/settings",
+    "pattern": "manual pattern SAVE or Bank 3 hold current; pattern snapshot and globals/settings",
+    "copy": "explicit copy or Bank 3 hold other; copied pattern and globals/settings",
+    "favourite": "hold 700 ms; favourite snapshot and sends only; preserves shared FX on recall",
+    "navigation": "no implicit flash write; save before switching or powering down",
+    "deferred_requests": "explicit saves wait for stop/quiet; require completion before power off",
+    "effects": "stored in pattern snapshot and global settings; loading a pattern restores its own saved FX"
+  },
+  "resources": {
+    "app_bytes": 150276,
+    "app_limit": 619520,
+    "ram_bytes": 68192,
+    "ram_limit": 98304,
+    "pool_bytes": 318708,
+    "pool_limit": 344064
+  },
+  "loader_sha256": "9171e2e62d560ec35cc7b0e346aa64cb74ec8db7b7925edd4c419c72bdf168d3",
+  "tests": {
+    "manual_persistence": "zero API writes on boot/edits/FX/octave/start-stop/pattern navigation; explicit preset/pattern/copy/favourite write and restart restore passed",
+    "performance": 245,
+    "contacts": 891,
+    "idle_dispatch": 332,
+    "smk_ui": 31,
+    "full_suite": "ALL TESTS PASSED; plus SMK-specific manual storage and pattern tests",
+    "physical_glitch_test": "pending"
+  }
+}
