@@ -117,8 +117,16 @@ static void smk_seq_pad_event(int32_t e,uint32_t *dirty)
         *dirty = 1;
 }
 
-static uint8_t drum_pad_part[8];
-static int smk_drums_hits(void){return obv_drums_selected()&&!layer&&((page==PG_DSOUND&&pf_bank()==0u)||(pf_bank()==1u&&drum_grid_shown()&&rec));}
+static uint8_t drum_pad_part[8],drum_pad_channel[8],drum_pad_down[8];
+static int smk_drums_hits(void){return obv_drums_selected()&&(pf_bank()==4u||(!layer&&pf_bank()==1u&&drum_grid_shown()&&rec));}
+/* Same audio-owned timestamps as ui_drum_hits: reflects live, MIDI and sequence hits. */
+static uint16_t drum_pad_led(uint32_t p){
+ if(p>=8u||!obv_drums_selected())return 0;
+ uint32_t t=seq_trk%NTRK;
+ uint32_t hit=(drum_pad_down[p]&&drum_pad_part[p]==t)||(drum_stamp[t][p]&&eng_t+1u-drum_stamp[t][p]<FS/10u);
+ /* Violet at 70% of the requested RGB level; bright white during each hit. */
+ return hit?RGB(255,255,255):smk_dim(RGB(166,66,255),179u);
+}
 static void smk_pads(uint32_t base, uint32_t *dirty)
 {
     int32_t e;
@@ -126,17 +134,17 @@ static void smk_pads(uint32_t base, uint32_t *dirty)
     while ((e = smk_pad_take()) >= 0) {
         uint32_t p=((uint32_t)e>>8)&15u,vel=(uint32_t)e&255u;
         if(preset_ui)continue;
-        if(vel)pf_role[p]=pf_bank()==3u?7u:obv_drums_selected()&&pf_bank()==1u&&!rec&&!layer?5u:(pf_bank()==1u&&drum_grid_shown())?(rec?(p<8u?4u:6u):5u):smk_drums_hits()&&p<8u?4u:pf_bank()==1u?1u:pf_bank()==2u?3u:2u;
+        if(vel)pf_role[p]=pf_bank()==4u?(obv_drums_selected()&&p<8u?4u:6u):pf_bank()==3u?7u:obv_drums_selected()&&pf_bank()==1u&&!rec&&!layer?5u:(pf_bank()==1u&&drum_grid_shown())?(rec?(p<8u?4u:6u):5u):pf_bank()==1u?1u:pf_bank()==2u?3u:2u;
         if(pf_role[p]==7u){keyboard_pad(p,vel);*dirty=1;}
         else if(pf_role[p]==1u)smk_seq_pad_event(e,dirty);
         else if(pf_role[p]==2u)pf_event(p,vel);
         else if(pf_role[p]==3u)pb_event(p,vel);
         else if(pf_role[p]==5u){if(vel){drum_grid_pad(p,vel);dirty_steps=dirty_page=1;}*dirty=1;}
         else if(pf_role[p]==4u){
-            if(vel){drum_pad_part[p]=(uint8_t)seq_trk;drum_ui_lane[seq_trk]=(uint8_t)p;dirty_page=1;note_event_p(seq_trk,1,DRUM_NOTE[p],vel);rec_note_at(seq_trk,1,DRUM_NOTE[p],vel);midi_send(0x90u|MIDI_OUT_CH,DRUM_NOTE[p],vel);}
-            else {uint32_t t=drum_pad_part[p],n=DRUM_NOTE[p];
+            if(vel){drum_pad_part[p]=(uint8_t)seq_trk;drum_pad_channel[p]=(uint8_t)MIDI_OUT_CH;drum_pad_down[p]=1;drum_ui_lane[seq_trk]=(uint8_t)p;dirty_page=1;note_event_p(seq_trk,1,DRUM_NOTE[p],vel);rec_note_at(seq_trk,1,DRUM_NOTE[p],vel);midi_send(0x90u|drum_pad_channel[p],DRUM_NOTE[p],vel);}
+            else {uint32_t t=drum_pad_part[p],n=DRUM_NOTE[p];drum_pad_down[p]=0;
                 note_event_p(t,0,n,0);rec_note_at(t,0,n,0);ctl_live_hold[t][n>>5]&=~(1u<<(n&31u));
-                midi_send(0x80u|MIDI_OUT_CH,n,0);}
+                midi_send(0x80u|drum_pad_channel[p],n,0);}
             *dirty=1;
         }
         if(!vel)pf_role[p]=0;
@@ -312,8 +320,8 @@ static void smk_leds(void)
             if(ctl_seq_run&&n==ui_seq_pos[t])c=C_CREAM;
         }
         else if(pf_bank()==1u&&drum_grid_shown()&&rec&&p>=8u)c=0;
-        else if(smk_drums_hits()&&p<8u){uint32_t hit=drum_stamp[t][p]&&eng_t+1u-drum_stamp[t][p]<FS/10u;
-            c=smk_dim(hit?C_RED:C_AMBER,hit?220u:p==drum_ui_lane[t]?80u:20u);}
+        else if(pf_bank()==4u)c=drum_pad_led(p);
+        else if(smk_drums_hits()&&p<8u)c=drum_pad_led(p);
         else if(pf_bank()==2u)c=pb_led(p);
         else if(pf_bank()==3u)c=keyboard_pad_led(p);
         padled_set(p, (uint8_t)((c >> 11) * 255u / 31u), (uint8_t)(((c >> 5) & 63u) * 255u / 63u), (uint8_t)((c & 31u) * 255u / 31u));

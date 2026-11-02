@@ -10,7 +10,7 @@
  * millisecond resume it right there. One pass of the loop per millisecond of audio, as tests/host.c does.
  * The ISR is app_audio(256 frames) as on the device; sim_render serves the worklet's 128-frame quanta out of it. */
 #define BOARD_SMK37 1
-#define APP_VER "3.0.1-p16o1"
+#define APP_VER "3.0.1-dp1"
 #define OBV_EXPERIMENTAL 1
 #define OBV_HOST 1
 #define OBV_WASM 1
@@ -253,7 +253,7 @@ EXPORT uint32_t sim_drum_busy(uint32_t t){return t<NTRK?drums_busy(t):0;}
 EXPORT uint32_t sim_melodic_busy(void){uint32_t n=0;for(unsigned i=0;i<NV;i++)n+=vc[i].gate?1u:0u;return n;}
 
 EXPORT uint32_t sim_drum_grid(void){return pf_bank()==1u&&drum_grid_shown();}
-EXPORT uint32_t sim_drum_record(void){return pf_bank()==1u&&drum_grid_shown()&&rec;}
+EXPORT uint32_t sim_drum_record(void){return obv_drums_selected()&&rec&&(pf_bank()==4u||(pf_bank()==1u&&drum_grid_shown()));}
 EXPORT uint32_t sim_drum_lane(void){return drum_ui_lane[seq_trk];}
 EXPORT uint32_t sim_drum_mask(uint32_t t,uint32_t n){return t<NTRK&&n<SEQ_STEPS?drum_pattern_mask(&pat,t,n):0;}
 EXPORT uint32_t sim_seq_pos(uint32_t t){return t<NTRK?ui_seq_pos[t]:0;}

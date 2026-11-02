@@ -921,6 +921,7 @@ static void param_value(char *s, uint32_t p, uint32_t v)   /* <= 7 characters */
 static uint32_t cut_shown_t;                    /* the header shows the cutoff for a second after it moved */
 static uint32_t perf_header_slot(void);
 static uint32_t perf_pattern_bank(void);
+static uint32_t perf_drum_bank(void);
 static void draw_header(void)
 {
     char tags[40];
@@ -943,6 +944,7 @@ static void draw_header(void)
         tags[n]='A'+keyboard_live(&pat)->part[0];tags[n+1]='+';tags[n+2]='A'+keyboard_live(&pat)->part[1];tags[n+3]=0;
         scat(tags," REC ");n=slen(tags);tags[n]='A'+seq_trk;tags[n+1]=0;
     }
+    if(perf_drum_bank()){tags[0]=0;scat(tags,obv_drums_selected()?"B4 DRUM PADS":"B4 INACTIVE");}
     ui_header(ed_prog(), ed_patch(0)->v + NPARAM, ed_edited(), tags, seq_trk, perf_header_slot());
         return;
     }
@@ -971,6 +973,7 @@ static void draw_header(void)
         tags[n]='A'+keyboard_live(&pat)->part[0];tags[n+1]='+';tags[n+2]='A'+keyboard_live(&pat)->part[1];tags[n+3]=0;
         scat(tags," REC ");n=slen(tags);tags[n]='A'+seq_trk;tags[n+1]=0;
     }
+    if(perf_drum_bank()){tags[0]=0;scat(tags,obv_drums_selected()?"B4 DRUM PADS":"B4 INACTIVE");}
     ui_header(ed_prog(), ed_patch(0)->v + NPARAM, ed_edited(), tags, seq_trk, perf_header_slot());
 }
 
@@ -1151,6 +1154,7 @@ static void draw_page(void)
         const char *t = pg->title;
         if(page==PG_KEYBOARD&&!layer)t=kb_edit_oct?"KEYBOARD OCTAVES":"KEYBOARD LEVELS";
         if(obv_drums_selected() && (page==PG_PERFORM||page==PG_VOICE))t="DRUM PERFORMANCE";
+        if(perf_drum_bank()&&!layer&&page==PG_DSOUND)t=obv_drums_selected()?"DRUM PADS":"DRUM PADS / INACTIVE";
         if (layer == L_EDIT) { title[0] = 0; scat(title, "EDIT "); title[5] = TRK_L[seq_trk % NTRK]; title[6] = 0; scat(title, ": ERASE"); t = title; }
         else if (page == PG_MIXER && !layer) t = mix_row == 0u ? "MIXER  LEVEL" : mix_row == 1u ? "MIXER  PAN" : mix_row == 2u ? "SEND  CHORUS" : mix_row == 3u ? "SEND  DELAY" : mix_row == 4u ? "SEND  REVERB" : mix_row == 5u ? "SEND  DRIVE" : "MASTER";
         else if (layer == L_GLO) t = "GLO: MUTE SOLO TAP";
@@ -1206,6 +1210,7 @@ static void draw_hints(void)
     static char ring[24];
     uint32_t r = (fm1_ms / 3500u) % 3u, key, held = rec_down ? fm1_ms - rec_down_t : 0u;
     int toasting = toast && fm1_ms - toast_t < 1500u;
+    if(perf_drum_bank()&&!layer&&!toasting&&!rec){uint32_t dk=obv_drums_selected()?901u:902u;if(hints_key!=dk){hints_key=dk;ui_hints(obv_drums_selected()?"PADS 1-8: PLAY / REC":"SELECT A DRUM-X PART",obv_drums_selected()?"PADS 9-16 UNUSED":"KNOB BANK: EXIT",obv_drums_selected()?RGB(166,66,255):C_AMBER);}return;}
     if(page==PG_KEYBOARD&&!layer&&!toasting&&!rec){if(hints_key!=900u){hints_key=900u;ui_hints("P8 / P16 SELECT PLAY ROW", "K5 LEVEL/OCT  TWO PADS LAYER", C_TRKC[0]);}return;}
     if (held > 500u) {                          /* REC held: a bar fills up to the clear */
         uint32_t k, f = (held - 500u) * 12u / 700u;
@@ -1235,7 +1240,7 @@ static void draw_hints(void)
 }
 
 static void draw_tags(void) { draw_header(); }
-static void draw_scope(void) { if(page==PG_KEYBOARD&&!layer)draw_keyboard_scope();else if(obv_drums_selected())ui_drum_hits(seq_trk%NTRK);else ui_scope(scope, SCOPE_N); }
+static void draw_scope(void) { if(perf_drum_bank()&&!obv_drums_selected()){cv_begin(240,50,C_SCOPE_BG);cv_text(4,2,&FONT_S,"DRUM PADS INACTIVE",C_AMBER);cv_text(4,28,&FONT_S,"SELECT A DRUM-X PART",C_DIMT);cv_blit(0,146);return;}if(page==PG_KEYBOARD&&!layer)draw_keyboard_scope();else if(obv_drums_selected())ui_drum_hits(seq_trk%NTRK);else ui_scope(scope, SCOPE_N); }
 static void draw_leds(void)                     /* (32 voices: eight lights, each the loudest of its card in all four groups) */
 {
     static int32_t l8[NCARD];
@@ -2121,6 +2126,7 @@ static void panel_note_in(uint32_t on,uint32_t note,uint32_t vel){keyboard_physi
 #else
 static uint32_t perf_header_slot(void) { return 0; }
 static uint32_t perf_pattern_bank(void) { return 0; }
+static uint32_t perf_drum_bank(void) { return 0; }
 #endif
 
 static uint32_t cycle_page(uint32_t first, uint32_t count)   /* a button steps through its pages */

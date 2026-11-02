@@ -21,6 +21,8 @@ static uint32_t pf_seq_mode;
 static uint32_t pf_bank(void){return pf_seq_mode?1u:pf_manual_seq;}
 static uint32_t pf_seq_bank(void) {return pf_bank()==1u;}
 static uint32_t perf_pattern_bank(void) {return pf_bank()==2u;}
+/* DP1: explicit fourth manual bank; selection is never changed by part/engine/REC. */
+static uint32_t perf_drum_bank(void) {return pf_bank()==4u;}
 static uint32_t pb_down[NPAT],pb_source[NPAT],pb_fired[NPAT],pb_confirm,pb_confirm_t,pb_confirm_source;
 static uint32_t preset_ui,save_ui_dirty,save_ui_restore,save_ui_t,preset_part,preset_pattern,preset_home_cancel,preset_down,preset_t,preset_long;
 static patch_t preset_snapshot;
@@ -272,14 +274,14 @@ static uint32_t pf_page_request;
 static void pf_nav(uint32_t bank){
  pf_seq_mode=0;pf_manual_seq=bank;pb_cancel();kb_pad_down=0;
  layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();transpose_keys=0;
- pf_page_request=(bank==3u?PG_KEYBOARD:PG_PERFORM)+1u;
+ pf_page_request=(bank==3u?PG_KEYBOARD:bank==4u?PG_DSOUND:PG_PERFORM)+1u;
  pf_redraw();dirty_hdr=1;
 }
 static void pf_bank_poll(uint32_t b,uint32_t rel){
  if(b>>BTN_KNOB_BANK&1u){pf_bank_down=1;pf_bank_t=fm1_ms;pf_diag=0;}
  if(pf_bank_down&&(fm1_in.buttons>>BTN_KNOB_BANK&1u)&&fm1_ms-pf_bank_t>=700u&&!pf_diag){pf_nav(0);pf_diag=1;}
  if(rel>>BTN_KNOB_BANK&1u){
-  if(pf_bank_down&&!pf_diag){unsigned next=pf_seq_mode?0u:pf_manual_seq==0?3u:pf_manual_seq==3?2u:0u;pf_nav(next);say(next==3u?"PADS SPLIT / LAYER":next==2u?"PADS PATTERNS / SAVE":"PADS PERFORMANCE / FAV");}
+  if(pf_bank_down&&!pf_diag){unsigned next=pf_seq_mode?0u:pf_manual_seq==0?3u:pf_manual_seq==3?2u:pf_manual_seq==2u&&obv_drums_selected()?4u:0u;pf_nav(next);say(next==4u?"PADS DRUM PADS":next==3u?"PADS SPLIT / LAYER":next==2u?"PADS PATTERNS / SAVE":"PADS PERFORMANCE / FAV");}
   pf_bank_down=0;pf_diag=0;
  }
 }

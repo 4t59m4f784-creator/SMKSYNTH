@@ -1,0 +1,1 @@
+PASS: 68 torn erase/program interruption points, journal recovery, exact B1 bank restoration, protected bytes, hash binding, payload framing, RLE/raw max reply, timeout latch and reboot. 410 full-restore operations.

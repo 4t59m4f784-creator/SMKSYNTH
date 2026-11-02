@@ -19,7 +19,7 @@ int main(int argc,char **argv){
  host_enc[ENC_KNOB2]=-1;panel_encoders();assert(live_p[0].v[DP_LEVEL[2]]==98);
  host_enc[ENC_KNOB3]=1;panel_encoders();assert(live_p[0].v[DP_DECAY[2]]==66);
  host_enc[ENC_KNOB4]=1;panel_encoders();assert(live_p[0].v[DP_PITCH[2]]==65);
- uint32_t dirty=0;pf_manual_seq=0;rec=0;
+ uint32_t dirty=0;pf_nav(4);rec=0;
  for(unsigned p=0;p<8;p++){host_qput(0,(int32_t)(p<<8|110));smk_pads(48,&dirty);render();host_qput(0,(int32_t)(p<<8));smk_pads(48,&dirty);}
  assert(drums_busy(0));assert(!vc[0].gate);assert(drum_ui_lane[0]==7&&dirty_page);
  /* Real-time drum pads retain hit mode during REC and never write tied tails. */
@@ -30,7 +30,7 @@ int main(int argc,char **argv){
  assert(!seq_live(0,36)&&!rec_open[36].t&&pat.st[0][1].note[0]==0);
  rec=REC_OFF;ctl_seq_run=0;render();
  /* PATCH/performance restores normal track pads and retains favourites. */
- page=PG_PERFORM;host_qput(0,(1<<8|100));smk_pads(48,&dirty);assert(seq_trk==1);
+ pf_nav(0);page=PG_PERFORM;host_qput(0,(1<<8|100));smk_pads(48,&dirty);assert(seq_trk==1);
  seq_trk=0;page=PG_DSOUND;pf_snapshot(&pf_store.slot[0],0);pf_store.used=1;
  obv_analog_choose(0);pf_recall(0,0);render();render();assert(obv_engine_track[0].active==OBV_DRUMS);
  pat.lane[0][0].param=DP_DECAY[2];pat.lane[0][0].v[0]=77;seq_auto(0,0);assert(live_p[0].v[DP_DECAY[2]]==77);
@@ -49,6 +49,6 @@ int main(int argc,char **argv){
   page=PG_DSOUND;draw_page();snprintf(file,sizeof file,"%s-sound.ppm",argv[1]);write_ppm_as(file);
   page=PG_ENGINE;draw_page();snprintf(file,sizeof file,"%s-setup.ppm",argv[1]);write_ppm_as(file);
  }
- puts("PASS: engine choice stays in PART SETUP; performance/track workflow, eight contextual hit pads, normal performance pads, real-time drum REC/hold release, per-instrument edit/automation, favourite recall, kit/program/pattern storage.");
+ puts("PASS: engine choice stays in PART SETUP; performance/track workflow, eight explicit DRUM PADS, normal performance pads, real-time drum REC/hold release, per-instrument edit/automation, favourite recall, kit/program/pattern storage.");
  return 0;
 }
