@@ -216,50 +216,88 @@ static void smk_buttons(uint32_t b, uint32_t *dirty)
     }
 }
 
-/* Bank B: sends of the selected part, with pickup after a part/bank/recall
- * changes the target. Master and bank A retain their original movement rule. */
-static uint8_t smk_send_pick[3], smk_send_target[3], smk_send_part[3]={255,255,255};
+/* Fader ownership includes identical-value recalls and UI/part/bank changes.
+ * The four physical faders retain fixed destinations; they never follow Attack
+ * or the currently displayed parameter. K1..K8 remain relative encoders. */
+static uint32_t smk_fader_context(void)
+{
+    uint32_t h = smk_controls_epoch;
+#define SMK_CTX(v) h = h * 33u + (uint32_t)(v)
+    SMK_CTX(page); SMK_CTX(layer); SMK_CTX(seq_trk); SMK_CTX(smk_bank);
+    SMK_CTX(mix_row); SMK_CTX(seq_view);
+    SMK_CTX(pf_bank()); SMK_CTX(obv_patch_engine(&live_p[seq_trk%NTRK]));
+    SMK_CTX(keyboard_pattern_epoch); SMK_CTX(ui_pat_swapped);
+    SMK_CTX(preset_ui); SMK_CTX(pb_confirm); SMK_CTX(pat.keyboard_selected); SMK_CTX(kb_edit_row);
+#undef SMK_CTX
+    return h;
+}
+static uint32_t smk_control_context(void)
+{
+    return (smk_fader_context()*33u+(uint32_t)step_held)*33u+seq_cur[seq_trk%NTRK];
+}
+typedef struct { uint32_t context, value; uint8_t seen, picked, jump; } smk_fader_owner_t;
+static smk_fader_owner_t smk_fader_owner[4];
+static uint32_t smk_fader_value(unsigned i, unsigned p)
+{
+    unsigned t=seq_trk%NTRK;
+    return !smk_bank ? ed_patch(p)->v[p] : i==0 ? set.mix_cho[t] : i==1 ? set.mix_dly[t] : i==2 ? set.mix_rev[t] : (uint32_t)smk_master;
+}
 static void smk_faders(uint32_t *dirty_page, uint32_t *dirty_hdr, uint32_t *dirty_tags)
 {
     static const uint8_t FP[4]={P_CUTOFF,P_RESO,P_FENV_AMT,P_AR};
     static const char *const FN[2][4]={{"CUTOFF","RESO","ENV AMT","RELEASE"},{"CHO SEND","DLY SEND","REV SEND","MASTER"}};
     static char l1[40],l2[32];
-    uint32_t t=seq_trk%NTRK;
-    for(uint32_t i=0;i<4;i++) {
-        uint32_t v=fm1_in.fader[i],prev=smk_fad_last[i],waiting=0;
-        uint8_t *send=i==0?set.mix_cho:i==1?set.mix_dly:set.mix_rev;
-        if(smk_bank&&i<3) {
-            if(prev==255u||smk_send_part[i]!=t||smk_send_target[i]!=send[t])smk_send_pick[i]=0;
-            smk_send_part[i]=(uint8_t)t;smk_send_target[i]=send[t];
+    uint32_t t=seq_trk%NTRK,context=smk_fader_context(),jump=!!smk_fader_jump();
+    for(unsigned i=0;i<4;i++) {
+        unsigned p=obv_drums_selected()&&i==3u?DP_FOLD:FP[i];
+        unsigned max=!smk_bank ? (unsigned)obv_param_max(ed_patch(p),p) : i==3 ? 1023u : 127u;
+        unsigned value=smk_fader_value(i,p),v=fm1_in.fader[i],prev=smk_fad_last[i];
+        unsigned target=(value*127u+max/2u)/max,waiting;
+        smk_fader_owner_t *o=&smk_fader_owner[i];
+        /* Seed the physical position, never use the former context's position
+         * to claim a crossing against a freshly recalled target. */
+        if(!o->seen||o->context!=context||o->value!=value||o->jump!=jump||prev==255u||fm1_in.frames<200u||preset_ui||pb_confirm) {
+            o->seen=1;o->context=context;o->value=value;o->jump=(uint8_t)jump;o->picked=0;
+            smk_fad_last[i]=(uint8_t)v;continue;
         }
-        if(prev==255u||fm1_in.frames<200u){smk_fad_last[i]=(uint8_t)v;continue;}
         if(v==prev)continue;
         smk_fad_last[i]=(uint8_t)v;
+        if(!o->picked&&((prev<=target&&v>=target)||(prev>=target&&v<=target)))o->picked=1;
+        waiting=!jump&&!o->picked;
         char val[12];
-        if(smk_bank&&i<3) {
-            uint32_t target=send[t];
-            if(!smk_send_pick[i]&&((prev<=target&&v>=target)||(prev>=target&&v<=target)||
-                (v+1u>=target&&v<=target+1u)))smk_send_pick[i]=1;
-            waiting=!smk_send_pick[i];
-            if(!waiting) {
-                send[t]=(uint8_t)v;smk_send_target[i]=(uint8_t)v;
+        if(!waiting) {
+#ifndef OBV_HOST
+            uint32_t irq = fm1__lock();
+#endif
+            if(smk_fader_context()!=context){
+                o->seen=0;
+#ifndef OBV_HOST
+                fm1__unlock(irq);
+#endif
+                continue;
+            }
+            if(!smk_bank) {
+                set_param(p,(int32_t)((v*max+63u)/127u));
+                if(p==P_CUTOFF)cut_shown_t=fm1_ms+1u;
+                *dirty_page=*dirty_hdr=1;
+            } else if(i<3u) {
+                uint8_t *send=i==0?set.mix_cho:i==1?set.mix_dly:set.mix_rev;
+                send[t]=(uint8_t)v;
                 if(i&&v){pf_store.last_send[i-1][t]=(uint8_t)v;pf_changed();}
                 mix_apply();set_dirty=1;set_t=fm1_ms;
                 *dirty_page=*dirty_hdr=*dirty_tags=1;
-            }
-            fmt_u(val,((waiting?target:v)*100u+63u)/127u);scat(val,"%");
-        } else if(!smk_bank) {
-            uint32_t p=obv_drums_selected()&&i==3u?DP_FOLD:FP[i];set_param(p,(int32_t)(v*obv_param_max(ed_patch(p),p)+63u)/127);
-            param_value(val,p,ed_patch(p)->v[p]);
-            if(p==P_CUTOFF)cut_shown_t=fm1_ms+1u;
-            *dirty_page=*dirty_hdr=1;
-        } else {
-            smk_master=(int32_t)(v*1023u/127u);
-            fmt_u(val,(v*100u+63u)/127u);scat(val,"%");
+            } else smk_master=(int32_t)(v*1023u/127u);
+            o->value=smk_fader_value(i,p); /* our own write does not disarm pickup */
+#ifndef OBV_HOST
+            fm1__unlock(irq);
+#endif
         }
-        l1[0]=0;scat(l1,smk_bank?"B":"A");fmt_u(l1+1,i+1u);scat(l1," ");scat(l1,(!smk_bank&&obv_drums_selected())?obv_voice_label(obv_drums_selected()&&i==3u?DP_FOLD:FP[i]):FN[smk_bank][i]);
+        if(!smk_bank)param_value(val,p,ed_patch(p)->v[p]);
+        else {fmt_u(val,((waiting?target:v)*100u+63u)/127u);scat(val,"%");}
+        l1[0]=0;scat(l1,smk_bank?"B":"A");fmt_u(l1+1,i+1u);scat(l1," ");
+        scat(l1,(!smk_bank&&obv_drums_selected())?obv_voice_label(p):FN[smk_bank][i]);
         if(smk_bank&&i<3){char tr[3]={' ',TRK_L[t],0};scat(l1,tr);}
-        scat(l1,waiting?" PICKUP ":" ");scat(l1,val);
+        scat(l1,waiting?" CATCH ":" ");scat(l1,val);
         smk_bar(l2,v,127u);smk_overlay(l1,l2);
     }
 }

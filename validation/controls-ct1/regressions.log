@@ -1,0 +1,10 @@
+PASS: illegal encoder trace, all Gray phases/directions and bounce; Attack isolation; JUMP/CATCH for all faders; mixer/FX/part/page/bank/recall/pattern rearm; relative encoders and context ownership; settings compatibility.
+PASS: all four parts and five octaves, step/chord/held-pad/live-REC/autostart, MIDI absolute, split/layer routing, inherited nudge removed, persistent transpose + K4 and release ownership; 201 tempos x 7 divisions x 128 intervals, phase error <16 frames (0.363 ms). Physical CPU not measured.
+PASS: per-part octave, physical routes, held notes across octave/part changes, layer additive offsets, preset/favorite/scene roundtrips, legacy0, record sizes unchanged.
+PASS: two independent rows, max white selector, inactive edit, split boundary, held releases, row-exclusive gains, sustain, REC, SL1 migration, two-row persistence, synchronized pattern swap and transpose.
+PASS: preset-only short/long BT across SEQ/keyboard/locked layer, hold+tap overwrite, release safety, 4s timeout/no write, empty copy, wrong-pad/source cancellation, exact-size focus roundtrip, stopped/queued focus recall, legacy A, scene bytes intact.
+PASS: factory/user/INIT target names without load/write; no clears, idle preset overlays zero LCD writes, countdown only 240x20 once/second, same4s cancel, one waiting-state repaint, native240x240 captures.
+PASS: 16 complete independent slots, 256 steps x4, chords x4, automation x4, 8 drum lanes, scenes, two keyboard rows + focus, overwrite slot16 isolated, pad16 hold/tap + timeout, legacy slots8..15 blocked, synchronized slot16 focus/keyboard recall with transpose retained, two native pages.
+PASS: conditional bank, persistent ownership/engine/page changes, 8 hits/velocity, reserved lower pads, violet70/white and actual sequence feedback, per-part feedback isolation, REC/original note-off+channel, inactive UI, long escape and unchanged saved layouts.
+PASS: 80 stopped recalls, 4 queued audio-ISR recalls, full patches/ARP/FX/mixer/steps/automation, K1 retained, zero recall writes.
+PASS: 396 headers preserve all pixels outside logo; boot colours, left-to-right sweep, both rows and final blackout.

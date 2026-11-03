@@ -1,0 +1,28 @@
+name: Physical controls candidate
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native controls and workflow regressions
+        run: sh tests/run_physical_controls_tests.sh
+      - name: Real WASM controls, persistence and identical factory audio
+        run: node tests/physical_controls_wasm_test.mjs experimental/controls-ct1/SMKSYNTH-1.0.1-ct1.wasm
+      - name: Candidate hashes, source pins and exact return app
+        run: |
+          python3 tools/check_controls_candidate.py
+          python3 tests/voice_package_bank_test.py experimental/controls-ct1/SMKSYNTH-1.0.1-ct1-SMK37-Pro.fwsc
+          python3 tests/voice_package_bank_test.py experimental/controls-ct1/SMKSYNTH-1.0.0-return-preserve-bank.fwsc
+      - name: Update and return preserve bank across interrupted erases
+        run: |
+          cc -O2 -DBOARD_SMK37=1 -DOBV_VOICE_HW=1 -o build/controls/loader tests/backup_loader_test.c
+          build/controls/loader web/install/firmware/SMKSYNTH-1.0.0-SMK37-Pro.fwsc experimental/controls-ct1/SMKSYNTH-1.0.1-ct1-SMK37-Pro.fwsc
+          build/controls/loader experimental/controls-ct1/SMKSYNTH-1.0.1-ct1-SMK37-Pro.fwsc experimental/controls-ct1/SMKSYNTH-1.0.0-return-preserve-bank.fwsc
