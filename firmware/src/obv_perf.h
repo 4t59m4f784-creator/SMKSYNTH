@@ -199,6 +199,7 @@ static void pf_recall(uint32_t i,uint32_t t) {
     if(!(pf_store.used>>i&1u)){pf_message("FAV EMPTY ",i+1u);return;}
     const pf_slot_t *v=&pf_store.slot[i];patch_t p=v->patch;
     if(!t)fx_keep(&p); /* preserve shared FX and their tails */
+    smk_controls_epoch++;
     live_p[t]=p;trk_prog[t]=v->prog;trk_edited[t]=v->edited;set.tprog[t]=v->prog;
     if(!t)set.prog=v->prog;
     if(v->cho<=127u)set.mix_cho[t]=v->cho;

@@ -399,33 +399,26 @@ static void smk__buttons(void)
     }
 }
 
-static void smk__encoders(void)                    /* stock decoder: 3-state window, 4 counts a cycle */
+#include "smk_encoder_filter.h"
+static void smk__encoders(void)
 {
-    uint32_t e;
-    for (e = 0; e < FM1_NENC; e++) {
-        uint32_t cur = smk__closed(SMK_ENCC[e][0]) | smk__closed(SMK_ENCC[e][1]) << 1, h;
-        if (fm1_in.enc_last[e] == 0xFF) {           /* first frame */
-            fm1_in.enc_last[e] = (uint8_t)cur;
-            fm1_in.enc_hist[e] = (uint8_t)(cur * 0x15u);
+    for (uint32_t e = 0; e < FM1_NENC; e++) {
+        uint32_t cur = smk__closed(SMK_ENCC[e][0]) | smk__closed(SMK_ENCC[e][1]) << 1;
+        if (fm1_in.enc_last[e] == 0xFF) {
+            fm1_in.enc_last[e] = fm1_in.enc_hist[e] = (uint8_t)cur;
+            fm1_in.enc_cnt[e] = 0;
             continue;
         }
-        if (cur != fm1_in.enc_last[e]) {            /* must hold for two frames */
-            fm1_in.enc_last[e] = (uint8_t)cur;
-            continue;
-        }
-        if (cur == (fm1_in.enc_hist[e] & 3u))
-            continue;
-        h = ((uint32_t)fm1_in.enc_hist[e] << 2 | cur) & 0x3Fu;
-        fm1_in.enc_hist[e] = (uint8_t)h;
-        if (h == 0x07u || h == 0x1Eu || h == 0x21u || h == 0x38u)
-            fm1_in.enc_cnt[e]--;                     /* A leads */
-        else if (h == 0x0Bu || h == 0x12u || h == 0x2Du || h == 0x34u)
-            fm1_in.enc_cnt[e]++;                     /* B leads */
-        if (fm1_in.enc_cnt[e] >= SMK_ENC_DIV || fm1_in.enc_cnt[e] <= -SMK_ENC_DIV) {   /* one step a detent */
-            int32_t s = fm1_in.enc_cnt[e] / SMK_ENC_DIV;
-            fm1_in.enc_steps[e] = (int16_t)(fm1_in.enc_steps[e] + s);
-            fm1_in.enc_cnt[e] = (int16_t)(fm1_in.enc_cnt[e] - s * SMK_ENC_DIV);
-        }
+        if (cur != fm1_in.enc_last[e]) { fm1_in.enc_last[e] = (uint8_t)cur; continue; }
+        uint32_t previous = fm1_in.enc_hist[e] & 3u;
+        if (cur == previous) continue;
+        int partial = fm1_in.enc_cnt[e];
+        int delta = smk_encoder_delta(previous, cur, &partial);
+        fm1_in.enc_hist[e] = (uint8_t)cur;
+        fm1_in.enc_cnt[e] = (int16_t)partial;
+        /* A stalled UI must not wrap the relative accumulator's sign. */
+        int steps = fm1_in.enc_steps[e] + delta;
+        fm1_in.enc_steps[e] = (int16_t)(steps < -32767 ? -32767 : steps > 32767 ? 32767 : steps);
     }
 }
 

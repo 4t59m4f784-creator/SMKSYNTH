@@ -1,0 +1,1 @@
+PASS: 782 valid baseline encoder scenarios byte-identical. 65 artificial ANALOG-on-DRUM/VOICE-page redirect scenarios now discard the queued old-context delta as intended. New GLOBAL CONTROLS is appended.
