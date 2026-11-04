@@ -11,7 +11,7 @@ static pf_store_t pf_store;
 static uint32_t pf_manual_write;
 static uint32_t pf_pending, pf_dirty, pf_t, pf_saved_bank = 1, pf_manual_seq;
 static uint8_t pf_role[16], pf_fired[8], pf_target[8], pf_active[NTRK];
-static uint32_t pf_down[8], pf_flash[16], pf_bank_t, pf_bank_down, pf_diag;
+static uint32_t pf_down[8], pf_flash[16], pf_bank_t, pf_bank_down, pf_bank_held;
 static pf_slot_t pf_capture[8];
 static void trk_select(uint32_t t);
 static uint16_t smk_dim(uint16_t c, uint32_t k);
@@ -199,6 +199,7 @@ static void pf_recall(uint32_t i,uint32_t t) {
     if(!(pf_store.used>>i&1u)){pf_message("FAV EMPTY ",i+1u);return;}
     const pf_slot_t *v=&pf_store.slot[i];patch_t p=v->patch;
     if(!t)fx_keep(&p); /* preserve shared FX and their tails */
+    smk_controls_epoch++;
     live_p[t]=p;trk_prog[t]=v->prog;trk_edited[t]=v->edited;set.tprog[t]=v->prog;
     if(!t)set.prog=v->prog;
     if(v->cho<=127u)set.mix_cho[t]=v->cho;
@@ -278,11 +279,11 @@ static void pf_nav(uint32_t bank){
  pf_redraw();dirty_hdr=1;
 }
 static void pf_bank_poll(uint32_t b,uint32_t rel){
- if(b>>BTN_KNOB_BANK&1u){pf_bank_down=1;pf_bank_t=fm1_ms;pf_diag=0;}
- if(pf_bank_down&&(fm1_in.buttons>>BTN_KNOB_BANK&1u)&&fm1_ms-pf_bank_t>=700u&&!pf_diag){pf_nav(0);pf_diag=1;}
+ if(b>>BTN_KNOB_BANK&1u){pf_bank_down=1;pf_bank_t=fm1_ms;pf_bank_held=0;}
+ if(pf_bank_down&&(fm1_in.buttons>>BTN_KNOB_BANK&1u)&&fm1_ms-pf_bank_t>=700u&&!pf_bank_held){pf_nav(0);pf_bank_held=1;}
  if(rel>>BTN_KNOB_BANK&1u){
-  if(pf_bank_down&&!pf_diag){unsigned next=pf_seq_mode?0u:pf_manual_seq==0?3u:pf_manual_seq==3?2u:pf_manual_seq==2u&&obv_drums_selected()?4u:0u;pf_nav(next);say(next==4u?"PADS DRUM PADS":next==3u?"PADS SPLIT / LAYER":next==2u?"PADS PATTERNS / SAVE":"PADS PERFORMANCE / FAV");}
-  pf_bank_down=0;pf_diag=0;
+  if(pf_bank_down&&!pf_bank_held){unsigned next=pf_seq_mode?0u:pf_manual_seq==0?3u:pf_manual_seq==3?2u:pf_manual_seq==2u&&obv_drums_selected()?4u:0u;pf_nav(next);say(next==4u?"PADS DRUM PADS":next==3u?"PADS SPLIT / LAYER":next==2u?"PADS PATTERNS / SAVE":"PADS PERFORMANCE / FAV");}
+  pf_bank_down=0;pf_bank_held=0;
  }
 }
 static uint32_t pf_home_down,pf_home_t,pf_home_long;

@@ -1,5 +1,12 @@
 > Atualização de 02/11/2026: Marcus confirmou a primeira instalação física por USB no SMK-37 Pro. Os registros abaixo descrevem também os testes automatizados realizados antes dessa confirmação.
 
+## Atualização 1.0.1
+
+No instalador, escolha Atualizar se já usa SMKSYNTH: o banco é preservado, sem reinstalar V016. Escolha Instalar somente para a primeira instalação a partir da M‑VAVE oficial V016; essa opção substitui o banco e carrega os exemplos de fábrica. Exporte um backup antes de atualizar. USB oferece MIDI, backup/restauração e atualizações; grave áudio pela saída física usando uma interface.
+
+GLOBAL → FADER MODE: JUMP aplica a posição do fader; CATCH assume o parâmetro ao cruzar o valor atual e rearma ao trocar páginas, partes, bancos ou patterns. Salve GLOBAL para conservar a escolha. Os oito encoders permanecem relativos.
+
+
 # Instalação SMKSYNTH 1.0.0
 
 Modelo: **M‑VAVE SMK‑37 Pro**. Origem obrigatória: **oficial V016**, identidade `SMK-37 Pro_016`. Destino: `SMK-37 Pro_19618`. Outros modelos, V015/V017, nomes genéricos e firmwares alternativos são recusados.

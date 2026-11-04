@@ -10,7 +10,9 @@
  * millisecond resume it right there. One pass of the loop per millisecond of audio, as tests/host.c does.
  * The ISR is app_audio(256 frames) as on the device; sim_render serves the worklet's 128-frame quanta out of it. */
 #define BOARD_SMK37 1
+#ifndef APP_VER
 #define APP_VER "1.0.0"
+#endif
 #define OBV_HOST 1
 #define OBV_WASM 1
 #include <stdint.h>
@@ -286,3 +288,6 @@ EXPORT uint32_t sim_lcd_pixels(void){return host_lcd_pixels;}
 
 EXPORT int32_t sim_part_octave(uint32_t t){return patch_keyboard_octave(&live_p[t%4]);}
 
+
+EXPORT uint32_t sim_fader_jump(void){return !!smk_fader_jump();}
+EXPORT uint32_t sim_fader_caught(uint32_t i){return i<4u?smk_fader_owner[i].picked:0u;}

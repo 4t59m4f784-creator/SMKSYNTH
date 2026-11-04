@@ -16,10 +16,14 @@ jobs:
       - name: Validate curated content and boot layout
         run: |
           python3 tests/release_factory_test.py
-          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.0-SMK37-Pro.fwsc
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.1-first-install-SMK37-Pro.fwsc
       - name: Validate first-install guard and seeded simulator
         run: |
-          node tests/release_installer_test.mjs
+          node tests/release_101_installer_test.mjs
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/controls tests/physical_controls_test.c
+          /tmp/controls
+          cc -O2 -o /tmp/midi-only tests/usb_midi_only_test.c
+          /tmp/midi-only
           node tests/release_demo_wasm_test.mjs
           node tests/release_i18n_test.mjs
           node tests/simulator_midi_test.mjs

@@ -16,7 +16,7 @@ async function fetchPackages(){try{
   const r=await fetch(PINS[kind].url,{cache:'no-store'});if(!r.ok)throw Error('Download indisponível: '+kind);
   const raw=new Uint8Array(await r.arrayBuffer());await validate(raw,kind);buffers[kind]=raw;
  }
- status('packageStatus','SMKSYNTH 1.0.0 verificado: SHA-256, modelo e CRCs aprovados.');
+ status('packageStatus','SMKSYNTH 1.0.1 verificado: SHA-256, modelo e CRCs aprovados.');
 }catch(e){for(const kind of Object.keys(buffers))delete buffers[kind];status('packageStatus','Pacotes bloqueados: '+e.message);log(e.message)}refresh()}
 $('connect').addEventListener('click',async()=>{
  if(busy)return;device=null;service=null;refresh();$('connect').disabled=true;status('deviceStatus','Solicitando acesso USB-MIDI e consultando identidade…');
@@ -32,7 +32,7 @@ $('connect').addEventListener('click',async()=>{
 function prepare(kind){
  if(busy||Object.keys(buffers).length!==Object.keys(PINS).length||!service||!mode(kind))return;choice=kind;
  $('confirmTitle').textContent=(mode(kind)==='resume'?'Retomar: ':'')+PINS[kind].name;
- $('confirmDetails').textContent='Origem: '+device.text+'. Destino: '+PINS[kind].product+'. Esta instalação inicial substitui a área do instrumento e instala cinco patterns e oito favoritos. O banco anterior do SMKSYNTH não é preservado por este pacote. A origem deve ser M-VAVE oficial V016. Se houver restauração pendente, retome com o mesmo arquivo antes de instalar firmware.';
+ $('confirmDetails').textContent='Origem: '+device.text+'. Destino: '+PINS[kind].product+'. '+(kind==='update'?'Atualização direta do SMKSYNTH, preservando presets, favoritos e sequências. Guarde um backup antes. Não reinstale a V016.':'Instalação inicial a partir da M-VAVE V016: substitui o banco e instala cinco patterns e oito favoritos.')+' Se houver restauração pendente, conclua-a com o mesmo arquivo antes de atualizar.';
  $('confirmWrite').textContent='Confirmar firmware';$('confirmation').showModal();
 }
 for(const kind of Object.keys(PINS))$(kind).addEventListener('click',()=>prepare(kind));
@@ -53,6 +53,6 @@ $('confirmation').addEventListener('close',async()=>{
  finally{busy=false;refresh()}
 });
 window.addEventListener('beforeunload',e=>{if(busy){e.preventDefault();e.returnValue=''}});
-$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-1.0.0-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-1.0.1-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 refresh();fetchPackages();
 
