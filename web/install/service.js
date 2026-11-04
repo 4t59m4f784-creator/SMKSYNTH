@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"release": {"name": "SMKSYNTH 1.0.0 \u00b7 Instala\u00e7\u00e3o inicial", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "47b625307c97dea73efbb5148076b091f1c1568ca1d1e3a2ae98d146b20d4c0d", "url": "./firmware/SMKSYNTH-1.0.0-SMK37-Pro.fwsc"}});
-export const PENDING="smksynth.1.0.0.first-install.pending.v1";
+export const PINS=Object.freeze({"release": {"name": "Instalar SMKSYNTH 1.0.1", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "3bc0cd43cad00e452f44fa03d52a32b220202baaa7ea445f52c3601686e421f4", "url": "./firmware/SMKSYNTH-1.0.1-first-install-SMK37-Pro.fwsc"}, "update": {"name": "Atualizar SMKSYNTH 1.0.1", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "6fffb8900340c201651aa1c576d2f0320caff4a2901cbeb551f54b5e21005a20", "url": "./firmware/SMKSYNTH-1.0.1-update-SMK37-Pro.fwsc"}});
+export const PENDING="smksynth.1.0.1.pending.v1";
 export async function validate(raw,kind){
  const p=PINS[kind];if(!p)throw Error('Operação inválida.');
  if(raw.length!==p.size)throw Error('Tamanho diferente do pacote esperado.');
@@ -14,14 +14,14 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const SOURCES=new Set(['SMK-37 Pro_016']);
+const originAllowed=(kind,source)=>kind==='release'?source==='SMK-37 Pro_016':kind==='update'&&['SMK-37 Pro_19617','SMK-37 Pro_19618'].includes(source);
 export function modeFor(kind,id,pending){
  if(!PINS[kind])throw Error('Operação inválida.');
  if(!id?.text)throw Error('Conecte e consulte o teclado.');
  if(!['SMK-37 Pro','ota-SMK-37 Pro'].includes(id.model))throw Error('Modelo recusado: somente SMK-37 Pro.');
- if(SOURCES.has(id.text))return 'install';
- if(id.text==='ota-SMK-37 Pro_900'&&(pending?.kind===kind&&pending.sha===PINS[kind].sha&&pending.source==='SMK-37 Pro_016'))return 'resume';
- throw Error('Instalação inicial exige M-VAVE oficial V016 (SMK-37 Pro_016). Detectado: '+id.text+'. Nenhuma gravação iniciada.');
+ if(originAllowed(kind,id.text))return 'install';
+ if(id.text==='ota-SMK-37 Pro_900'&&(pending?.kind===kind&&pending.sha===PINS[kind].sha&&originAllowed(kind,pending.source)))return 'resume';
+ throw Error('Escolha Instalar para M-VAVE V016 ou Atualizar para SMKSYNTH. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
 }
 function guardFor(source){return (phase,id)=>{
  if(phase==='start'&&id.text!==source())throw Error('A identidade mudou antes da gravação: '+id.text);
@@ -36,7 +36,7 @@ export class InstallService{
   if(!PINS[kind])throw Error('Operação inválida.');const pkg=validated[kind];let source;
   const up=new this.UpdaterType(this.access,this.log,{guard:guardFor(()=>source)});
   const d=await up.find();if(!d)throw Error('Teclado não encontrado.');
-  const id=d.id;source=id.text;d.link.close();const mode=modeFor(kind,id,readPending(this.storage));
+  const id=d.id;const pending=readPending(this.storage);d.link.close();const mode=modeFor(kind,id,pending);source=mode==='resume'?pending.source:id.text;
   this.storage.setItem(PENDING,JSON.stringify({kind,sha:PINS[kind].sha,source}));
   if(mode==='resume'){if(!await up.resume(pkg.image,step,{product:pkg.product}))throw Error('Retomada incompleta. Preserve o log.');}
   else await up.install(pkg.image,pkg.product,step);

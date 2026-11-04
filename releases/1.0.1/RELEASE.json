@@ -1,0 +1,26 @@
+{
+  "version": "1.0.1",
+  "identity": "SMK-37 Pro_19618",
+  "required_origin": "SMK-37 Pro_016",
+  "installation": "first-install-or-preserving-update",
+  "runtime_base": "6c11279e6bfcfb627dfb54628dddc2ee8a653f58",
+  "factory_patterns": 5,
+  "favorites": 8,
+  "extra_user_presets": 0,
+  "tempo": 90,
+  "dp2_runtime_hardware_approved": true,
+  "first_install_hardware_approved": false,
+  "firmware_sha256": "3bc0cd43cad00e452f44fa03d52a32b220202baaa7ea445f52c3601686e421f4",
+  "wasm_sha256": "6328360a9fbb9ade9ddb9fb0ada846a5a8e21972fae4cd563f709a8e65a3ab2a",
+  "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
+  "app_bytes": 156616,
+  "static_ram_bytes": 80048,
+  "pool_bytes": 325984,
+  "loader_bytes": 7211,
+  "update_firmware_sha256": "6fffb8900340c201651aa1c576d2f0320caff4a2901cbeb551f54b5e21005a20",
+  "usb_audio": false,
+  "fader_modes": [
+    "JUMP",
+    "CATCH"
+  ]
+}

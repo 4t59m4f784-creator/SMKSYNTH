@@ -89,6 +89,9 @@ typedef struct {                                /* SET_VERSION 2 (1.4.3 and befo
 } set_v2_t;
 static uint32_t set_dirty, set_t, manual_store_request;
 #if BOARD_SMK37
+static uint32_t smk_controls_epoch; /* identical-value recalls still change ownership */
+#endif
+#if BOARD_SMK37
 /* Reserved rec_q byte: high bit marks boot volume, low 7 bits encode K1.
  * Same settings size/version/sector; old firmware ignores it with rec_qt_ok valid.
  * Rounding error <=4 ADC counts, smaller than a K1 encoder detent (24).
@@ -146,6 +149,15 @@ static uint32_t pat_save_armed, pat_save_t, q_edited;   /* q_edited: the next pa
 static uint32_t pat_queue, copy_to, copy_arm, copy_arm_t;   /* pat_queue: the next pattern + 1 (playing: on the next bar) */
 enum { CLICK_OFF, CLICK_REC, CLICK_ON, CLICK_COUNT, NCLICK };   /* COUNT: as REC, and REC armed + PLAY counts in a bar */
 static const char *const CLICK_NAME[NCLICK] = {"OFF", "REC", "ON", "COUNT-IN"};
+#if BOARD_SMK37
+/* Preserve settings size, version, CRC framing and every existing click value.
+ * Old readers already use click % 4. Tagged upper bits encode this global only;
+ * old/unmarked stores default to CATCH. Presets/patterns never carry this byte. */
+_Static_assert(NCLICK == 4, "fader mode storage requires four click modes");
+static uint32_t smk_fader_jump(void) { return (set.click & 0xF8u) == 0xA0u && (set.click & 4u); }
+static void smk_fader_mode_set(uint32_t jump) { set.click = (uint8_t)(0xA0u | (jump ? 4u : 0u) | (set.click % NCLICK)); }
+#endif
+
 /* the panel as sloopDX's: a function button tapped (let go, nothing else touched) opens its pages; held, it is a
  * layer (the keys and knobs change job until it is let go; HOME tapped while it is held locks it open) */
 enum { L_NONE, L_SEQ, L_EDIT, L_GLO, L_SAVE, L_FX };
@@ -244,6 +256,9 @@ static uint32_t ed_edited(void) { return trk_edited[seq_trk % NTRK]; }
 
 static void trk_load(uint32_t t, uint32_t n)    /* track t: program n */
 {
+#if BOARD_SMK37
+    smk_controls_epoch++;
+#endif
     patch_t p;
     t %= NTRK; n %= NPROG;
     prog_get(n, &p);
@@ -531,6 +546,9 @@ static void pat_fetch(uint32_t n, pattern_t *p)   /* manual recall restores step
 }
 static void load_pattern(uint32_t n)            /* stopped: pattern n with its sounds and its mix */
 {
+#if BOARD_SMK37
+    smk_controls_epoch++;
+#endif
     uint32_t t;
     n %= NPAT;
     ctl_panic = 1;                              /* (what the old one held lets go) */
@@ -1143,6 +1161,11 @@ static void draw_page(void)
             k[i].present = 1;
             if (i == 0) { scat(k[i].value, DV_NAME[set.dv_type % NDV]); k[i].v = set.dv_type % NDV; k[i].max = NDV - 1; }
             else { uint32_t v = i == 1 ? set.dv_amt : i == 2 ? set.dv_tone : set.dv_mix; fmt_u(k[i].value, v); k[i].v = v; k[i].max = 127; }
+        } else if (page == PG_CONTROLS && !layer) {
+#if BOARD_SMK37
+            if (!i) { k[i].label = "MODE"; k[i].present = 1;
+                scat(k[i].value, smk_fader_jump() ? "JUMP" : "CATCH"); k[i].v = smk_fader_jump() ? 0 : 1; k[i].max = 1; }
+#endif
         } else if (page == PG_GLOBAL && !layer && !SMK_PAD_HELD) {
             static const char *const GL[4] = {"TEMPO", "CLICK", "MIDI CH", "TUNE"};
             k[i].label = GL[i];
@@ -2395,6 +2418,9 @@ static void trk_clear(void)
 static void panel_encoders(void)
 {
     uint32_t k; int32_t e;
+#if BOARD_SMK37
+    uint32_t control_context = smk_control_context();
+#endif
     obv_context_refresh();
 #if BOARD_SMK37
     if(preset_ui||pb_confirm){for(unsigned i=0;i<8;i++){int e=fm1_enc_take(i);if(preset_ui==1&&i==ENC_PRESETS&&e){save_to=(uint32_t)((int32_t)save_to+e+(int32_t)NPROG*4)%NPROG;save_ui_dirty=1;}}return;}
@@ -2436,9 +2462,17 @@ static void panel_encoders(void)
                 dirty_page |= page == PG_GLOBAL;
             }
         }
+#if BOARD_SMK37
+        /* K5/K6/K7 may have changed focus/recall earlier in this same batch.
+         * A parameter delta queued with that navigation belongs to the old context. */
+        uint32_t context_changed = control_context != smk_control_context();
+#endif
         for (k = 0; k < 4u; k++) {
             int32_t p = obv_page_param(page,k);
             if ((e = fm1_enc_take(ENC_KNOB1 + k)) == 0) continue;
+#if BOARD_SMK37
+            if (context_changed || control_context != smk_control_context()) continue;
+#endif
             if (e > 1 || e < -1) e *= 3;        /* a fast turn goes further */
             if(k==3u&&performance_transpose_control()){transpose_keys_set(e>0);dirty_hdr=dirty_steps=1;}
             else if(page==PG_KEYBOARD&&!layer){keyboard_turn(k,e);dirty_hdr=1;}
@@ -2469,9 +2503,13 @@ static void panel_encoders(void)
                 if (k == 0) set.dv_type = (uint8_t)clampi((int32_t)(set.dv_type % NDV) + (e > 0 ? 1 : -1), 0, NDV - 1);
                 else { uint8_t *v = k == 1 ? &set.dv_amt : k == 2 ? &set.dv_tone : &set.dv_mix; *v = (uint8_t)clampi((int32_t)*v + e * 2, 0, 127); }
                 mix_apply(); set_dirty = 1; set_t = fm1_ms;
+            } else if (page == PG_CONTROLS && !layer) {
+#if BOARD_SMK37
+                if (!k) { smk_fader_mode_set(e < 0); set_dirty = 1; set_t = fm1_ms; }
+#endif
             } else if (page == PG_GLOBAL && !layer && !SMK_PAD_HELD) {   /* (a held layer has the knobs, on every page) */
                 if (k == 0) { set.tempo = (uint8_t)clampi(set.tempo + e, 40, 240); ctl_tempo = set.tempo; }
-                else if (k == 1) set.click = (uint8_t)clampi((int32_t)(set.click % NCLICK) + (e > 0 ? 1 : -1), 0, NCLICK - 1);
+                else if (k == 1) set.click = (uint8_t)((set.click & 0xFCu) | (uint32_t)clampi((int32_t)(set.click % NCLICK) + (e > 0 ? 1 : -1), 0, NCLICK - 1));
                 else if (k == 2) set.midi_ch = (uint8_t)clampi(set.midi_ch + e, 0, 16);
                 else { set.tune = (int8_t)clampi(set.tune + e, -50, 50); ctl_tune8 = set.tune * 256 / 100; }
                 set_dirty = 1; set_t = fm1_ms;
@@ -2590,6 +2628,9 @@ static void app_main(void)
     say(APP_VER);                              /* visible boot label for the isolated test build */
 #endif
     scope_state = 1;
+#if BOARD_SMK37
+    uint32_t smk_control_seen = smk_control_context();
+#endif
 
     for (;;) {
         uint32_t rel, b, lit = 0, base = (uint32_t)(KEY0 + 12 * keyboard_base_octave()), np = page;
@@ -2599,6 +2640,9 @@ static void app_main(void)
         static unsigned b1_shown;
         if(b1_active){b1_discard_inputs();if(!b1_shown){lcd_fill(0,0,240,240,C_PANEL);draw_text_box(0,90,240,&FONT_S,b2_latched?"RESTORE / SAVED DATA":"BACKUP / SAVED DATA",C_CREAM,1);draw_text_box(0,120,240,&FONT_S,"USB - DO NOT EDIT",C_AMBER,1);b1_shown=1;}continue;}
         if(b1_shown){b1_discard_inputs();if(fm1_in.keys||fm1_in.notes||fm1_in.buttons)continue;b1_shown=0;save_ui_restore=1;}
+#endif
+#if BOARD_SMK37
+        uint32_t control_context_before_buttons = smk_control_seen;
 #endif
         keys_in(0);
 #if BOARD_SMK37
@@ -2673,7 +2717,7 @@ static void app_main(void)
                         } else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
                         else if (LL[k] == L_EDIT) np = obv_drums_selected() ? (page==PG_DKIT?PG_DSOUND:PG_DKIT) : cycle_page(PG_OSC1, 5);
                         else if (LL[k] == L_FX) np = cycle_page(PG_CHORUS, 4);
-                        else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : PG_GLOBAL;
+                        else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : PG_GLOBAL;
 
                     }
                     layer = L_NONE;
@@ -2783,9 +2827,14 @@ static void app_main(void)
             page = np; dirty_page = dirty_steps = 1; step_held = -1; audition_off(); hints_key = 0xFFFFFFFFu; leds_q = 0xFFFFFFFFu;
         }
 
+#if BOARD_SMK37
+        if (control_context_before_buttons != smk_control_context())
+            for (unsigned c = 0; c < 4; c++) (void)fm1_enc_take(ENC_KNOB1 + c);
+#endif
         panel_encoders();
 
 #if BOARD_SMK37
+        smk_control_seen = smk_control_context();
         smk_faders(&dirty_page, &dirty_hdr, &dirty_tags);
         smk_wheels();
 #endif
@@ -2860,7 +2909,7 @@ static void app_main(void)
         fm1_led_key(BTN_ENV, page == PG_FENV || page == PG_AENV);
         fm1_led_key(BTN_LFO, page >= PG_LFO && page <= PG_LFO2);
         fm1_led_key(BTN_FX, page >= PG_CHORUS && page <= PG_DRIVE);
-        fm1_led_key(BTN_GLO, page >= PG_VOICE && page <= PG_GLOBAL);
+        fm1_led_key(BTN_GLO, (page >= PG_VOICE && page <= PG_GLOBAL) || page == PG_CONTROLS);
         fm1_led_key(BTN_SAVE, preset_ui==1||preset_ui==2||preset_down);
 #if BOARD_SMK37
         smk_leds();                             /* the step pads, FADER BANK, < > */
@@ -2870,7 +2919,7 @@ static void app_main(void)
         if(save_ui_restore){save_ui_restore=0;lcd_fill(0,0,240,240,C_PANEL);dirty_hdr=dirty_tags=dirty_page=dirty_steps=1;hints_key=leds_q=0xFFFFFFFFu;scope_state=1;t_scope=0;}
         {   /* KNOB BANK held: the panel check owns the screen; let go, everything is drawn again */
             uint32_t redraw = 0;
-            if (!save_ui_active()&&smk_check(&redraw)) continue;
+
             if (redraw) {
                 lcd_fill(0, 0, 240, 240, C_PANEL);   /* (the strips leave gaps between them) */
                 dirty_hdr = dirty_page = dirty_steps = dirty_tags = 1; hints_key = leds_q = 0xFFFFFFFFu; scope_state = 1; t_scope = 0;

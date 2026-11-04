@@ -101,7 +101,7 @@ static volatile uint32_t fm1_ms;                /* milliseconds since power-on (
 #define FELUCCA_OTA 1
 #define FELUCCA_CDC 0
 #ifndef FELUCCA_UAC
-#define FELUCCA_UAC 1                           /* USB audio to the computer (-DFELUCCA_UAC=0: MIDI only, as zp12) */
+#define FELUCCA_UAC (!BOARD_SMK37)              /* SMKSYNTH: USB MIDI/data/update only; no audio interface. */
 #endif
 #define FELUCCA_UART (!BOARD_SMK37)             /* the FM-1's TRS MIDI IN (SMK-37: none, PH8 is a key-matrix row) */
 #if BOARD_SMK37 && FELUCCA_UART

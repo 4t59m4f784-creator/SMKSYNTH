@@ -49,3 +49,5 @@ A build validada B2 permanece inalterada. O pacote contém fontes, ferramentas, 
 ## Autoria e licença
 
 Direção do projeto e workflow de performance: **Marcus Padrini** (crédito proposto para revisão). Autores originais e colaboradores: [CREDITS.md](CREDITS.md). Código sob GPL-3.0-only, com componentes identificados separadamente em [LICENSING.md](LICENSING.md). O texto integral está em [LICENSE](LICENSE). Este pacote não contém samples de Mellotron nem material do SMKTRON. Projeto independente, sem vínculo oficial com a M-VAVE.
+
+FADER MODE JUMP/CATCH: GLOBAL. [Changelog](CHANGELOG.md).
