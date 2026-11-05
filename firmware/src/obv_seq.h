@@ -20,14 +20,16 @@ typedef struct { uint8_t note[SEQ_CHORD], vel, gate, ratch, chance, nudge; } ste
                                                                                          nudge 0..127: that much of the step later */
 #define STEP_OFF 0x80u                          /* in ratch: the step is switched off, its notes kept */
 typedef struct { uint16_t len; uint8_t div, swing; int8_t transp; uint8_t mute, pad[2]; } seqtrk_t;   /* swing 50..75 % */
-/* END1 uses the two reserved track bytes: no pattern prefix/record grows.
- * Tag D0..D7: bit0 HOLD, bits1..2 direction (0 forward,1 reverse,2 random).
- * Untagged legacy tracks keep the original player, gate and keyboard routing. */
-static int endless_enabled(const seqtrk_t*k){return (k->pad[0]&0xF8u)==0xD0u&&((k->pad[0]>>1)&3u)<3u&&k->pad[1]<=126u;}
+/* ENDLESS: E1 D0..D5 tags remain readable. E2 C0..CF stores the
+ * global session/HOLD in every reserved track pair; bit3 marks an initialized
+ * append phrase. Direction/gate stay per track. No record or prefix grows. */
+static int endless_enabled(const seqtrk_t*k){return (((k->pad[0]&0xF8u)==0xD0u)||((k->pad[0]&0xF0u)==0xC0u))&&((k->pad[0]>>1)&3u)<3u&&k->pad[1]<=126u;}
 static unsigned endless_hold(const seqtrk_t*k){return k->pad[0]&1u;}
 static unsigned endless_dir(const seqtrk_t*k){return (k->pad[0]>>1)&3u;}
 static volatile uint32_t end_keys[NTRK],end_restart[NTRK],end_record_mask;
 static volatile int32_t end_transpose[NTRK];
+static volatile uint32_t end_mode,end_global_hold=1,end_held,end_stop_request;
+static volatile int32_t end_global_transpose;
 static uint32_t end_seen[NTRK];
 /* (OberVave 3) the knobs recorded: per track up to NLANE lanes, each one parameter of the track's sound with a value per
  * step (AUTO_NONE: that step leaves it as it is). REC running + a knob turned = the value written on the step playing;
@@ -44,6 +46,14 @@ typedef struct { uint32_t magic; seqtrk_t trk[NTRK]; step_t st[NTRK][SEQ_STEPS];
     uint32_t keyboard_magic; keyboard_cfg_t keyboard;
     uint32_t keyboard2_magic; keyboard_cfg_t keyboard_alt; uint8_t keyboard_selected, keyboard_pad[3];
 } pattern_t;
+/* Called on both stopped and audio-boundary pattern recall. E1 migration
+ * chooses the saved focus' HOLD, falling back to the first tagged track. */
+static void endless_pattern_state(const pattern_t*p){
+ unsigned focus=p->keyboard_pad[0]==0xA3u&&p->keyboard_pad[1]<NTRK?p->keyboard_pad[1]:0u;
+ end_mode=0;end_global_hold=1;
+ if(endless_enabled(&p->trk[focus])){end_mode=1;end_global_hold=endless_hold(&p->trk[focus]);return;}
+ for(unsigned t=0;t<NTRK;t++)if(endless_enabled(&p->trk[t])){end_mode=1;end_global_hold=endless_hold(&p->trk[t]);return;}
+}
 #define PAT_DRUM_BYTES ((uint32_t)__builtin_offsetof(pattern_t,keyboard_magic))
 _Static_assert(PAT_DRUM_BYTES==14448u,"AD1 DRS1 prefix moved");
 #define KEYBOARD2_MAGIC 0x3244424Bu /* KBD2, after the intact SL1 prefix */
@@ -302,6 +312,7 @@ static void seq_auto(uint32_t t, uint32_t i)
 static void seq_tick(void)
 {
     uint32_t t, q;
+    if(end_stop_request){end_stop_request=0;for(t=0;t<NTRK;t++){seq_from_top(t);ui_seq_pos[t]=ui_seq_frac[t]=0;}seq_was=0;}
     if (!ctl_seq_run) {
         if (seq_was) { for (t = 0; t < NTRK; t++) seq_release_t(t); seq_was = 0; }
         seq_take_requests();                    /* (stopped: a pad switches its track at once) */
@@ -329,8 +340,8 @@ static void seq_tick(void)
                 /* the next pattern (2 = being swapped in: the main loop leaves pat_q alone): the tracks from the top */
                 if (ctl_pat_keep) pat_old = pat;
                 keyboard_pattern_epoch++;
-                end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
-                pat = pat_q;seq_trk=pattern_focus(&pat);
+                end_global_transpose=0;end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
+                pat = pat_q;seq_trk=pattern_focus(&pat);end_held=0;endless_pattern_state(&pat);
                 keyboard_pattern_gains(&pat);
                 if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) { snd_old[t] = live_p[t]; live_p[t] = snd_q[t]; } ctl_snd_swap = 0; ui_snd_swapped = 1; }
                 mx_swap_in();                   /* (its mixer, drive and master on the same downbeat) */
@@ -358,10 +369,10 @@ static void seq_tick(void)
         const step_t *s;
         uint32_t len = k->len;
         uint32_t isdrum=obv_patch_engine(&live_p[t])==OBV_DRUMS;
-        uint32_t en=!isdrum&&endless_enabled(k);
-        int32_t transp=isdrum?0:k->transp+(en?end_transpose[t]:0);
+        uint32_t en=end_mode&&!isdrum&&endless_enabled(k);
+        int32_t transp=isdrum?0:k->transp+(en?end_global_transpose:0);
         if(en && (end_seen[t]!=end_restart[t])){end_seen[t]=end_restart[t];seq_from_top(t);}
-        if(en && ((end_record_mask>>t&1u)||(!endless_hold(k)&&!end_keys[t]))){seq_from_top(t);continue;}
+        if(end_record_mask>>t&1u){seq_from_top(t);continue;}
         if (!len || !(ctl_trk_on >> t & 1u)) { seq_release_t(t); r->tie = 0; r->wait = NO_WAIT; r->hold_end = 0; continue; }
         if (r->cnt >= r->dur) {                 /* the next step */
             uint32_t dv = DIV_PER_QUARTER[k->div % NDIV], base = q / dv, sw, carry = 0;

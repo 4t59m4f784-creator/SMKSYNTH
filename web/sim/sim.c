@@ -297,6 +297,11 @@ EXPORT uint32_t sim_endless_record(void){return end_record;}
 EXPORT uint32_t sim_endless_enabled(uint32_t t){return endless_enabled(&pat.trk[t%NTRK]);}
 EXPORT uint32_t sim_seq_length(uint32_t t){return pat.trk[t%NTRK].len;}
 EXPORT uint32_t sim_step_gate(uint32_t t,uint32_t n){return pat.st[t%NTRK][n%SEQ_STEPS].gate;}
-EXPORT int32_t sim_endless_transpose(uint32_t t){return end_transpose[t%NTRK];}
+EXPORT int32_t sim_endless_transpose(uint32_t t){return obv_patch_engine(&live_p[t%NTRK])==OBV_DRUMS?0:end_global_transpose;}
 EXPORT uint32_t sim_endless_input_step(void){return end_pos;}
 EXPORT uint32_t sim_transport(void){return ctl_seq_run;}
+
+EXPORT uint32_t sim_endless_mode(void){return end_mode;}
+EXPORT uint32_t sim_endless_hold(void){return end_global_hold;}
+EXPORT uint32_t sim_endless_held_keys(void){return end_held;}
+EXPORT uint32_t sim_seq_div(uint32_t t){return pat.trk[t%NTRK].div;}

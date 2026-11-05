@@ -1,24 +1,34 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import fs from 'node:fs';import assert from 'node:assert/strict';import {Engine} from '../web/simulator/engine.js';
-const wasm=fs.readFileSync(process.argv[2]||'build/controls/SMKSYNTH-1.0.3.wasm'),seed=fs.readFileSync('web/simulator/factory-session.bin');
+const wasm=fs.readFileSync(process.argv[2]||'build/endless-e2/SMKSYNTH-1.0.3-e2.wasm'),seed=fs.readFileSync('web/simulator/factory-session.bin');
 const e=new Engine(wasm,seed.buffer.slice(seed.byteOffset,seed.byteOffset+seed.byteLength));e.advance(5000);
 const b=(n,ms=80)=>{e.input({t:'btn',b:n,down:true});e.advance(ms);e.input({t:'btn',b:n,down:false});e.advance(180);};
 const pad=(p,ms=100)=>{e.input({t:'pad',p,v:100});e.advance(ms);e.input({t:'pad',p,v:0});e.advance(250);};
 const key=(k,on)=>{e.input({t:'key',k,down:on});e.advance(60);};
-const page=()=>{b(12,900);for(let i=0;i<9;i++){b(15);if(e.ex.sim_seq_view()===6)return;}assert.fail('ENDLESS not in SEQ cycle');};
-// Work on empty P6; no example pattern is overwritten.
-b(0);b(0);assert.equal(e.frame().bank,2);pad(5);assert.equal(e.frame().pattern,6);page();
-b(17);assert.equal(e.ex.sim_endless_record(),1);assert.equal(e.ex.sim_seq_length(0),0);
-key(12,true);key(16,true);key(19,true);assert.equal(e.ex.sim_seq_length(0),1);key(12,false);key(16,false);key(19,false);
-assert.deepEqual([0,1,2].map(i=>e.ex.sim_step_note(0,0,i)),[60,64,67]);
-b(3);assert.equal(e.ex.sim_seq_length(0),2);assert.equal(e.ex.sim_step_note(0,1,0),0);
-key(24,true);b(3);key(24,false);assert.equal(e.ex.sim_seq_length(0),4);assert.equal(e.ex.sim_step_gate(0,2),127);assert.equal(e.ex.sim_step_note(0,3,0),72);
-b(17);assert.equal(e.ex.sim_endless_record(),0);assert.equal(e.ex.sim_transport(),0);
-// HOLD OFF captures keyboard transposition and releases sequenced gates.
-e.input({t:'enc',e:3,steps:-1});e.advance(150);key(2,true);assert.equal(e.ex.sim_endless_transpose(0),2);assert.equal(e.ex.sim_transport(),1);e.advance(200);key(2,false);e.advance(40);assert.equal(e.ex.sim_gates_part(0,1),0);b(16);assert.equal(e.ex.sim_transport(),0);
-// Unchanged page generates no repeated traffic after toast expires.
-e.advance(2500);let old=[e.ex.sim_lcd_fills(),e.ex.sim_lcd_blits(),e.ex.sim_lcd_pixels()];e.advance(1200);assert.deepEqual([e.ex.sim_lcd_fills(),e.ex.sim_lcd_blits(),e.ex.sim_lcd_pixels()],old);
-// Save P6 through actual pattern-pad UI, switch away and recall the stored mode/phrase.
-b(0);b(0);b(0);assert.equal(e.frame().bank,2);pad(5,850);e.advance(6000);assert(e.frame().patternsUsed&(1<<5));pad(0);assert.equal(e.frame().pattern,1);pad(5);assert.equal(e.frame().pattern,6);assert.equal(e.ex.sim_endless_enabled(0),1);assert.equal(e.ex.sim_seq_length(0),4);assert.equal(e.ex.sim_step_gate(0,2),127);
-const bankWrites=e.frame().writes;
-console.log(JSON.stringify({result:'PASS',real_firmware_loop:true,phrase:[['C4','E4','G4'],'REST','C5~','C5'],length:4,transport_and_hold:true,transpose:2,idle_redraws:0,pattern6_saved_and_recalled:true,writes:bankWrites}));
+const enc=(knob,steps)=>{e.input({t:'enc',e:knob,steps});e.advance(100);};
+const page=()=>{b(12,900);for(let i=0;i<9;i++){b(15);if(e.ex.sim_seq_view()===6)return;}assert.fail('ENDLESS missing');};
+b(0);b(0);pad(5);assert.equal(e.frame().pattern,6);page();
+assert.equal(e.ex.sim_endless_mode(),1);for(let t=0;t<4;t++)assert.equal(e.ex.sim_endless_enabled(t),1);
+// Per-part append recording is unchanged. Global activation never erases another phrase.
+for(const [t,notes]of [[0,[12,16,19]],[1,[0,4,7,12,16]],[2,[0,2,4,5,7,9,11]]]){
+ if(t)enc(5,1);assert.equal(e.frame().track,t);assert.equal(e.ex.sim_seq_view(),6);b(17);assert.equal(e.ex.sim_endless_record(),t+1);assert.equal(e.ex.sim_seq_length(t),0);
+ for(const k of notes){key(k,true);key(k,false);}b(17);assert.equal(e.ex.sim_seq_length(t),notes.length);
+}
+assert.deepEqual([0,1,2].map(t=>e.ex.sim_seq_length(t)),[3,5,7]);
+// DRUM-X retains its editor/steps. Its sequence joins the same transport.
+e.input({t:'drums',part:3,kit:0});e.advance(100);enc(5,1);assert.equal(e.frame().track,3);assert.notEqual(e.ex.sim_seq_view(),6);pad(0);assert(e.ex.sim_drum_step_bits()&1);
+enc(5,-1);assert.equal(e.frame().track,2);assert.equal(e.ex.sim_seq_view(),6);assert.equal(e.ex.sim_endless_mode(),1);
+const pat=e.frame().pattern;const tempo=e.ex.sim_tempo();enc(4,120-tempo);assert.equal(e.ex.sim_tempo(),120);assert.equal(e.frame().pattern,pat);assert.deepEqual([0,1,2].map(t=>e.ex.sim_seq_length(t)),[3,5,7]);
+// Every key-on, including legato, retriggers all first steps. Fixed drum pitch.
+key(0,true);e.advance(200);key(2,true);for(let t=0;t<4;t++)assert.equal(e.ex.sim_seq_pos(t),0);
+assert.deepEqual([0,1,2,3].map(t=>e.ex.sim_endless_transpose(t)),[2,2,2,0]);
+let prev=e.ex.sim_seq_pos(0),wrapped=false;
+for(let i=0;i<600&&!wrapped;i++){e.advance(1);const pos=e.ex.sim_seq_pos(0);if(prev===2&&pos===0){wrapped=true;assert.deepEqual([1,2,3].map(t=>e.ex.sim_seq_pos(t)),[3,3,3]);}prev=pos;}assert(wrapped);
+enc(3,-1);assert.equal(e.ex.sim_endless_hold(),0);key(0,false);assert.equal(e.ex.sim_transport(),1);key(2,false);assert.equal(e.ex.sim_transport(),0);assert.equal((e.frame().leds>>>16)&1,0);for(let t=0;t<4;t++)assert.equal(e.ex.sim_seq_pos(t),0);
+// Explicit PLAY and the next note restart; HOLD ON survives key release.
+b(16);assert.equal(e.ex.sim_transport(),1);key(5,true);for(let t=0;t<4;t++)assert.equal(e.ex.sim_seq_pos(t),0);key(5,false);assert.equal(e.ex.sim_transport(),0);
+enc(3,1);key(0,true);key(0,false);assert.equal(e.ex.sim_transport(),1);e.advance(1000);b(16);assert.equal(e.ex.sim_transport(),0);
+// No idle redraws after transient messages, plus actual saved-pattern recall.
+e.advance(2500);const traffic=()=>[e.ex.sim_lcd_fills(),e.ex.sim_lcd_blits(),e.ex.sim_lcd_pixels()];const before=traffic();e.advance(1200);assert.deepEqual(traffic(),before);
+b(0);b(0);b(0);assert.equal(e.frame().bank,2);pad(5,850);e.advance(8000);assert(e.frame().patternsUsed&(1<<5));pad(0);assert.equal(e.ex.sim_endless_mode(),0);pad(5);assert.equal(e.frame().pattern,6);assert.equal(e.ex.sim_endless_mode(),1);assert.equal(e.ex.sim_endless_hold(),1);assert.deepEqual([0,1,2].map(t=>e.ex.sim_seq_length(t)),[3,5,7]);
+console.log(JSON.stringify({result:'PASS',real_firmware_loop:true,all_parts_default:true,independent_lengths:[3,5,7],global_legato_retrigger:true,global_hold_and_play_LED:true,drums_fixed_and_synced:true,analog_drum_focus_persistence:true,k5_tempo:120,idle_redraws:0,pattern6_saved_and_recalled:true}));

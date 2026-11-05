@@ -143,6 +143,7 @@ static uint32_t end_record, end_pos, end_count, end_ui_seen;
 static uint8_t end_owner[128]; /* low bits: captured part+1, bit7: live monitor */
 static void endless_reset(void);
 static void endless_finish(void);
+static void endless_recall(void);
 static int endless_screen(void);
 static uint32_t more_held;
 #define SV_EFF (seq_view == SV_STEPS && more_held ? (uint32_t)SV_MORE : seq_view)
@@ -558,7 +559,7 @@ static void load_pattern(uint32_t n)            /* stopped: pattern n with its s
     n %= NPAT;
     endless_reset();
     ctl_panic = 1;                              /* (what the old one held lets go) */
-    pat_fetch(n, &pat);seq_trk=pattern_focus(&pat);keyboard_pattern_epoch++;keyboard_pattern_gains(&pat);
+    pat_fetch(n, &pat);seq_trk=pattern_focus(&pat);keyboard_pattern_epoch++;endless_recall();keyboard_pattern_gains(&pat);
     set.pat = (uint8_t)n;
     if (psnd[n].magic == PSN2_MAGIC) {
         patch_t nx[NTRK];
@@ -788,7 +789,7 @@ static void obv_context_refresh(void)
         if((page>=PG_OSC1&&page<=PG_FILTER2)||page==PG_SUPER||page==PG_VOWELS||page==PG_VTONE)page=PG_DKIT;
         if(page==PG_FENV||page==PG_AENV||page==PG_LFO||page==PG_LFODEST||page==PG_LFO2)page=PG_DSOUND;
     }
-    else {if(page==PG_DSEQ){page=PG_SEQ;if(seq_view!=SV_TRANSPOSE)seq_view=SV_TRACKS;}else if(page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND)page=PG_OSC1;}
+    else {if(page==PG_DSEQ){page=PG_SEQ;if(end_mode)seq_view=SV_ENDLESS;else if(seq_view!=SV_TRANSPOSE)seq_view=SV_TRACKS;}else if(page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND)page=PG_OSC1;}
 }
 static int32_t obv_page_param(uint32_t pg,uint32_t k)
 {
@@ -2477,7 +2478,11 @@ static void panel_encoders(void)
                                                  * the MIXER the next pattern (on the bar), else the tempo */
             static char msg[16];
             uint32_t t = seq_trk % NTRK, len = pat.trk[t].len;
-            if(page==PG_KEYBOARD&&!layer){kb_edit_oct^=1u;dirty_page=1;say(kb_edit_oct?"KEYBOARD OCTAVES":"KEYBOARD LEVELS");}
+            if(endless_screen()){
+                set.tempo=(uint8_t)clampi((int)set.tempo+e,40,240);ctl_tempo=set.tempo;set_dirty=1;set_t=fm1_ms;
+                dirty_page=1;
+            }
+            else if(page==PG_KEYBOARD&&!layer){kb_edit_oct^=1u;dirty_page=1;say(kb_edit_oct?"KEYBOARD OCTAVES":"KEYBOARD LEVELS");}
             else if (is_seq_page(page) && SV_ENTRY(seq_view) && !layer) {
                 if (len) {
                     int32_t c = (int32_t)(seq_cur[t] % len) + (e > 0 ? 16 : -16);
@@ -2752,7 +2757,7 @@ static void app_main(void)
                             static const char *const HINT[NSV] = {NM_ALGO ": TRACK A-D", "KEYS WRITE  " NM_SELBTN " HELD: MORE", "MORE PER STEP", "THE TRACK: LENGTH ..", "THE 8 PATTERNS", "K1 KEYS  K2 VALUE  K3 ZERO", "REC APPEND / PARA ENABLE"};
                             if (page==PG_DSEQ) {seq_view=seq_view==SV_STEPS?SV_MORE:seq_view==SV_MORE?SV_TRACK:seq_view==SV_TRACK?SV_TRACKS:seq_view==SV_TRACKS?SV_SLOTS:seq_view==SV_SLOTS?SV_TRANSPOSE:SV_STEPS;}
                             else if (is_seq_page(page)) { seq_view = (seq_view + 1u) % NSV; if (seq_view == SV_MORE) seq_view = SV_TRACK; }   /* (STEP+ = SELECT held in STEPS) */
-                            else { seq_back = page; np = PG_SEQ; seq_view = SV_TRACKS; }
+                            else { seq_back = page; np = PG_SEQ; seq_view = end_mode?SV_ENDLESS:SV_TRACKS; }
                             if (seq_view == SV_SLOTS) slot_sel = pat_queue ? pat_queue - 1u : set.pat;
                             say(HINT[seq_view]);
                             entry_reset();
@@ -2780,7 +2785,7 @@ static void app_main(void)
         ctl_click = set.click % NCLICK == CLICK_ON || (rec == REC_ON && set.click % NCLICK != CLICK_OFF);
         if (b & (3u << BTN_OCT_DOWN)) {
             if (layer == L_EDIT) {              /* EDIT + OCT- / OCT+: undo / redo (one level: a swap) */
-                if (undo_ok) { pattern_t tmp = pat; pat = undo_pat; undo_pat = tmp; pat_edited = 1; say(b & (1u << BTN_OCT_DOWN) ? "UNDO" : "REDO"); }
+                if (undo_ok) { pattern_t tmp = pat; pat = undo_pat; undo_pat = tmp; endless_recall(); pat_edited = 1; say(b & (1u << BTN_OCT_DOWN) ? "UNDO" : "REDO"); }
                 else say("NOTHING TO UNDO");
                 layer_used = 1;
             } else if (steps_on()) {            /* the SEQ layer: OCT- / OCT+ page */
@@ -2825,7 +2830,7 @@ static void app_main(void)
         }
         if ((b & (1u << BTN_PLAY)) && end_record) endless_finish();
         if (b & (1u << BTN_PLAY)) {             /* start from step 1 / stop (a take ends with it) */
-            if (ctl_seq_run) { ctl_seq_run = 0; rec = REC_OFF; rec_wait = 0; }   /* (the stop ends REC, armed too: the pads start / stop again) */
+            if (ctl_seq_run) { if(end_mode)endless_stop();else{ctl_seq_run = 0; rec = REC_OFF; rec_wait = 0;} }   /* (the stop ends REC, armed too: the pads start / stop again) */
             else {
                 if (rec == REC_READY) { rec = REC_ON; undo_save(); ctl_count = set.click % NCLICK == CLICK_COUNT; }
                 ctl_seq_restart = 1; ctl_seq_run = 1;

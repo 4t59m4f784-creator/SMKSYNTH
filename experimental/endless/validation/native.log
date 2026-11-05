@@ -1,2 +1,2 @@
      0 ms  pattern slot 15 saved (14476 + 380 B)
-PASS: 4 parts, chords/rests/ties/undo/256 bound, FWD/REV/RND, HOLD/transposition, focus-safe releases, legacy data preservation, flash roundtrip, idle/partial display.
+PASS E2: independent recording, global HOLD/last-key stop/PLAY reset, legato global retrigger, 3/5/7-step clocks, fixed DRUM-X, focus persistence, exclusive K5 tempo, unchanged storage/E1 migration and partial display.

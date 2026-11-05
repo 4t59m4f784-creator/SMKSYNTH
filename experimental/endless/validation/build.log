@@ -1,12 +1,12 @@
-firmware/src/obervave.c:153:33: warning: unused variable 'pat_save_t' [-Wunused-variable]
+firmware/src/obervave.c:154:33: warning: unused variable 'pat_save_t' [-Wunused-variable]
 static uint32_t pat_save_armed, pat_save_t, q_edited;   /* q_edited: the next pattern brings unsaved edits */    /* SAVE tapped in the sequencer: SAVE PATTERN? (again: saved) */
                                 ^
 1 warning generated.
 loader: image 8932 B at 0x1c0a800, bss end 0x1c0f710
 loader: ota.bin 7703 B
   ok    .ram_text: 1585 insns, no calls
-  ok    image 170372 B of 327680; RAM .data+.bss 86896 B of 98304; pool 325984 B of 344064
+  ok    image 171656 B of 327680; RAM .data+.bss 86912 B of 98304; pool 325984 B of 344064
   ok    register access: hal/ only (src/, loader/ clean)
-app      /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave.bin  170372 B
+app      /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave.bin  171656 B
 loader   /workspace/scratch/5c61352abec3/SMKSYNTH/build/loader/ota.bin  7703 B
-package  /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave-1.0.3-e1-smk37.fwsc  651819 B, identity SMK-37 Pro_19623, board smk37
+package  /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave-1.0.3-e2-smk37.fwsc  651819 B, identity SMK-37 Pro_19624, board smk37
