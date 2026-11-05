@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2 — 2026-11-04
+
+- Áudio USB estéreo 16 bits em 44,1/48 kHz, com a implementação validada na UA1. Testado por Marcus no Mac e no iPhone com AudioShare. JUMP/CATCH preservado.
+- Problema conhecido: a gravação de vídeo com áudio USB no iPhone pode apresentar cliques e pequenos cortes durante a reprodução, independentemente das trocas de patterns. Em investigação.
+- Stereo 16-bit USB audio at 44.1/48 kHz, using the UA1 implementation. Tested by Marcus on Mac and on iPhone with AudioShare. JUMP/CATCH retained.
+- Known issue: iPhone video recording using USB audio may contain clicks and brief dropouts during playback, independently of pattern changes. Under investigation.
+
+
 ## 1.0.1 — 2026-11-04
 
 - GLOBAL: FADER MODE JUMP/CATCH. Em CATCH, o fader assume o parâmetro ao cruzar seu valor; a proteção é reativada ao mudar de contexto.

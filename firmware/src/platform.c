@@ -95,13 +95,16 @@ static volatile uint32_t fm1_ms;                /* milliseconds since power-on (
 #define CV_MAX (240u * 120u)                    /* the biggest strip drawn at once (OberVave: the knob page) */
 #include "gfx.c"
 
+#ifndef SMK_USB_ACK_FIRST
+#define SMK_USB_ACK_FIRST 1
+#endif
 #define FS 44100u                               /* the sample rate */
 #define HALF_FRAMES 256u                        /* I2S half buffer: 5.8 ms (as sloopDX: the USB audio band is set for it) */
 #define HALF_WORDS (HALF_FRAMES * 2u)
 #define FELUCCA_OTA 1
 #define FELUCCA_CDC 0
 #ifndef FELUCCA_UAC
-#define FELUCCA_UAC (!BOARD_SMK37)              /* SMKSYNTH: USB MIDI/data/update only; no audio interface. */
+#define FELUCCA_UAC 1              /* Stereo USB audio, MIDI, data and updates. */
 #endif
 #define FELUCCA_UART (!BOARD_SMK37)             /* the FM-1's TRS MIDI IN (SMK-37: none, PH8 is a key-matrix row) */
 #if BOARD_SMK37 && FELUCCA_UART
@@ -455,6 +458,11 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
     if (p & FM1_AUDIO_HALF) {
         int32_t *o = &abuf[fm1_audio_free_half() * HALF_WORDS];
         uint32_t i, b;
+#if SMK_USB_ACK_FIRST
+        /* JIANT 0.8.9 audio.c: clear only the event being serviced. A later
+         * DMA half flip must remain pending while this half renders. */
+        fm1_audio_ack_half();
+#endif
         for (i = 0; i < HALF_WORDS; i++)
             o[i] = 0;
         UAC_ONLY(uac_render_start());
@@ -467,7 +475,9 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
             UAC_ONLY(uac_tap(o + 2u * b, 32u));   /* the computer records what the speaker plays */
         for (i = 0; i < HALF_WORDS; i++)
             o[i] <<= 7;
+#if !SMK_USB_ACK_FIRST
         fm1_audio_ack_half();
+#endif
     }
     in_audio = 0;
 }

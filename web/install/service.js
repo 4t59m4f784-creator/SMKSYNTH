@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"release": {"name": "Instalar SMKSYNTH 1.0.1", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "3bc0cd43cad00e452f44fa03d52a32b220202baaa7ea445f52c3601686e421f4", "url": "./firmware/SMKSYNTH-1.0.1-first-install-SMK37-Pro.fwsc"}, "update": {"name": "Atualizar SMKSYNTH 1.0.1", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "6fffb8900340c201651aa1c576d2f0320caff4a2901cbeb551f54b5e21005a20", "url": "./firmware/SMKSYNTH-1.0.1-update-SMK37-Pro.fwsc"}});
-export const PENDING="smksynth.1.0.1.pending.v1";
+export const PINS=Object.freeze({"release": {"name": "Instalar SMKSYNTH 1.0.2", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "0070522159f182f697b21aeb4cfc788981427de9bc54587366a9e41193f893aa", "url": "./firmware/SMKSYNTH-1.0.2-first-install-SMK37-Pro.fwsc"}, "update": {"name": "Atualizar SMKSYNTH 1.0.2", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3", "url": "./firmware/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc"}});
+export const PENDING="smksynth.1.0.2.pending.v1";
 export async function validate(raw,kind){
  const p=PINS[kind];if(!p)throw Error('Operação inválida.');
  if(raw.length!==p.size)throw Error('Tamanho diferente do pacote esperado.');
