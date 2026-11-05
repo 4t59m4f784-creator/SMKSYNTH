@@ -20,6 +20,15 @@ typedef struct { uint8_t note[SEQ_CHORD], vel, gate, ratch, chance, nudge; } ste
                                                                                          nudge 0..127: that much of the step later */
 #define STEP_OFF 0x80u                          /* in ratch: the step is switched off, its notes kept */
 typedef struct { uint16_t len; uint8_t div, swing; int8_t transp; uint8_t mute, pad[2]; } seqtrk_t;   /* swing 50..75 % */
+/* END1 uses the two reserved track bytes: no pattern prefix/record grows.
+ * Tag D0..D7: bit0 HOLD, bits1..2 direction (0 forward,1 reverse,2 random).
+ * Untagged legacy tracks keep the original player, gate and keyboard routing. */
+static int endless_enabled(const seqtrk_t*k){return (k->pad[0]&0xF8u)==0xD0u&&((k->pad[0]>>1)&3u)<3u&&k->pad[1]<=126u;}
+static unsigned endless_hold(const seqtrk_t*k){return k->pad[0]&1u;}
+static unsigned endless_dir(const seqtrk_t*k){return (k->pad[0]>>1)&3u;}
+static volatile uint32_t end_keys[NTRK],end_restart[NTRK],end_record_mask;
+static volatile int32_t end_transpose[NTRK];
+static uint32_t end_seen[NTRK];
 /* (OberVave 3) the knobs recorded: per track up to NLANE lanes, each one parameter of the track's sound with a value per
  * step (AUTO_NONE: that step leaves it as it is). REC running + a knob turned = the value written on the step playing;
  * the player sets it on its step. After the steps, behind auto_magic: a pattern saved before has none (cleared at load) */
@@ -320,6 +329,7 @@ static void seq_tick(void)
                 /* the next pattern (2 = being swapped in: the main loop leaves pat_q alone): the tracks from the top */
                 if (ctl_pat_keep) pat_old = pat;
                 keyboard_pattern_epoch++;
+                end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
                 pat = pat_q;seq_trk=pattern_focus(&pat);
                 keyboard_pattern_gains(&pat);
                 if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) { snd_old[t] = live_p[t]; live_p[t] = snd_q[t]; } ctl_snd_swap = 0; ui_snd_swapped = 1; }
@@ -348,7 +358,10 @@ static void seq_tick(void)
         const step_t *s;
         uint32_t len = k->len;
         uint32_t isdrum=obv_patch_engine(&live_p[t])==OBV_DRUMS;
-        int32_t transp=isdrum?0:k->transp;
+        uint32_t en=!isdrum&&endless_enabled(k);
+        int32_t transp=isdrum?0:k->transp+(en?end_transpose[t]:0);
+        if(en && (end_seen[t]!=end_restart[t])){end_seen[t]=end_restart[t];seq_from_top(t);}
+        if(en && ((end_record_mask>>t&1u)||(!endless_hold(k)&&!end_keys[t]))){seq_from_top(t);continue;}
         if (!len || !(ctl_trk_on >> t & 1u)) { seq_release_t(t); r->tie = 0; r->wait = NO_WAIT; r->hold_end = 0; continue; }
         if (r->cnt >= r->dur) {                 /* the next step */
             uint32_t dv = DIV_PER_QUARTER[k->div % NDIV], base = q / dv, sw, carry = 0;
@@ -360,7 +373,9 @@ static void seq_tick(void)
                 if (e > r->dur) carry = e - r->dur;
             }
             r->cnt -= r->dur;
-            r->step = r->step + 1u >= len ? 0u : r->step + 1u;
+            if(en&&endless_dir(k)==1u)r->step=r->step==0xFFFFFFFFu||!r->step?len-1u:r->step-1u;
+            else if(en&&endless_dir(k)==2u)r->step=xorshift(&rnd_state)%len;
+            else r->step = r->step + 1u >= len ? 0u : r->step + 1u;
             sw = base * (uint32_t)(clampi(k->swing, 50, 75) - 50) / 50u;
             r->dur = r->step & 1u ? base - sw : base + sw;   /* swing: the first of each pair longer */
             if (r->dur < CTL) r->dur = CTL;
@@ -385,10 +400,15 @@ static void seq_tick(void)
             r->rat_n = (s->ratch & 3u) + 1u;
             r->sub = (r->dur - r->on_at) / r->rat_n;
             r->rat_i = 0;
-            r->tie = !isdrum && r->play && s->gate >= GATE_TIE && !s->nudge;
+            uint32_t gate=s->gate;
+            if(en){
+                if(endless_dir(k)==1u){const step_t *nx=seq_step(t,r->step?r->step-1u:len-1u);gate=nx->gate>=GATE_TIE&&seq_has(nx,s->note[0],0)?GATE_TIE:k->pad[1];}
+                else if(gate<GATE_TIE)gate=k->pad[1];
+            }
+            r->tie = !isdrum && r->play && gate >= GATE_TIE && !s->nudge;
             {                                   /* the length: of a whole step (a ratchet's share), also for a late note */
                 uint32_t g = r->dur / r->rat_n;
-                r->gate_at = s->gate >= GATE_TIE ? 0xFFFFFFFFu : (uint32_t)clampi((int32_t)((g * (s->gate + 1u)) >> 7), CTL, (int32_t)(g > CTL ? g : CTL));
+                r->gate_at = gate >= GATE_TIE ? 0xFFFFFFFFu : (uint32_t)clampi((int32_t)((g * (gate + 1u)) >> 7), CTL, (int32_t)(g > CTL ? g : CTL));
             }
             ui_seq_ticks++;
         } else {

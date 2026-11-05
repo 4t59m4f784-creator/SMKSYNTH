@@ -291,3 +291,12 @@ EXPORT int32_t sim_part_octave(uint32_t t){return patch_keyboard_octave(&live_p[
 
 EXPORT uint32_t sim_fader_jump(void){return !!smk_fader_jump();}
 EXPORT uint32_t sim_fader_caught(uint32_t i){return i<4u?smk_fader_owner[i].picked:0u;}
+
+/* ENDLESS prototype observability; no firmware/runtime state is stored here. */
+EXPORT uint32_t sim_endless_record(void){return end_record;}
+EXPORT uint32_t sim_endless_enabled(uint32_t t){return endless_enabled(&pat.trk[t%NTRK]);}
+EXPORT uint32_t sim_seq_length(uint32_t t){return pat.trk[t%NTRK].len;}
+EXPORT uint32_t sim_step_gate(uint32_t t,uint32_t n){return pat.st[t%NTRK][n%SEQ_STEPS].gate;}
+EXPORT int32_t sim_endless_transpose(uint32_t t){return end_transpose[t%NTRK];}
+EXPORT uint32_t sim_endless_input_step(void){return end_pos;}
+EXPORT uint32_t sim_transport(void){return ctl_seq_run;}

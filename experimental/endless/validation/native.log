@@ -1,0 +1,2 @@
+     0 ms  pattern slot 15 saved (14476 + 380 B)
+PASS: 4 parts, chords/rests/ties/undo/256 bound, FWD/REV/RND, HOLD/transposition, focus-safe releases, legacy data preservation, flash roundtrip, idle/partial display.

@@ -81,6 +81,10 @@ static int32_t smk_ext_back = -1;
 static void smk_seq_pad_event(int32_t e,uint32_t *dirty)
 {
         uint32_t p = ((uint32_t)e >> 8) & 15u, vel = (uint32_t)e & 0xFFu, k = SMK_WK[p], q;
+        if(endless_screen()){
+            if(vel&&!end_record){unsigned n=seq_pg[seq_trk]*16u+p;if(n<pat.trk[seq_trk].len)seq_cursor_set(seq_trk,n);}
+            *dirty=1;return; /* ENDLESS pads inspect; they never toggle/delete steps. */
+        }
         if (vel) {
             if (rec) {                              /* REC on: the pad plays the pen chord, recorded as the keys are */
                 for (q = 0; q < SEQ_CHORD; q++) {

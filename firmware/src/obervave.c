@@ -135,10 +135,15 @@ static uint8_t audition[SEQ_CHORD], audition_part;   /* the held step's notes so
 static const char *toast;
 static int is_seq_page(uint32_t pg) { return pg == PG_SEQ || pg == PG_DSEQ; }
 /* the full-screen sequencer's views (SEQ tapped steps through the first three; SAVE tapped there: PATTERNS) */
-enum { SV_TRACKS, SV_STEPS, SV_MORE, SV_TRACK, SV_SLOTS, SV_TRANSPOSE, NSV };   /* TRACKS first: A-D one under the other (SLOOP) */
-static const char *const SV_NAME[NSV] = {"TRACKS", "STEPS", "STEP+", "TRACK", "PATTERNS", "TRANSPOSE"};
+enum { SV_TRACKS, SV_STEPS, SV_MORE, SV_TRACK, SV_SLOTS, SV_TRANSPOSE, SV_ENDLESS, NSV };   /* TRACKS first: A-D one under the other (SLOOP) */
+static const char *const SV_NAME[NSV] = {"TRACKS", "STEPS", "STEP+", "TRACK", "PATTERNS", "TRANSPOSE", "ENDLESS"};
 #define SV_ENTRY(v) ((v) == SV_STEPS || (v) == SV_MORE)   /* the views where the keys write into the cursor's step */
 /* STEP+ is no view of its own: SELECT held down in STEPS shows its knobs (RATCHET, CHANCE, ON/OFF), as VIBE's SHIFT */
+static uint32_t end_record, end_pos, end_count, end_ui_seen;
+static uint8_t end_owner[128]; /* low bits: captured part+1, bit7: live monitor */
+static void endless_reset(void);
+static void endless_finish(void);
+static int endless_screen(void);
 static uint32_t more_held;
 #define SV_EFF (seq_view == SV_STEPS && more_held ? (uint32_t)SV_MORE : seq_view)
 static uint32_t seq_view, slot_sel, pat_used, pat_next, arm_k, arm_t, entry_n, pat_edit_t, pend_slot, pat_save_say;
@@ -551,6 +556,7 @@ static void load_pattern(uint32_t n)            /* stopped: pattern n with its s
 #endif
     uint32_t t;
     n %= NPAT;
+    endless_reset();
     ctl_panic = 1;                              /* (what the old one held lets go) */
     pat_fetch(n, &pat);seq_trk=pattern_focus(&pat);keyboard_pattern_epoch++;keyboard_pattern_gains(&pat);
     set.pat = (uint8_t)n;
@@ -1563,6 +1569,8 @@ static void entry_note(uint32_t on, uint32_t note, uint32_t vel)
 
 static void entry_reset(void) { entry_n = 0; memset(entry_on_note, 0, sizeof entry_on_note); }
 
+#include "obv_endless.h"
+
 /* which slots hold a pattern, its tracks' lengths, and every pattern's sounds (at boot; undo_pat as the buffer) */
 static void slot_lens_read(void)
 {
@@ -1746,6 +1754,7 @@ static void seq_view_turn(uint32_t knob, int32_t e)
     seqtrk_t *tk = &pat.trk[t];
     int32_t sg = e > 0 ? 1 : -1;
     step_t *st;
+    if(seq_view==SV_ENDLESS){endless_turn(knob,e);return;}
     if(seq_view==SV_TRANSPOSE){
         if(knob==0)transpose_keys_set(e>0);
         else if(knob==1)ctl_seq_transpose=clampi(ctl_seq_transpose+e,-48,79);
@@ -1817,6 +1826,7 @@ static void seq_view_turn(uint32_t knob, int32_t e)
 
 static void seq_view_knob(knob_view_t *k, uint32_t i)
 {
+    if(seq_view==SV_ENDLESS){endless_knob(k,i);return;}
     static const char *const L[NSV][4] = {{"CUTOFF", "LEVEL", "LENGTH", "QUANT"}, {"STEP", "NOTE", "GATE", "VELO"},
                                           {"STEP", "RATCHET", "CHANCE", "ON/OFF"}, {"LENGTH", "DIV", "SWING", "TRANSP"},
                                           {"SLOT", "", "GO", "SAVE"}};
@@ -1837,6 +1847,7 @@ static void seq_view_knob(knob_view_t *k, uint32_t i)
     k->label = L[SV_EFF][i];
     k->present = k->label[0] != 0;
     k->bip = 0; k->v = 0; k->max = 0;
+    if(seq_view==SV_ENDLESS){endless_knob(k,i);return;}
     if (seq_view == SV_SLOTS) {
         if (i == 0) { fmt_u(v, slot_sel + 1u); k->v = (int32_t)slot_sel; k->max = NPAT - 1; }
         else if (i == 2u) scat(v, slot_sel == set.pat ? "HERE" : "TURN");
@@ -2148,6 +2159,7 @@ static void note_in(uint32_t on, uint32_t note, uint32_t vel)
 {
     uint32_t t;
     note &= 127u;
+    if(endless_note(on,note,vel))return;
     unsigned had_pen=panel_live_note[note]==1u;
     if(!on && transpose_captured[note]){transpose_captured[note]=0;return;}
     if(on && transpose_keys && !layer){
@@ -2315,7 +2327,7 @@ static void midi_in(uint32_t notes_only)
         else if (kind == 0xB0u) {
             if (d1 == 7u) ctl_cc7 = d2;
             else if (d1 == 64u) ctl_sustain = d2 >= 64u;
-            else if (d1 == 120u || d1 == 123u) ctl_panic = 1;
+            else if (d1 == 120u || d1 == 123u) {endless_reset();ctl_panic = 1;}
             else if (cc_map[d1]) {
                 uint32_t p = cc_map[d1] - 1u;
                 set_param(p, (int32_t)((d2*obv_param_max(ed_patch(p),p)+63u)/127u));
@@ -2664,6 +2676,7 @@ static void app_main(void)
     for (;;) {
         uint32_t rel, b, lit = 0, base = (uint32_t)(KEY0 + 12 * keyboard_base_octave()), np = page;
         platform_poll();
+        endless_poll();
 #if OBV_VOICE_HW && !defined(OBV_HOST)
         b1_ready=1;
         static unsigned b1_shown;
@@ -2736,14 +2749,15 @@ static void app_main(void)
                     if (layer != LL[k] || layer_lock) continue;
                     if (!layer_used && fm1_ms - layer_t < 600u) {   /* a tap: the button's pages */
                         if (LL[k] == L_SEQ) {   /* SEQ: the full-screen sequencer; there, its next view (as SLOOP) */
-                            static const char *const HINT[NSV] = {NM_ALGO ": TRACK A-D", "KEYS WRITE  " NM_SELBTN " HELD: MORE", "MORE PER STEP", "THE TRACK: LENGTH ..", "THE 8 PATTERNS", "K1 KEYS  K2 VALUE  K3 ZERO"};
+                            static const char *const HINT[NSV] = {NM_ALGO ": TRACK A-D", "KEYS WRITE  " NM_SELBTN " HELD: MORE", "MORE PER STEP", "THE TRACK: LENGTH ..", "THE 8 PATTERNS", "K1 KEYS  K2 VALUE  K3 ZERO", "REC APPEND / PARA ENABLE"};
                             if (page==PG_DSEQ) {seq_view=seq_view==SV_STEPS?SV_MORE:seq_view==SV_MORE?SV_TRACK:seq_view==SV_TRACK?SV_TRACKS:seq_view==SV_TRACKS?SV_SLOTS:seq_view==SV_SLOTS?SV_TRANSPOSE:SV_STEPS;}
                             else if (is_seq_page(page)) { seq_view = (seq_view + 1u) % NSV; if (seq_view == SV_MORE) seq_view = SV_TRACK; }   /* (STEP+ = SELECT held in STEPS) */
                             else { seq_back = page; np = PG_SEQ; seq_view = SV_TRACKS; }
                             if (seq_view == SV_SLOTS) slot_sel = pat_queue ? pat_queue - 1u : set.pat;
                             say(HINT[seq_view]);
                             entry_reset();
-                        } else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
+                        } else if (LL[k] == L_EDIT && page==PG_SEQ && seq_view==SV_ENDLESS) endless_toggle();
+                        else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
                         else if (LL[k] == L_EDIT) np = obv_drums_selected() ? (page==PG_DKIT?PG_DSOUND:PG_DKIT) : super_edit_page();
                         else if (LL[k] == L_FX) np = cycle_page(PG_CHORUS, 4);
                         else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : PG_GLOBAL;
@@ -2758,6 +2772,9 @@ static void app_main(void)
         }
 #if BOARD_SMK37
         pf_bank_poll(b, rel);
+        if(endless_screen()&&(b&((1u<<BTN_LEFT)|(1u<<BTN_RIGHT)))){
+            endless_arrow((b>>BTN_RIGHT)&1u);b&=~((1u<<BTN_LEFT)|(1u<<BTN_RIGHT));dirty_steps=dirty_page=1;
+        }
         smk_buttons(b, &dirty_steps);           /* FADER BANK, < > */
 #endif
         ctl_click = set.click % NCLICK == CLICK_ON || (rec == REC_ON && set.click % NCLICK != CLICK_OFF);
@@ -2806,6 +2823,7 @@ static void app_main(void)
             if (page == PG_ARP) { hold ^= 1u << (seq_trk % NTRK); ctl_hold = hold; dirty_tags = 1; }   /* on its page: the panel's sound's HOLD */
             else np = PG_ARP;
         }
+        if ((b & (1u << BTN_PLAY)) && end_record) endless_finish();
         if (b & (1u << BTN_PLAY)) {             /* start from step 1 / stop (a take ends with it) */
             if (ctl_seq_run) { ctl_seq_run = 0; rec = REC_OFF; rec_wait = 0; }   /* (the stop ends REC, armed too: the pads start / stop again) */
             else {
@@ -2817,12 +2835,14 @@ static void app_main(void)
         if (b & (1u << BTN_REC)) { rec_down = 1; rec_down_t = fm1_ms; }   /* REC acts when let go; held 1.2 s it clears the track */
         if (rec_down && fm1_ms - rec_down_t > 1200u) {
             trk_clear();
+            if(endless_screen()&&endless_enabled(&pat.trk[seq_trk])){endless_finish();pat.trk[seq_trk].len=0;seq_cursor_set(seq_trk,0);}
             rec_down = 0;
             leds_q = 0xFFFFFFFFu;
         }
         if (rel & (1u << BTN_REC) && rec_down) {
             if (fm1_ms - rec_down_t < 500u) {   /* a press: playing, record now / stop recording; stopped, arm */
-                if (rec) rec = REC_OFF;
+                if(endless_screen())endless_record_toggle();
+                else if (rec) rec = REC_OFF;
                 else if (ctl_seq_run) { rec = REC_ON; undo_save(); }
                 else rec = REC_READY;
                 memset(rec_open_part, 0, sizeof rec_open_part);
@@ -2917,7 +2937,7 @@ static void app_main(void)
         if (ui_seq_beat != beat_seen) { beat_seen = ui_seq_beat; beat_t = fm1_ms; }
         {
             uint32_t play_on = ctl_seq_run && fm1_ms - beat_t < 90u;   /* PLAY flashes on the beat */
-            uint32_t rec_on = rec == REC_ON || (rec == REC_READY && (fm1_ms / 250u) & 1u);
+            uint32_t rec_on = end_record || rec == REC_ON || (rec == REC_READY && (fm1_ms / 250u) & 1u);
             uint32_t pg = steps_on();
             uint32_t on = pg ? seq_pg[seq_trk] > 0u : panel_octave() < 0, up2 = pg ? seq_pg[seq_trk] + 1u < seq_pages(seq_trk) : panel_octave() > 0;
             lit |= (play_on << 27) | ((uint32_t)(ed_patch(P_ARP_MODE)->v[P_ARP_MODE] != 0) << 28) | (on << 29) | (up2 << 30) | (rec_on << 31);
@@ -2960,6 +2980,10 @@ static void app_main(void)
         /* the screen: only what changed */
         idle_ok = 1;
         if(save_ui_active()){save_ui_draw();}else{
+        if(endless_screen()){
+            if(fm1_ms-t_page>=30u){t_page=fm1_ms;endless_draw(!end_ui_seen);end_ui_seen=1;dirty_page=dirty_steps=dirty_hdr=dirty_tags=0;}
+        } else {
+        end_ui_seen=0;
         if (is_seq_page(page)) {                /* the full-screen sequencer: its own strips */
             static uint32_t top_key, t_seq, info_key;
             static char info_prev[40];
@@ -3057,6 +3081,7 @@ static void app_main(void)
             t_scope = fm1_ms;
             for (i = 0; i < SCOPE_N; i++) scope[i] = 0;
             draw_scope();
+        }
         }
         }
         }

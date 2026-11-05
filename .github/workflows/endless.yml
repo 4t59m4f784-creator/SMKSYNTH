@@ -1,0 +1,32 @@
+name: ENDLESS prototype checks
+on:
+  push:
+    branches: ['experimental/endless']
+  pull_request:
+    paths: ['firmware/src/obv_endless.h', 'tests/endless*', 'experimental/endless/**']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native sequencing, ownership, storage and display
+        run: |
+          mkdir -p build
+          cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/endless tests/endless_test.c
+          ASAN_OPTIONS=detect_leaks=0 UBSAN_OPTIONS=halt_on_error=1 build/endless
+          sh tests/run_physical_controls_tests.sh
+          node tests/endless_installer_test.mjs
+          python3 tests/smk_pkg_test.py experimental/endless/SMKSYNTH-1.0.3-e1-SMK37-Pro.fwsc 'SMK-37 Pro_19623'
+      - name: Compile the same firmware loop for browser workflow tests
+        run: |
+          python3 -m pip install --target build/zig-python ziglang==0.14.1
+          npm install --prefix build/wasm-tools binaryen@132.0.0
+          SIM_VERSION=1.0.3-e1 SIM_OUT=build/endless-sim ZIG="$PWD/build/zig-python/ziglang/zig" WASM_OPT="$PWD/build/wasm-tools/node_modules/.bin/wasm-opt" sh tools/build_controls_sim.sh
+          node tests/endless_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-e1.wasm
+          node tests/release_demo_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-e1.wasm
+          node tests/display_refresh_test.mjs build/endless-sim/SMKSYNTH-1.0.3-e1.wasm
