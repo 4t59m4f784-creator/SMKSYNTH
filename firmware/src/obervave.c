@@ -3000,7 +3000,13 @@ static void app_main(void)
             }
         } else {
         if (dirty_hdr && fm1_ms - t_hdr >= 30u) { dirty_hdr = 0; t_hdr = fm1_ms; draw_header(); }
-        if (dirty_page && fm1_ms - t_page >= 30u) { dirty_page = 0; t_page = fm1_ms; draw_page(); }
+        if (dirty_page && fm1_ms - t_page >= 30u) {
+            dirty_page = 0;
+            /* Outside sequencer/record/mixer, the page consumes this invalidation.
+             * Clear before drawing: app_idle may queue a new event during a blit. */
+            if (!seq_shown() && !rec && page != PG_MIXER) dirty_steps = 0;
+            t_page = fm1_ms; draw_page();
+        }
         if (dirty_tags) { dirty_tags = 0; draw_tags(); }
         if (page == PG_MIXER) {                 /* the mixer: its strip instead of the scope and the voice lights */
             static uint32_t mix_key = 0xFFFFFFFFu;
