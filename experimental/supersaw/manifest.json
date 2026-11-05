@@ -7,10 +7,10 @@
     "url": "./SMKSYNTH-1.0.2-return-SMK37-Pro.fwsc"
   },
   "update": {
-    "name": "Instalar supersaw SS2 otimizada",
-    "product": "SMK-37 Pro_19620",
+    "name": "Instalar supersaw SS3 otimizada",
+    "product": "SMK-37 Pro_19621",
     "size": 651819,
-    "sha": "49f517bd3a08c15259570eb589a824c6b90d2f3f0c2ceb517304e9bc4fc71f0b",
-    "url": "./SMKSYNTH-1.0.2-ss2-SMK37-Pro.fwsc"
+    "sha": "3fe2ca80bb9f3b4dd04280b26b0e2cd994f3f5ee8fb766a0e28900d6657dd3c5",
+    "url": "./SMKSYNTH-1.0.2-ss3-SMK37-Pro.fwsc"
   }
 }

@@ -1231,7 +1231,7 @@ static void draw_page(void)
             cpu[0] = 0; fmt_u(cpu, ui_render_us); scat(cpu, "us");
 #endif
 #if OBV_VOICE_HW
-            if(page==PG_SUPER){scat(cpu," O");fmt_u(cpu+slen(cpu),ui_render_overruns>99999u?99999u:ui_render_overruns);}
+            if(page==PG_SUPER){cpu[0]=0;scat(cpu,"P");fmt_u(cpu+slen(cpu),ui_render_peak_us);scat(cpu," O");fmt_u(cpu+slen(cpu),ui_render_overruns>99999u?99999u:ui_render_overruns);}
             else
 #endif
             scat(cpu, set.sync_int ? " INT" : ctl_ext_quarter ? " CLK" : " AUTO");

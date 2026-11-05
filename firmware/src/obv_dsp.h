@@ -40,10 +40,7 @@ static inline uint32_t pitch_inc(int32_t p)
 }
 
 /* ---- oscillators */
-typedef struct {
-    uint32_t ph;                                /* phase, wraps */
-    int32_t prev;                               /* the previous sample, still open to a correction */
-} osc_t;
+#include "obv_osc_type.h"
 
 #define OSC_SAW 1u
 #define OSC_PLS 2u

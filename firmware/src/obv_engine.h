@@ -807,11 +807,14 @@ static void voice_render(voice_t *v, int32_t *out)
     int32_t hw2 = (ww2 & OSC_SAW ? -65536 : 0) + (ww2 & OSC_PLS ? -65536 : 0);
     int32_t super_buf[2][CTL];
     super_state_t *ss = super_state[v - vc];
-    if (ww1 == W_SUPER || ww2 == W_SUPER) { sy = 0; xq = 0; } /* SS1: deliberately bypassed */
+    uint32_t has_super = ww1 == W_SUPER || ww2 == W_SUPER;
+    uint32_t buffered1 = ww1 == W_SUPER || (has_super && ww1 == W_SAW);
+    uint32_t buffered2 = ww2 == W_SUPER || (has_super && ww2 == W_SAW);
+    if (has_super) { sy = 0; xq = 0; } /* SS1: deliberately bypassed */
     if (ww1 == W_SUPER) super_render_call(&ss[0], &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
-    else ss[0].active = 0;
+    else {ss[0].active = 0;if(buffered1)super_plain_call(&ss[0],&v->o1,inc1,l1?super_buf[0]:0,CTL);}
     if (ww2 == W_SUPER) super_render_call(&ss[1], &v->o2, inc2, g->p->v[P_O2_PW], patch_super_mix(g->p,1), l2 ? super_buf[1] : 0, CTL);
-    else ss[1].active = 0;
+    else {ss[1].active = 0;if(buffered2)super_plain_call(&ss[1],&v->o2,inc2,l2?super_buf[1]:0,CTL);}
     for (i = 0; i < CTL; i++) {
         int32_t s1, s2, mix, lp, bp, hp, y, amp, rt = -1;
         uint32_t ie = inc1;
@@ -821,10 +824,10 @@ static void voice_render(voice_t *v, int32_t *out)
             ie = m < (int32_t)(inc1 >> 4) ? inc1 >> 4 : (uint32_t)m;
             d1 = ie >> 15;
         }
-        s1 = ww1 == W_SUPER ? (l1 ? super_buf[0][i] : 0) : osc_step(&v->o1, ie, d1, pw1, ww1, hw1, -1);
+        s1 = buffered1 ? (l1 ? super_buf[0][i] : 0) : osc_step(&v->o1, ie, d1, pw1, ww1, hw1, -1);
         if (sy && v->o1.ph < ie && d1)
             rt = (int32_t)(v->o1.ph / d1);
-        s2 = ww2 == W_SUPER ? (l2 ? super_buf[1][i] : 0) : osc_step(&v->o2, inc2, d2, pw2, ww2, hw2, rt);
+        s2 = buffered2 ? (l2 ? super_buf[1][i] : 0) : osc_step(&v->o2, inc2, d2, pw2, ww2, hw2, rt);
         o2n = v->o2.prev;
         mix = s1 * l1 + s2 * l2;
         if (ln) mix += ((int32_t)(xorshift(&v->noise) >> 16) - 32768) * ln;

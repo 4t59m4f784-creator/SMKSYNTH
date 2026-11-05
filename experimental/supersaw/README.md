@@ -1,3 +1,38 @@
+# SMKSYNTH 1.0.2-ss3 — High-note processing revision
+
+Hardware report from Marcus: one SUPER now plays without stalls and O remains unchanged. SUPER + SAW + FX showed some late high notes, without noise. Two SUPERs still stalled; the photo shows P=6727 us and O=569. The nominal render deadline is 256/44100 s = 5805 us, so that configuration measurably misses deadlines. The high-note input delay is consistent with reduced main-loop time, but its cause is not separately proven.
+
+## SS3 changes
+
+1. Replace each saw-wrap division with an exact cached reciprocal plus remainder correction. This is integer-exact, not an approximate waveform. High notes wrap more often, so removing wrap divisions targets their pitch-dependent cost. Reciprocal values are recalculated only when their denominator changes, not on every tiny drift change.
+2. Build only `obv_supersaw.c` with -O2 in a separate object. Main synthesis/control/USB keep their tested -Os options. `obv_osc_type.h` shares the oscillator ABI; host/browser builds still include the same implementation directly. Native tests also exercise an external -O2 kernel linked to an -Os controller fixture.
+3. When a voice contains SUPER plus ordinary SAW, render the companion SAW with the same optimized natural-wrap kernel. Voices with no SUPER retain the original path. SYNC/XMOD remain bypassed in SUPER voices as before.
+4. Compact the SUPER timing label to `P6727 O569` so it fits alongside the page title. P is peak audio-render microseconds; O is the accumulated deadline-overrun count. Restart clears the counters.
+
+There are still seven saws per SUPER, all eight shared voice cards, the same detune/gain laws and same saved patches. No sample-rate reduction, voice cap or note delay is deliberately introduced.
+
+## Validation
+
+- Existing SS1 reference comparison still passes: 32768 paired blocks, every MIDI note, parameter/pitch changes, silent advancement, oscillator states and samples exact.
+- 1572840 reciprocal quotient cases match integer division; 32768 companion-SAW blocks match the original oscillator, including high notes and silent advancement.
+- Whole-engine comparison against SS2: 48 repeated chord attacks over four scenarios (4/8 notes, high notes, release overlap, modulation/drift, SUPER+SAW, dual SUPER, silent OSC2 and effects). The PCM streams are byte-identical: SHA-256 `7c7688bb6186498d7f9abe83db713e8ef7f4c98b69bfe094007965aa50471fba`. An external -O2 kernel with an -Os host main also produces that hash.
+- ASan/UBSan and existing physical-control/sequencer/layer/scene tests pass. The target build checks RAM/flash bounds and no outbound calls from RAM. Target disassembly has no divide instruction inside any rendering loop of either optimized kernel.
+- Installer and preserving-loader tests cover SS2->SS3, interruption/resume and stable return. Original SS1 and SS2 resume pages/keys/packages are preserved.
+
+See `validation-ss3/` for logs. Host timing ratios do not predict keyboard CPU; reduction of P/O and elimination of late high notes/stalls still require the physical test.
+
+## Install and compare
+
+Update directly from SS1/SS2 using the current installer. SS3 identity: `SMK-37 Pro_19621`. SUPER presets/favorites/scenes/backups are unchanged and carry over. No restore is required when upgrading. Keep a backup. Stable return remains available; stable 1.0.2 does not understand SUPER patches, so use a pre-SUPER backup when returning to it.
+
+Restart between measurement cases. First repeat one SUPER + SAW + the same effects and high-note chords. Then use two SUPERs with the same settings that gave P6727/O569. Note new P, whether O grows, whether the stall remains and whether high notes arrive late. P excludes some USB/output work: O=0 alone does not guarantee enough control-input margin.
+
+Build uses the usual SDK/toolchain with `--release 1.0.2-ss3 --experimental-id 19621`; the build script compiles the extra DSP object automatically. USB implementation and its compiler profile remain unchanged. iPhone USB-video clicks remain the separate known issue.
+
+---
+
+## Previous revisions and architecture
+
 # SMKSYNTH 1.0.2-ss2 — Supersaw performance revision
 
 SS2 follows hardware feedback: SS1 sounded good but simultaneous attacks of four notes stalled; a second SUPER made it worse. This is consistent with missed audio deadlines, but the physical cause is not proven without timing measurements. No voice cap, dropped saws, lower sample rate or altered detune/gain law is used here.

@@ -21,12 +21,17 @@ jobs:
           ASAN_OPTIONS=detect_leaks=0 build/supersaw/native
           cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/supersaw/equivalence tests/supersaw_performance_test.c
           ASAN_OPTIONS=detect_leaks=0 build/supersaw/equivalence
+          cc -O2 -DOBV_HOST -Ifirmware/src -Ifirmware/gen -c firmware/src/obv_supersaw.c -o build/supersaw/kernel.o
+          cc -Os -DOBV_HOST -DOBV_SUPER_EXTERNAL -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -c tests/supersaw_integration_test.c -o build/supersaw/integration.o
+          cc build/supersaw/integration.o build/supersaw/kernel.o -o build/supersaw/integration
+          build/supersaw/integration build/supersaw/integration.pcm
+          python3 -c "import hashlib; assert hashlib.sha256(open('build/supersaw/integration.pcm','rb').read()).hexdigest() == '7c7688bb6186498d7f9abe83db713e8ef7f4c98b69bfe094007965aa50471fba'"
           sh tests/run_physical_controls_tests.sh
       - name: Pinned installer and stable return
         run: |
           node tests/supersaw_installer_test.mjs
           node tests/release_101_installer_test.mjs
-          python3 tests/smk_pkg_test.py experimental/supersaw/SMKSYNTH-1.0.2-ss2-SMK37-Pro.fwsc 'SMK-37 Pro_19620'
+          python3 tests/smk_pkg_test.py experimental/supersaw/SMKSYNTH-1.0.2-ss3-SMK37-Pro.fwsc 'SMK-37 Pro_19621'
           cc -O1 -DBOARD_SMK37=1 -DOBV_VOICE_HW=1 -o build/supersaw/loader tests/backup_loader_test.c
-          build/supersaw/loader releases/1.0.2/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc experimental/supersaw/SMKSYNTH-1.0.2-ss2-SMK37-Pro.fwsc
-          build/supersaw/loader experimental/supersaw/SMKSYNTH-1.0.2-ss2-SMK37-Pro.fwsc releases/1.0.2/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc
+          build/supersaw/loader releases/1.0.2/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc experimental/supersaw/SMKSYNTH-1.0.2-ss3-SMK37-Pro.fwsc
+          build/supersaw/loader experimental/supersaw/SMKSYNTH-1.0.2-ss3-SMK37-Pro.fwsc releases/1.0.2/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc

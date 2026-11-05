@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"release": {"name": "Retornar \u00e0 vers\u00e3o est\u00e1vel 1.0.2", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3", "url": "./SMKSYNTH-1.0.2-return-SMK37-Pro.fwsc"}, "update": {"name": "Instalar supersaw SS2 otimizada", "product": "SMK-37 Pro_19620", "size": 651819, "sha": "49f517bd3a08c15259570eb589a824c6b90d2f3f0c2ceb517304e9bc4fc71f0b", "url": "./SMKSYNTH-1.0.2-ss2-SMK37-Pro.fwsc"}});
-export const PENDING="smksynth.ss2.pending.v1";
+export const PINS=Object.freeze({"release": {"name": "Retornar \u00e0 vers\u00e3o est\u00e1vel 1.0.2", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3", "url": "./SMKSYNTH-1.0.2-return-SMK37-Pro.fwsc"}, "update": {"name": "Instalar supersaw SS3 otimizada", "product": "SMK-37 Pro_19621", "size": 651819, "sha": "3fe2ca80bb9f3b4dd04280b26b0e2cd994f3f5ee8fb766a0e28900d6657dd3c5", "url": "./SMKSYNTH-1.0.2-ss3-SMK37-Pro.fwsc"}});
+export const PENDING="smksynth.ss3.pending.v1";
 export async function validate(raw,kind){
  const p=PINS[kind];if(!p)throw Error('Operação inválida.');
  if(raw.length!==p.size)throw Error('Tamanho diferente do pacote esperado.');
@@ -14,14 +14,14 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620'].includes(source);
+const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621'].includes(source);
 export function modeFor(kind,id,pending){
  if(!PINS[kind])throw Error('Operação inválida.');
  if(!id?.text)throw Error('Conecte e consulte o teclado.');
  if(!['SMK-37 Pro','ota-SMK-37 Pro'].includes(id.model))throw Error('Modelo recusado: somente SMK-37 Pro.');
  if(originAllowed(kind,id.text))return 'install';
  if(id.text==='ota-SMK-37 Pro_900'&&(pending?.kind===kind&&pending.sha===PINS[kind].sha&&originAllowed(kind,pending.source)))return 'resume';
- throw Error('Esta página aceita SMKSYNTH 1.0.x, SS1 ou SS2 no SMK-37 Pro. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
+ throw Error('Esta página aceita SMKSYNTH 1.0.x, SS1, SS2 ou SS3 no SMK-37 Pro. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
 }
 function guardFor(source){return (phase,id)=>{
  if(phase==='start'&&id.text!==source())throw Error('A identidade mudou antes da gravação: '+id.text);

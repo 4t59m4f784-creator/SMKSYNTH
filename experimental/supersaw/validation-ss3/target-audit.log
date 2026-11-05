@@ -1,0 +1,2 @@
+PASS super_render: RAM address, no outbound calls; 7 backward loops without divide instructions.
+PASS super_plain_saw: RAM address, no outbound calls; 1 backward loops without divide instructions.

@@ -65,9 +65,27 @@ static double bench(int old,unsigned voices,unsigned oscs,int modulated)
 int main(void)
 {
     equivalent();
+    uint32_t seed=87654;
+    for(uint32_t d=1;d<=65535;d++)for(unsigned k=0;k<24;k++){
+        uint32_t n=k==0?0:k==1?0xFFFFFFFFu:k==2?d:k==3?d-1:xorshift(&seed);
+        assert(super_fraction(n,d,super_reciprocal(d))==n/d);
+    }
+    for(unsigned note=0;note<128;note++){
+        osc_t a={xorshift(&seed),0},b=a;super_state_t state={0};int32_t out[CTL];
+        for(unsigned k=0;k<256;k++){
+            uint32_t inc=pitch_inc(note*256+k);int silent=k%11==0;
+            super_plain_saw(&state,&a,inc,silent?0:out,CTL);
+            for(unsigned i=0;i<CTL;i++){
+                int32_t y=osc_step(&b,inc,inc>>15,0,OSC_SAW,-65536,-1);
+                if(!silent)assert(out[i]==y);
+            }
+            assert(!memcmp(&a,&b,sizeof a));
+        }
+    }
+    puts("PASS: 1572840 reciprocal quotients and 32768 companion-SAW blocks exact, including high notes and silent advance.");
     for(unsigned voices=4;voices<=8;voices+=4)for(unsigned oscs=1;oscs<=2;oscs++)for(int mod=0;mod<=1;mod++){
         double a=bench(1,voices,oscs,mod),b=bench(0,voices,oscs,mod);
-        printf("HOST %u voices x %u SUPER, %s: SS1 %.4fs SS2 %.4fs ratio %.3f\n",voices,oscs,mod?"changing pitch":"steady pitch",a,b,b/a);
+        printf("HOST %u voices x %u SUPER, %s: SS1 %.4fs SS3 %.4fs ratio %.3f\n",voices,oscs,mod?"changing pitch":"steady pitch",a,b,b/a);
     }
     puts("Timing is a host microbenchmark of oscillators only; measure attack peaks and overruns on the SMK37.");
     return 0;

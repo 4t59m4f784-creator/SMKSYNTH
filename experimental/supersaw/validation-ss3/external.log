@@ -1,0 +1,2 @@
+PASS: high-note 4/8-note bursts, release overlap, SUPER+SAW / dual SUPER / silent OSC2, modulation/drift and FX stream rendered.
+7c7688bb6186498d7f9abe83db713e8ef7f4c98b69bfe094007965aa50471fba  build/supersaw-ss3/ss3-external.pcm
