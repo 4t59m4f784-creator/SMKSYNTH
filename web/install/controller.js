@@ -16,7 +16,7 @@ async function fetchPackages(){try{
   const r=await fetch(PINS[kind].url,{cache:'no-store'});if(!r.ok)throw Error('Download indisponível: '+kind);
   const raw=new Uint8Array(await r.arrayBuffer());await validate(raw,kind);buffers[kind]=raw;
  }
- status('packageStatus','SMKSYNTH 1.0.1 verificado: SHA-256, modelo e CRCs aprovados.');
+ status('packageStatus','SMKSYNTH 1.0.2 verificado: SHA-256, modelo e CRCs aprovados.');
 }catch(e){for(const kind of Object.keys(buffers))delete buffers[kind];status('packageStatus','Pacotes bloqueados: '+e.message);log(e.message)}refresh()}
 $('connect').addEventListener('click',async()=>{
  if(busy)return;device=null;service=null;refresh();$('connect').disabled=true;status('deviceStatus','Solicitando acesso USB-MIDI e consultando identidade…');
@@ -53,6 +53,6 @@ $('confirmation').addEventListener('close',async()=>{
  finally{busy=false;refresh()}
 });
 window.addEventListener('beforeunload',e=>{if(busy){e.preventDefault();e.returnValue=''}});
-$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-1.0.1-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-1.0.2-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 refresh();fetchPackages();
 

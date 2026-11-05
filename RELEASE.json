@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "identity": "SMK-37 Pro_19618",
   "required_origin": "SMK-37 Pro_016",
   "installation": "first-install-or-preserving-update",
@@ -10,17 +10,25 @@
   "tempo": 90,
   "dp2_runtime_hardware_approved": true,
   "first_install_hardware_approved": false,
-  "firmware_sha256": "3bc0cd43cad00e452f44fa03d52a32b220202baaa7ea445f52c3601686e421f4",
-  "wasm_sha256": "6328360a9fbb9ade9ddb9fb0ada846a5a8e21972fae4cd563f709a8e65a3ab2a",
+  "firmware_sha256": "0070522159f182f697b21aeb4cfc788981427de9bc54587366a9e41193f893aa",
+  "wasm_sha256": "6872a8c174f0bb9759e3b5df32bd94a0dc777b7a1d1a0faae57d1e1e88ce4f89",
   "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
-  "app_bytes": 156616,
-  "static_ram_bytes": 80048,
+  "app_bytes": 160424,
+  "static_ram_bytes": 84576,
   "pool_bytes": 325984,
-  "loader_bytes": 7211,
-  "update_firmware_sha256": "6fffb8900340c201651aa1c576d2f0320caff4a2901cbeb551f54b5e21005a20",
-  "usb_audio": false,
+  "loader_bytes": 7703,
+  "update_firmware_sha256": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3",
+  "usb_audio": true,
   "fader_modes": [
     "JUMP",
     "CATCH"
-  ]
+  ],
+  "usb_audio_validation": [
+    "Mac 44.1/48 kHz",
+    "iPhone AudioShare"
+  ],
+  "known_issues": [
+    "iPhone USB video recording clicks/dropouts"
+  ],
+  "usb_audio_base": "UA1"
 }

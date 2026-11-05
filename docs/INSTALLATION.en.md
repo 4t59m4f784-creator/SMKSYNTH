@@ -1,8 +1,10 @@
 > Update, 2026-11-02: Marcus confirmed physical USB first installation on his SMK-37 Pro. The records below also describe automated tests performed before that confirmation.
 
-## Updating to 1.0.1
+Stereo USB audio tested on Mac and on iPhone with AudioShare. iPhone video recording using USB audio may contain clicks and dropouts; a known issue under investigation.
 
-Choose Update in the installer if SMKSYNTH is already installed: it preserves the bank without reinstalling V016. Choose Install only for a first installation from official M‑VAVE V016; it replaces the bank with the factory examples. Export a backup before updating. USB provides MIDI, backup/restore and firmware updates; record the physical audio output through an audio interface.
+## Updating to 1.0.2
+
+Choose Update in the installer if SMKSYNTH is already installed: it preserves the bank without reinstalling V016. Choose Install only for a first installation from official M‑VAVE V016; it replaces the bank with the factory examples. Export a backup before updating. USB provides stereo audio, MIDI, backup/restore and firmware updates.
 
 GLOBAL → FADER MODE: JUMP applies the physical position; CATCH engages when the fader crosses the current value and rearms after page, part, bank or pattern changes. Save GLOBAL to retain the choice. All eight encoders remain relative.
 
