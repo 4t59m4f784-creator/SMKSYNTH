@@ -1,8 +1,8 @@
-# SMKSYNTH 1.0.0 - Complete manual
+# SMKSYNTH 1.0.3 - Complete manual
 
-[PDF](pdf/SMKSYNTH-1.0.0-Manual-EN.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.0.3-Manual-EN.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Reference: firmware 1.0.0, SMK-37 Pro_19618.
+Reference: firmware 1.0.3, SMK-37 Pro_19618.
 
 ## Contents
 
@@ -22,9 +22,11 @@ Reference: firmware 1.0.0, SMK-37 Pro_19618.
 - 14. GLOBAL and MIDI
 - 15. Saving, installation and backup
 - 16. Simulator, troubleshooting and reference
+- SUPER / Supersaw
 - MIDI appendix / 1
 - MIDI appendix / 2
 - MIDI appendix / 3
+- Updates and USB audio
 
 ## AI-assisted development
 
@@ -32,7 +34,7 @@ Developed using AI: Marcus Padrini defined and directed the experience, created 
 
 ## 1. Overview and navigation
 
-Firmware 1.0.0 for M-VAVE SMK-37 Pro. Four parts A-D; ANALOG (OberVave) or DRUM-X per part. Eight shared ANALOG voices. 16 patterns; up to 256 steps per track and four notes per ANALOG step.
+Firmware 1.0.3 for M-VAVE SMK-37 Pro. Four parts A-D; ANALOG (OberVave) or DRUM-X per part. Eight shared ANALOG voices. 16 patterns; up to 256 steps per track and four notes per ANALOG step.
 
 ![knobs](diagrams/knobs-en.svg)
 
@@ -87,7 +89,7 @@ Pads 1-4 select A-D. Pads 5/6 disable or restore the part’s delay/reverb sends
 
 ![faders](diagrams/faders-en.svg)
 
-Fader Bank A controls the selected part on every page. Bank B: F1-F3 are per-part sends; move through the stored value for pickup to engage. F4 and K8 control the same physical master. This differs from VOL on the Mixer MASTER row.
+Fader Bank A controls the selected part on every page. Bank B: F1-F3 are per-part sends. GLOBAL > FADER MODE selects JUMP (immediate) or CATCH (engages when crossing the stored value). F4 and K8 control the same physical master. This differs from VOL on the Mixer MASTER row.
 
 Physical Pitch and Mod follow the selected part. Pitch uses the sound’s BEND range; Mod adds vibrato. Held notes retain their correct note-offs when changing parts.
 
@@ -251,7 +253,7 @@ Hold GLOBE: F3/G3/A3/B3 start/stop tracks A-D on the bar (with REC active, selec
 
 ## 11. ANALOG: oscillators, filter and envelopes
 
-PARA cycles OSC 1, OSC 2, OSC MOD, FILTER and FILTER +. CHORD alternates FILTER ENV and AMP ENV. Four knobs follow the columns below; pads retain the manual bank and faders retain Bank A/B.
+PARA cycles OSC 1, OSC 2, OSC MOD, FILTER, FILTER + and SUPER. CHORD alternates FILTER ENV and AMP ENV. Four knobs follow the columns below; pads retain the manual bank and faders retain Bank A/B.
 
 |  | K1 | K2 | K3 | K4 |
 | --- | --- | --- | --- | --- |
@@ -259,13 +261,14 @@ PARA cycles OSC 1, OSC 2, OSC MOD, FILTER and FILTER +. CHORD alternates FILTER 
 | OSC 2 | WAVE | PW | LEVEL | SEMI |
 | OSC MOD | SYNC | X-MOD | ENV>O2 | FINE |
 | FILTER | RESO | ENV AMT | KEY TRK | TYPE |
+| SUPER | DET1 | MIX1 | DET2 | MIX2 |
 | FILTER + | DRIVE | VEL>FLT | VEL>AMP | MORPH |
 | FILTER ENV | ATTACK | DECAY | SUSTAIN | RELEASE |
 | AMP ENV | ATTACK | DECAY | SUSTAIN | RELEASE |
 
 | Group | Use |
 | --- | --- |
-| OSC 1/2 | WAVE: OFF, SAW, PULSE or SAW+PLS; PW controls pulse width. LEVEL mixes each oscillator; NOISE adds noise. SEMI tunes OSC2 from -24 to +24 semitones; FINE is fine tuning. |
+| OSC 1/2 | WAVE: OFF, SAW, PULSE, SAW+PLS or SUPER; PW controls pulse width or DETUNE in SUPER. LEVEL mixes each oscillator; NOISE adds noise. SEMI tunes OSC2 from -24 to +24 semitones; FINE is fine tuning. |
 | OSC MOD | SYNC synchronizes oscillators; X-MOD controls cross modulation; ENV>O2 applies envelope to OSC2 pitch (bipolar). |
 | FILTER | CUTOFF is on Performance/fader A1; RESO emphasizes cutoff. ENV AMT is bipolar. KEY TRK follows pitch. TYPE: LP12, HP12, BP12, NOTCH, LP24, SEM; MORPH changes SEM. |
 | ENVELOPES | ATTACK: onset; DECAY: fall to SUSTAIN; RELEASE: tail after release. FILTER ENV shapes filtering; AMP ENV shapes amplitude. VEL>FLT/VEL>AMP set velocity response. |
@@ -372,7 +375,29 @@ Memory is local to the browser/domain. Panel SAVE writes to that memory. Export 
 | Export session expired | Stop everything, wait for saves, reboot and reconnect before exporting again. An incomplete file is not a valid backup. |
 | Installer rejects firmware | First installation requires exactly SMK-37 Pro_016; other sources are blocked. |
 
-Independent project. ANALOG synthesis: OberVave/zvenson; DRUM-X: JIANT; SMKSYNTH direction and hardware tests: Marcus Padrini; technical solutions, adaptation code and documentation with ChatGPT (OpenAI), under his direction. See repository CREDITS.md and LICENSING.md for all attributions. GPL-3.0-only.
+Independent project. ANALOG synthesis: OberVave/zvenson; DRUM-X: JIANT; SUPER: originated in Clipper/3dSam (github.com/isod89/clipper-fm1); SMKSYNTH direction and hardware tests: Marcus Padrini; technical solutions, adaptation code and documentation with ChatGPT (OpenAI), under his direction. See repository CREDITS.md and LICENSING.md for all attributions. GPL-3.0-only.
+
+## SUPER / Supersaw
+
+Select WAVE = SUPER on OSC 1 and/or OSC 2. Each oscillator mixes seven saws: one central and six detuned. PW becomes DETUNE. LEVEL still sets oscillator volume.
+
+PARA cycles OSC 1 > OSC 2 > OSC MOD > FILTER > FILTER + > SUPER. On the SUPER page the four knobs control:
+
+| K1 | K2 | K3 | K4 |
+| --- | --- | --- | --- |
+| DET1 | MIX1 | DET2 | MIX2 |
+
+DET1/DET2 (0-127): detune spread for each oscillator. MIX1/MIX2 (0-127): level of the six side saws relative to the central saw; MIX 0 keeps only the central saw. Default MIX is 64.
+
+Start with one SUPER oscillator, moderate DETUNE and MIX 64. Add OSC2 and effects as needed. OSC2 SEMI/FINE, pitch bend, glide, vibrato, envelopes and filters remain available. Eight ANALOG voices are shared; seven saws do not add polyphony. UNISON stacks complete voices and increases load.
+
+When either oscillator uses SUPER, SYNC and X-MOD are bypassed. PWM does not modulate SUPER detune. DETUNE uses the existing PW CCs and automation; MIX has no dedicated CC or automation.
+
+Settings are saved in presets, favourites, scenes and backups. Older sounds open without conversion, using MIX 64. Before returning to firmware predating SUPER, restore a backup made with that version: it does not understand WAVE 4 or all new favourites.
+
+P displays peak processing time in microseconds; O counts blocks exceeding their deadline. Both reset at boot. Marcus approved the SS3 implementation on hardware; load depends on polyphony, unison and effects.
+
+Origin: Clipper, by 3dSam, built on Felucca, with the detune curve and offsets derived from Adam Szabo’s analysis cited by Clipper. Source: https://github.com/isod89/clipper-fm1 . SMKSYNTH adapts this foundation with independent MIX and its own optimizations; it is not an exact Roland JP-8000/JP-8080 reproduction. GPL-3.0-only; attribution in CREDITS.md and LICENSING.md.
 
 ## MIDI appendix / 1
 
@@ -380,11 +405,11 @@ Incoming CC values are 0-127 and scaled to the parameter maximum. This table des
 
 | ID | CC | Display | Raw maximum |
 | --- | --- | --- | --- |
-| O1_WAVE | 20 | WAVE | 3 |
+| O1_WAVE | 20 | WAVE | NWAVE - 1 |
 | O1_PW | 21 | PW | 127 |
 | O1_LVL | 22 | LEVEL | 127 |
 | NOISE | 23 | NOISE | 127 |
-| O2_WAVE | 24 | WAVE | 3 |
+| O2_WAVE | 24 | WAVE | NWAVE - 1 |
 | O2_PW | 25 | PW | 127 |
 | O2_LVL | 26 | LEVEL | 127 |
 | O2_SEMI | 27 | SEMI | 48 |
@@ -405,7 +430,7 @@ Incoming CC values are 0-127 and scaled to the parameter maximum. This table des
 | FS | 40 | SUSTAIN | 127 |
 | FR | 41 | RELEASE | 127 |
 
-Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-3; MODE 0-3; SHAPE 0-5. For pages and four-knob assignments, see sections 11-14. Effect CCs are shared; they are not Bank B per-part sends.
+Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. For pages and four-knob assignments, see sections 11-14. Effect CCs are shared; they are not Bank B per-part sends.
 
 ## MIDI appendix / 2
 
@@ -438,7 +463,7 @@ Incoming CC values are 0-127 and scaled to the parameter maximum. This table des
 | MOD_DEPTH | 1 | MOD DPT | 127 |
 | ARP_MODE | 61 | ARP | 5 |
 
-Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-3; MODE 0-3; SHAPE 0-5. For pages and four-knob assignments, see sections 11-14. Effect CCs are shared; they are not Bank B per-part sends.
+Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. For pages and four-knob assignments, see sections 11-14. Effect CCs are shared; they are not Bank B per-part sends.
 
 ## MIDI appendix / 3
 
@@ -462,7 +487,13 @@ Incoming CC values are 0-127 and scaled to the parameter maximum. This table des
 | REV_PRE | 80 | PRE-DLY | 127 |
 | REV_MIX | 81 | MIX | 127 |
 
-Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-3; MODE 0-3; SHAPE 0-5. For pages and four-knob assignments, see sections 11-14. Effect CCs are shared; they are not Bank B per-part sends.
+Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. For pages and four-knob assignments, see sections 11-14. Effect CCs are shared; they are not Bank B per-part sends.
+
+## Updates and USB audio
+
+Already using SMKSYNTH? Export a backup and choose Update in the public installer. Versions 1.0.x and SUPER SS1/SS2/SS3 are accepted and the saved bank is preserved. Install is only for first installation from V016 and replaces the bank. Public identity remains SMK-37 Pro_19618.
+
+Stereo 16-bit USB audio, 44.1/48 kHz: tested on Mac and on iPhone with AudioShare. Known issue: iPhone video recordings using USB audio may contain clicks or dropouts.
 
 ## Links
 

@@ -1,0 +1,3 @@
+PASS: pinned SS3/stable-return, SS1/SS2 upgrades and SS3 reinstall, strict per-operation origins, same-ID update, two interrupted resumes retain original source, wrong model/source and tamper refusal before writes.
+PASS: frozen SS1 packages/keys and interrupted-install resume preserved.
+PASS: frozen SS2 resume keys/packages, SS3->stable return.

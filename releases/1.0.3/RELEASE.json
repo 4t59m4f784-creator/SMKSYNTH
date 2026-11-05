@@ -1,0 +1,36 @@
+{
+  "version": "1.0.3",
+  "identity": "SMK-37 Pro_19618",
+  "required_origin": "SMK-37 Pro_016",
+  "installation": "first-install-or-preserving-update",
+  "runtime_base": "0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853",
+  "factory_patterns": 5,
+  "favorites": 8,
+  "extra_user_presets": 0,
+  "tempo": 90,
+  "dp2_runtime_hardware_approved": true,
+  "first_install_hardware_approved": false,
+  "firmware_sha256": "f84844b56efc8421822a8ec64f2497c6759c3f71732d2a2a58d2f149e726c926",
+  "wasm_sha256": "aac3fd2e245859830a3e40e63cbea726255306c43ce3d07ca7112e6fc34cfecf",
+  "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
+  "app_bytes": 164052,
+  "static_ram_bytes": 86624,
+  "pool_bytes": 325984,
+  "loader_bytes": 7703,
+  "update_firmware_sha256": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870",
+  "usb_audio": true,
+  "fader_modes": [
+    "JUMP",
+    "CATCH"
+  ],
+  "usb_audio_validation": [
+    "Mac 44.1/48 kHz",
+    "iPhone AudioShare"
+  ],
+  "known_issues": [
+    "iPhone USB video recording clicks/dropouts"
+  ],
+  "usb_audio_base": "UA1",
+  "supersaw_hardware_approved": true,
+  "supersaw_origin": "https://github.com/isod89/clipper-fm1"
+}

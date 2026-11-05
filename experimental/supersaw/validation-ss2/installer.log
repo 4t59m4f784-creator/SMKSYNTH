@@ -1,0 +1,2 @@
+PASS: pinned SS2/stable-return, SS1->SS2 and SS2 reinstall, strict per-operation origins, same-ID update, two interrupted resumes retain original source, wrong model/source and tamper refusal before writes.
+PASS: frozen SS1 packages/keys and interrupted-install resume preserved.

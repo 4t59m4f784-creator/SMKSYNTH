@@ -19,7 +19,7 @@ jobs:
       - name: Verify release and website
         run: |
           python3 tests/release_factory_test.py
-          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.2-first-install-SMK37-Pro.fwsc
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc
           node tests/release_101_installer_test.mjs
           cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/controls tests/physical_controls_test.c
           /tmp/controls
@@ -28,7 +28,7 @@ jobs:
           node tests/release_demo_wasm_test.mjs
           node tests/release_i18n_test.mjs
           node tests/simulator_midi_test.mjs
-          cd releases/1.0.2 && sha256sum -c SHA256SUMS.txt
+          cd releases/1.0.3 && sha256sum -c SHA256SUMS.txt
   release:
     needs: verify
     runs-on: ubuntu-latest
@@ -41,13 +41,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 tools/package_release.py build/release-site
-          if ! gh release view v1.0.2 >/dev/null 2>&1; then
-            gh release create v1.0.2 releases/1.0.2/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.0.2' --notes-file docs/RELEASE-1.0.2.md
+          if ! gh release view v1.0.3 >/dev/null 2>&1; then
+            gh release create v1.0.3 releases/1.0.3/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.0.3' --notes-file docs/RELEASE-1.0.3.md
           else
-            echo 'Release v1.0.2 already exists; immutable downloads left unchanged.'
+            echo 'Release v1.0.3 already exists; immutable downloads left unchanged.'
           fi
-          gh release upload v1.0.2 docs/pdf/*.pdf --clobber
-          gh release edit v1.0.2 --notes-file docs/RELEASE-1.0.2.md
+          gh release upload v1.0.3 docs/pdf/*.pdf --clobber
+          gh release edit v1.0.3 --notes-file docs/RELEASE-1.0.3.md
   pages:
     needs: verify
     runs-on: ubuntu-latest

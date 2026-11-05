@@ -34,3 +34,33 @@ static uint32_t obv_param_max(const patch_t*p,uint32_t id){(void)p;return PDEF[i
 _Static_assert(NPARAM+PATCH_NAME<=PATCH_KBO_AT,"keyboard octave overlaps patch name");
 static int patch_keyboard_octave(const patch_t*p){unsigned v=p->v[PATCH_KBO_AT];return v>=0xD0u&&v<=0xD4u?(int)v-0xD2:0;}
 static void patch_keyboard_octave_set(patch_t*p,int oct){p->v[PATCH_KBO_AT]=(uint8_t)(0xD2+(oct < -2 ? -2 : oct > 2 ? 2 : oct));}
+
+/* SS1 extension occupies only the ANALOG engine's six trailing bytes.
+ * NPARAM, name, octave, PATCH_BYTES and every MIDI CC retain their offsets.
+ * Unknown/absent extension -> MIX 64. DRUM-X keeps its OVE tag unchanged.
+ * Readers never rewrite legacy bytes. Checksum is committed last by setter. */
+static int patch_super_valid(const patch_t *p)
+{
+    const uint8_t *t = p->v + OBV_ENGINE_TAG_AT;
+    return t[0]=='S' && t[1]=='S' && t[2]==1 && t[3]<=127 && t[4]<=127 &&
+        t[5]==(uint8_t)(0xA5u ^ t[3] ^ t[4]);
+}
+static uint32_t patch_super_mix(const patch_t *p, uint32_t osc)
+{
+    return patch_super_valid(p) ? p->v[OBV_ENGINE_TAG_AT+3u+(osc&1u)] : 64u;
+}
+static void patch_super_mix_set(patch_t *p, uint32_t osc, uint32_t value)
+{
+    uint8_t a=(uint8_t)patch_super_mix(p,0), b=(uint8_t)patch_super_mix(p,1);
+    uint8_t *t=p->v+OBV_ENGINE_TAG_AT;
+    if(obv_patch_engine(p)!=OBV_ANALOG)return;
+    value=value>127u?127u:value;
+    if(osc&1u)b=(uint8_t)value;else a=(uint8_t)value;
+#ifndef OBV_HOST
+    uint32_t irq=fm1__lock();
+#endif
+    t[0]='S';t[1]='S';t[2]=1;t[3]=a;t[4]=b;t[5]=(uint8_t)(0xA5u^a^b);
+#ifndef OBV_HOST
+    fm1__unlock(irq);
+#endif
+}

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"release": {"name": "Instalar SMKSYNTH 1.0.2", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "0070522159f182f697b21aeb4cfc788981427de9bc54587366a9e41193f893aa", "url": "./firmware/SMKSYNTH-1.0.2-first-install-SMK37-Pro.fwsc"}, "update": {"name": "Atualizar SMKSYNTH 1.0.2", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3", "url": "./firmware/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc"}});
-export const PENDING="smksynth.1.0.2.pending.v1";
+export const PINS=Object.freeze({"release": {"name": "Instalar SMKSYNTH 1.0.3", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "f84844b56efc8421822a8ec64f2497c6759c3f71732d2a2a58d2f149e726c926", "url": "./firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc"}, "update": {"name": "Atualizar SMKSYNTH 1.0.3", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870", "url": "./firmware/SMKSYNTH-1.0.3-update-SMK37-Pro.fwsc"}});
+export const PENDING="smksynth.1.0.3.pending.v1";
 export async function validate(raw,kind){
  const p=PINS[kind];if(!p)throw Error('Operação inválida.');
  if(raw.length!==p.size)throw Error('Tamanho diferente do pacote esperado.');
@@ -14,7 +14,7 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const originAllowed=(kind,source)=>kind==='release'?source==='SMK-37 Pro_016':kind==='update'&&['SMK-37 Pro_19617','SMK-37 Pro_19618'].includes(source);
+const originAllowed=(kind,source)=>kind==='release'?source==='SMK-37 Pro_016':kind==='update'&&['SMK-37 Pro_19617','SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621'].includes(source);
 export function modeFor(kind,id,pending){
  if(!PINS[kind])throw Error('Operação inválida.');
  if(!id?.text)throw Error('Conecte e consulte o teclado.');

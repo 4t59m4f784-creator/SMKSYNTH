@@ -1,0 +1,86 @@
+firmware/src/obervave.c: In function ‘pattern_slot_load’:
+firmware/src/obervave.c:517:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  517 |   if(p->magic!=PAT_MAGIC||p->drum_magic!=DRUM_SEQ_MAGIC)return -1;keyboard_pattern_init(p);
+      |   ^~
+firmware/src/obervave.c:517:67: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  517 |   if(p->magic!=PAT_MAGIC||p->drum_magic!=DRUM_SEQ_MAGIC)return -1;keyboard_pattern_init(p);
+      |                                                                   ^~~~~~~~~~~~~~~~~~~~~
+firmware/src/obervave.c: In function ‘rec_note_at’:
+firmware/src/obervave.c:654:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  654 |         if(!on)return;int lane=drum_lane(note);if(lane<0)return;
+      |         ^~
+firmware/src/obervave.c:654:23: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  654 |         if(!on)return;int lane=drum_lane(note);if(lane<0)return;
+      |                       ^~~
+firmware/src/obervave.c: In function ‘obv_voice_label’:
+firmware/src/obervave.c:800:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  800 |         if(p==DP_MORPH)return "MORPH";if(p==DP_TONE)return "TONE";
+      |         ^~
+firmware/src/obervave.c:800:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  800 |         if(p==DP_MORPH)return "MORPH";if(p==DP_TONE)return "TONE";
+      |                                       ^~
+firmware/src/obervave.c:801:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  801 |         if(p==DP_LENGTH)return "DECAY";if(p==DP_FOLD)return "FOLD";
+      |         ^~
+firmware/src/obervave.c:801:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  801 |         if(p==DP_LENGTH)return "DECAY";if(p==DP_FOLD)return "FOLD";
+      |                                        ^~
+firmware/src/obervave.c:802:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  802 |         if(p==P_O2_SEMI)return "TUNE";return PDEF[p].name;
+      |         ^~
+firmware/src/obervave.c:802:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  802 |         if(p==P_O2_SEMI)return "TUNE";return PDEF[p].name;
+      |                                       ^~~~~~
+In file included from firmware/src/obervave.c:901:
+firmware/src/obv_ui.h: In function ‘ui_drum_grid’:
+firmware/src/obv_ui.h:438:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  438 |         if(l==lane)cv_rect(0,y,30,16,C_RULE);cv_text(4,y,&FONT_S,names[l],col);
+      |         ^~
+firmware/src/obv_ui.h:438:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  438 |         if(l==lane)cv_rect(0,y,30,16,C_RULE);cv_text(4,y,&FONT_S,names[l],col);
+      |                                              ^~~~~~~
+firmware/src/obv_ui.h:443:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  443 |             if(ph>=0&&n==(uint32_t)ph)bg=STRIPE[0];cv_rect(x,y+3,9,10,bg);
+      |             ^~
+firmware/src/obv_ui.h:443:52: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  443 |             if(ph>=0&&n==(uint32_t)ph)bg=STRIPE[0];cv_rect(x,y+3,9,10,bg);
+      |                                                    ^~~~~~~
+firmware/src/obv_ui.h:445:17: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  445 |                 if(st->chance<100u)c=blend565(C_RULE,c,160);cv_rect(x+1,y+5,7,6,c);
+      |                 ^~
+firmware/src/obv_ui.h:445:61: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  445 |                 if(st->chance<100u)c=blend565(C_RULE,c,160);cv_rect(x+1,y+5,7,6,c);
+      |                                                             ^~~~~~~
+In file included from firmware/src/obv_smk.h:78,
+                 from firmware/src/obervave.c:2190:
+firmware/src/obv_perf.h: In function ‘pb_commit’:
+firmware/src/obv_perf.h:61:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   61 |  if(pat_save_say||copy_to)pb_write_target=p+1u;pf_redraw();
+      |  ^~
+firmware/src/obv_perf.h:61:48: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   61 |  if(pat_save_say||copy_to)pb_write_target=p+1u;pf_redraw();
+      |                                                ^~~~~~~~~
+firmware/src/obervave.c: At top level:
+firmware/src/obervave.c:148:33: warning: ‘pat_save_t’ defined but not used [-Wunused-variable]
+  148 | static uint32_t pat_save_armed, pat_save_t, q_edited;   /* q_edited: the next pattern brings unsaved edits */    /* SAVE tapped in the sequencer: SAVE PATTERN? (again: saved) */
+      |                                 ^~~~~~~~~~
+In file included from firmware/src/platform.c:43,
+                 from firmware/src/obervave.c:19:
+firmware/src/../../tests/host.c:49:17: warning: ‘smk_jedec’ defined but not used [-Wunused-variable]
+   49 | static uint32_t smk_jedec;
+      |                 ^~~~~~~~~
+firmware/src/../../tests/host.c:48:35: warning: ‘smk_trim_ok’ defined but not used [-Wunused-variable]
+   48 | static uint8_t smk_store_cleared, smk_trim_ok;
+      |                                   ^~~~~~~~~~~
+firmware/src/../../tests/host.c:48:16: warning: ‘smk_store_cleared’ defined but not used [-Wunused-variable]
+   48 | static uint8_t smk_store_cleared, smk_trim_ok;
+      |                ^~~~~~~~~~~~~~~~~
+  1000 ms  screen -> build/host/obervave-smk37-1000.ppm
+  2700 ms  MIDI out 90 67 0
+  2700 ms  MIDI out 90 74 0
+  3000 ms  screen -> build/host/obervave-smk37-3000.ppm
+  3400 ms  MIDI out 80 67 0
+  3400 ms  MIDI out 80 74 0
+sound  -> build/host/obervave-smk37.wav (286464 frames)
+screen -> build/host/obervave-smk37-1000.png
+screen -> build/host/obervave-smk37-3000.png

@@ -31,7 +31,7 @@ enum {
 
 enum { K_NUM, K_BIP, K_ONOFF, K_WAVE, K_FTYPE, K_MODE, K_LSHAPE, K_LPHASE, K_TO, K_ARP, K_DIV, K_SEMI, K_MS, K_HZ,
        K_PCT, K_CUT, K_OCT, K_MORPH, K_DDIV };
-enum { W_OFF, W_SAW, W_PLS, W_BOTH };
+enum { W_OFF, W_SAW, W_PLS, W_BOTH, W_SUPER, NWAVE };
 enum { F_LP12, F_HP12, F_BP12, F_NOTCH, F_LP24, F_SEM, NFTYPE };   /* SEM: LP .. notch .. HP by MORPH */
 enum { M_POLY, M_DUAL, M_UNISON, M_MONO };
 enum { L_TRI, L_SAW, L_RAMP, L_SQR, L_SH, L_RND };
@@ -46,11 +46,11 @@ typedef struct {
     uint8_t max, def, kind, cc;                 /* cc: a fixed MIDI CC, 0 = taken from 20 up in table order */
 } pdef_t;
 static const pdef_t PDEF[NPARAM] = {
-    [P_O1_WAVE] = {"WAVE", 3, W_SAW, K_WAVE, 0},
+    [P_O1_WAVE] = {"WAVE", NWAVE - 1, W_SAW, K_WAVE, 0},
     [P_O1_PW] = {"PW", 127, 64, K_PCT, 0},
     [P_O1_LVL] = {"LEVEL", 127, 110, K_NUM, 0},
     [P_NOISE] = {"NOISE", 127, 0, K_NUM, 0},
-    [P_O2_WAVE] = {"WAVE", 3, W_SAW, K_WAVE, 0},
+    [P_O2_WAVE] = {"WAVE", NWAVE - 1, W_SAW, K_WAVE, 0},
     [P_O2_PW] = {"PW", 127, 64, K_PCT, 0},
     [P_O2_LVL] = {"LEVEL", 127, 100, K_NUM, 0},
     [P_O2_SEMI] = {"SEMI", 48, 24, K_SEMI, 0},
@@ -111,7 +111,7 @@ static const pdef_t PDEF[NPARAM] = {
     [P_REV_MIX] = {"MIX", 127, 0, K_NUM, 0},
 };
 
-static const char *const WAVE_NAME[4] = {"OFF", "SAW", "PULSE", "SAW+PLS"};
+static const char *const WAVE_NAME[NWAVE] = {"OFF", "SAW", "PULSE", "SAW+PLS", "SUPER"};
 static const char *const FTYPE_NAME[NFTYPE] = {"LP 12", "HP 12", "BP 12", "NOTCH", "LP 24", "SEM"};
 static const char *const MODE_NAME[4] = {"POLY", "DUAL", "UNISON", "MONO"};
 static const char *const LSHAPE_NAME[6] = {"TRI", "SAW", "RAMP", "SQUARE", "S&H", "RANDOM"};
@@ -127,8 +127,9 @@ static const uint8_t DDIV_NUM[NDDIV] = {1, 1, 1, 3, 1, 3, 2}, DDIV_DEN[NDDIV] = 
 typedef struct { const char *title; int8_t p[4]; } page_t;
 enum { PG_PERFORM, PG_OSC1, PG_OSC2, PG_OSCMOD, PG_FILTER, PG_FILTER2, PG_FENV, PG_AENV, PG_LFO, PG_LFODEST,
        PG_LFO2, PG_ARP, PG_CHORUS, PG_DELAY, PG_REVERB, PG_DRIVE, PG_VOICE, PG_OUTPUT, PG_GLOBAL,
-       PG_MIXER, PG_SEQ, PG_ENGINE, PG_VOWELS, PG_VTONE, PG_DKIT, PG_DSOUND, PG_DSEQ, PG_KEYBOARD, PG_CONTROLS, NPAGE }; /* append only */
+       PG_MIXER, PG_SEQ, PG_ENGINE, PG_VOWELS, PG_VTONE, PG_DKIT, PG_DSOUND, PG_DSEQ, PG_KEYBOARD, PG_CONTROLS, PG_SUPER, NPAGE }; /* append only */
 static const page_t PAGE[NPAGE] = {
+    [PG_SUPER] = {"SUPER", {-1, -1, -1, -1}},
     [PG_CONTROLS] = {"GLOBAL: FADER MODE", {-1, -1, -1, -1}},
     [PG_PERFORM] = {"PERFORM", {P_CUTOFF, P_RESO, P_FENV_AMT, P_AR}},   /* (ALGORITHM picks the track now, as sloopDX) */
     [PG_OSC1] = {"OSC 1", {P_O1_WAVE, P_O1_PW, P_O1_LVL, P_NOISE}},

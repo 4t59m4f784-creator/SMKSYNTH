@@ -1,8 +1,8 @@
-# SMKSYNTH 1.0.0 - Quick start guide
+# SMKSYNTH 1.0.3 - Quick start guide
 
-[PDF](pdf/SMKSYNTH-1.0.0-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.0.3-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Reference: firmware 1.0.0, SMK-37 Pro_19618.
+Reference: firmware 1.0.3, SMK-37 Pro_19618.
 
 ## Contents
 
@@ -17,7 +17,7 @@ Developed using AI: Marcus Padrini defined and directed the experience, created 
 
 ## Quick start / 1. First steps
 
-SMKSYNTH 1.0.0 - M-VAVE SMK-37 Pro. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
+SMKSYNTH 1.0.3 - M-VAVE SMK-37 Pro. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
 
 1. Set K8/master to a suitable level and press PLAY.
 2. K6 selects A-D; K7 changes the part preset.
@@ -29,7 +29,7 @@ SMKSYNTH 1.0.0 - M-VAVE SMK-37 Pro. Use this guide after installation. First ins
 
 ![faders](diagrams/faders-en.svg)
 
-K1-K4 follow the screen. K5: tempo on Performance; LEVEL/OCT in Split/Layer; page in STEPS; pattern in other SEQ/Mixer views. FADER BANK only changes faders. Bank B F1-F3 use pickup: move through the stored value. Bank B F4 = K8/master.
+K1-K4 follow the screen. K5: tempo on Performance; LEVEL/OCT in Split/Layer; page in STEPS; pattern in other SEQ/Mixer views. FADER BANK only changes faders. GLOBAL > FADER MODE: JUMP engages immediately; CATCH waits to cross the stored value. Bank B F4 = K8/master.
 
 Five examples start at 90 BPM. Eight favourites, no extra personal presets. PLAY/REC and engine choice preserve the pad bank; SEQ explicitly requests steps.
 

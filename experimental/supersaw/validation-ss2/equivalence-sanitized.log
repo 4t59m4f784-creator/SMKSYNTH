@@ -1,0 +1,10 @@
+PASS: 32768 paired blocks, all 128 MIDI notes, changing detune/mix/pitch, silent fast-forward, variable block sizes, phase/state and output bit-identical to SS1.
+HOST 4 voices x 1 SUPER, steady pitch: SS1 0.0459s SS2 0.0193s ratio 0.421
+HOST 4 voices x 1 SUPER, changing pitch: SS1 0.0463s SS2 0.0221s ratio 0.477
+HOST 4 voices x 2 SUPER, steady pitch: SS1 0.0929s SS2 0.0433s ratio 0.466
+HOST 4 voices x 2 SUPER, changing pitch: SS1 0.0929s SS2 0.0430s ratio 0.463
+HOST 8 voices x 1 SUPER, steady pitch: SS1 0.0875s SS2 0.0397s ratio 0.454
+HOST 8 voices x 1 SUPER, changing pitch: SS1 0.0990s SS2 0.0447s ratio 0.451
+HOST 8 voices x 2 SUPER, steady pitch: SS1 0.1728s SS2 0.0785s ratio 0.454
+HOST 8 voices x 2 SUPER, changing pitch: SS1 0.1701s SS2 0.0827s ratio 0.486
+Timing is a host microbenchmark of oscillators only; measure attack peaks and overruns on the SMK37.

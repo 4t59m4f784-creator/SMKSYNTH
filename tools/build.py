@@ -180,7 +180,9 @@ def build_app():
     cmds = [("cc", "-c", FW / "crt0.S", "-o", OUT / "crt0.o"),
             ("cc", "-c", FW / "hal" / "fm1_vec.S", "-o", OUT / "fm1_vec.o"),
             ("cc", "-c", FW / "hal" / "fm1_isr.S", "-o", OUT / "fm1_isr.o"),
-            ("cc", *flags, "-c", FW / "src" / "obervave.c", "-o", OUT / "obervave.o")]
+            ("cc", *flags, "-c", FW / "src" / "obervave.c", "-o", OUT / "obervave.o"),
+            # DSP-only speed optimization: never change the USB/main -Os profile.
+            ("cc", "-O2", *flags[1:], "-c", FW / "src" / "obv_supersaw.c", "-o", OUT / "obv_supersaw.o")]
     tc_all(*cmds)
     elf = OUT / "obervave.elf"
     ld = FW / "app.ld"
@@ -191,7 +193,7 @@ def build_app():
         ld = OUT / "app.ld"
         ld.write_text(txt.replace("LENGTH = 0x8DFBC", f"LENGTH = {APP_SLOT:#X}".replace("0X", "0x")))
     tc("pi32v2/bin/ld", "--gc-sections", "-e", "_start", "-T", ld, OUT / "crt0.o", OUT / "fm1_vec.o",
-       OUT / "fm1_isr.o", OUT / "obervave.o", "-o", elf)
+       OUT / "fm1_isr.o", OUT / "obervave.o", OUT / "obv_supersaw.o", "-o", elf)
     for sect in ("text.bin", "data.bin", "ramtext.bin"):
         (OUT / sect).unlink(missing_ok=True)
     *_, syms, dis, rt = tc_all(("common/bin/objcopy", "-O", "binary", "-j", ".text", elf, OUT / "text.bin"),
@@ -319,7 +321,7 @@ def main():
     if a.identity and a.experimental_id: raise SystemExit("Choose one identity option")
     if a.first_install != bool(a.factory_bank): raise SystemExit("--first-install requires --factory-bank and vice versa")
     FIRST_INSTALL=a.first_install
-    if a.identity and (a.identity!="19618" or a.release not in ("1.0.0","1.0.1","1.0.2") or (a.release=="1.0.0" and not FIRST_INSTALL)): raise SystemExit("Stable profile: 19618; 1.0.0 first install or 1.0.1 first install/update")
+    if a.identity and (a.identity!="19618" or a.release not in ("1.0.0","1.0.1","1.0.2","1.0.3") or (a.release=="1.0.0" and not FIRST_INSTALL)): raise SystemExit("Stable profile: 19618; 1.0.0 first install or 1.0.1-1.0.3 first install/update")
     if not a.voice_hardware:
         raise SystemExit("OBERVAVE VOICE: installable builds require the explicit --voice-hardware profile")
     if (a.board or os.environ.get("BOARD"))!="smk37" or (a.model or os.environ.get("MODEL") or "pro").lower() not in ("pro","elite") or not (a.experimental_id or a.identity) or not a.release or (not a.identity and "-" not in a.release):

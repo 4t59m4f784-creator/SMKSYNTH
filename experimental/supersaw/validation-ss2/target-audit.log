@@ -1,0 +1,1 @@
+PASS: SUPER runs in RAM; offset table in RAM; no outbound calls; no signed divisions in kernel.
