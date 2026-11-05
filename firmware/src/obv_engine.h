@@ -792,6 +792,9 @@ static void voice_block(voice_t *v, uint32_t card)
     ui_vnote[card] = (uint8_t)played_note;
 }
 
+#include "obv_supersaw.h"
+static super_state_t super_state[NV][2];
+
 /* ---- the samples of one voice: oscillators -> mix -> drive -> filter -> amp -> pan */
 static void voice_render(voice_t *v, int32_t *out)
 {
@@ -802,6 +805,13 @@ static void voice_render(voice_t *v, int32_t *out)
     uint32_t ft = g->ftype, xq = g->xmod_q, sy = g->sync_on, ww1 = g->w1, ww2 = g->w2;
     int32_t hw1 = (ww1 & OSC_SAW ? -65536 : 0) + (ww1 & OSC_PLS ? -65536 : 0);
     int32_t hw2 = (ww2 & OSC_SAW ? -65536 : 0) + (ww2 & OSC_PLS ? -65536 : 0);
+    int32_t super_buf[2][CTL];
+    super_state_t *ss = super_state[v - vc];
+    if (ww1 == W_SUPER || ww2 == W_SUPER) { sy = 0; xq = 0; } /* SS1: deliberately bypassed */
+    if (ww1 == W_SUPER) super_render(&ss[0], &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), super_buf[0], CTL);
+    else ss[0].active = 0;
+    if (ww2 == W_SUPER) super_render(&ss[1], &v->o2, inc2, g->p->v[P_O2_PW], patch_super_mix(g->p,1), super_buf[1], CTL);
+    else ss[1].active = 0;
     for (i = 0; i < CTL; i++) {
         int32_t s1, s2, mix, lp, bp, hp, y, amp, rt = -1;
         uint32_t ie = inc1;
@@ -811,10 +821,10 @@ static void voice_render(voice_t *v, int32_t *out)
             ie = m < (int32_t)(inc1 >> 4) ? inc1 >> 4 : (uint32_t)m;
             d1 = ie >> 15;
         }
-        s1 = osc_step(&v->o1, ie, d1, pw1, ww1, hw1, -1);
+        s1 = ww1 == W_SUPER ? super_buf[0][i] : osc_step(&v->o1, ie, d1, pw1, ww1, hw1, -1);
         if (sy && v->o1.ph < ie && d1)
             rt = (int32_t)(v->o1.ph / d1);
-        s2 = osc_step(&v->o2, inc2, d2, pw2, ww2, hw2, rt);
+        s2 = ww2 == W_SUPER ? super_buf[1][i] : osc_step(&v->o2, inc2, d2, pw2, ww2, hw2, rt);
         o2n = v->o2.prev;
         mix = s1 * l1 + s2 * l2;
         if (ln) mix += ((int32_t)(xorshift(&v->noise) >> 16) - 32768) * ln;

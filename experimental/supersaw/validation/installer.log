@@ -1,0 +1,1 @@
+PASS: pinned SS1/stable-return, strict per-operation origins, same-ID update, two interrupted resumes retain original source, wrong model/source and tamper refusal before writes.

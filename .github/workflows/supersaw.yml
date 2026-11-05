@@ -1,0 +1,30 @@
+name: Supersaw experimental checks
+on:
+  push:
+    branches: ['experimental/supersaw']
+  pull_request:
+    paths: ['firmware/src/obv_super*', 'tests/supersaw*', 'experimental/supersaw/**']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: DSP, persistence and controls
+        run: |
+          mkdir -p build/supersaw
+          cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/supersaw/native tests/supersaw_test.c
+          ASAN_OPTIONS=detect_leaks=0 build/supersaw/native
+          sh tests/run_physical_controls_tests.sh
+      - name: Pinned installer and stable return
+        run: |
+          node tests/supersaw_installer_test.mjs
+          node tests/release_101_installer_test.mjs
+          python3 tests/smk_pkg_test.py experimental/supersaw/SMKSYNTH-1.0.2-ss1-SMK37-Pro.fwsc 'SMK-37 Pro_19619'
+          cc -O1 -DBOARD_SMK37=1 -DOBV_VOICE_HW=1 -o build/supersaw/loader tests/backup_loader_test.c
+          build/supersaw/loader releases/1.0.2/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc experimental/supersaw/SMKSYNTH-1.0.2-ss1-SMK37-Pro.fwsc
+          build/supersaw/loader experimental/supersaw/SMKSYNTH-1.0.2-ss1-SMK37-Pro.fwsc releases/1.0.2/SMKSYNTH-1.0.2-update-SMK37-Pro.fwsc

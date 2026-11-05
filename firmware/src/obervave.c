@@ -779,7 +779,7 @@ static void obv_context_refresh(void)
     uint32_t id=obv_patch_engine(&live_p[seq_trk%NTRK]);
     if(id==OBV_DRUMS){
         if(page==PG_SEQ){page=PG_DSEQ;if(seq_view!=SV_TRANSPOSE)seq_view=SV_STEPS;}
-        if((page>=PG_OSC1&&page<=PG_FILTER2)||page==PG_VOWELS||page==PG_VTONE)page=PG_DKIT;
+        if((page>=PG_OSC1&&page<=PG_FILTER2)||page==PG_SUPER||page==PG_VOWELS||page==PG_VTONE)page=PG_DKIT;
         if(page==PG_FENV||page==PG_AENV||page==PG_LFO||page==PG_LFODEST||page==PG_LFO2)page=PG_DSOUND;
     }
     else {if(page==PG_DSEQ){page=PG_SEQ;if(seq_view!=SV_TRANSPOSE)seq_view=SV_TRACKS;}else if(page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND)page=PG_OSC1;}
@@ -801,7 +801,15 @@ static const char *obv_voice_label(uint32_t p)
         if(p==DP_LENGTH)return "DECAY";if(p==DP_FOLD)return "FOLD";
         if(p==P_O2_SEMI)return "TUNE";return PDEF[p].name;
     }
+    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER) ||
+       (p==P_O2_PW && ed_patch(0)->v[P_O2_WAVE]==W_SUPER))return "DETUNE";
     return PDEF[p].name;
+}
+static uint32_t super_edit_page(void)
+{
+    if(page==PG_FILTER2)return PG_SUPER;
+    if(page==PG_SUPER)return PG_OSC1;
+    return page>=PG_OSC1 && page<PG_FILTER2 ? page+1u : PG_OSC1;
 }
 static patch_t obv_park_analog[NTRK];
 static uint8_t obv_park_valid[NTRK];
@@ -921,10 +929,12 @@ static void param_value(char *s, uint32_t p, uint32_t v)   /* <= 7 characters */
         if(p==DP_TONE||p==DP_LENGTH){fmt_s(s,(int32_t)v-64);return;}
     }
 
+    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER) ||
+       (p==P_O2_PW && ed_patch(0)->v[P_O2_WAVE]==W_SUPER)){fmt_u(s,v);return;}
     switch (PDEF[p].kind) {
     case K_BIP: if (v < 64u) { scat(s, "-"); fmt_u(t, 64u - v); } else { scat(s, v > 64u ? "+" : ""); fmt_u(t, v - 64u); } scat(s, t); break;
     case K_ONOFF: scat(s, v ? "ON" : "OFF"); break;
-    case K_WAVE: scat(s, WAVE_NAME[v & 3u]); break;
+    case K_WAVE: scat(s, WAVE_NAME[v < NWAVE ? v : W_OFF]); break;
     case K_FTYPE: scat(s, FTYPE_NAME[v % NFTYPE]); break;
     case K_MODE: scat(s, MODE_NAME[v & 3u]); break;
     case K_LSHAPE: scat(s, LSHAPE_NAME[v % 6u]); break;
@@ -1118,7 +1128,13 @@ static void draw_page(void)
         k[i].present = 0;
         k[i].bip = 0;
         k[i].value[0] = 0;
-        if(i==3u&&performance_transpose_control()){
+        if(page==PG_SUPER && !layer){
+            static const char *const labels[4]={"DET1","MIX1","DET2","MIX2"};
+            const patch_t *p=ed_patch(0);unsigned o=i/2;
+            k[i].present=1;k[i].label=labels[i];k[i].max=127;
+            k[i].v=(i&1u)?patch_super_mix(p,o):p->v[o?P_O2_PW:P_O1_PW];
+            fmt_u(k[i].value,k[i].v);
+        }else if(i==3u&&performance_transpose_control()){
             k[i].label="KEY TR";k[i].present=1;k[i].v=1;k[i].max=1;scat(k[i].value,"ON");
         }else if(page==PG_KEYBOARD&&!layer){keyboard_knob(&k[i],i);}
         else if(page==PG_DSOUND && obv_drums_selected() && !layer){
@@ -1251,6 +1267,10 @@ static void draw_hints(void)
     int toasting = toast && fm1_ms - toast_t < 1500u;
     if(perf_drum_bank()&&!layer&&!toasting&&!rec){uint32_t dk=obv_drums_selected()?901u:902u;if(hints_key!=dk){hints_key=dk;ui_hints(obv_drums_selected()?"PADS 1-8: PLAY / REC":"SELECT A DRUM-X PART",obv_drums_selected()?"PADS 9-16 UNUSED":"KNOB BANK: EXIT",obv_drums_selected()?RGB(166,66,255):C_AMBER);}return;}
     if(page==PG_KEYBOARD&&!layer&&!toasting&&!rec){if(hints_key!=900u){hints_key=900u;ui_hints("P8 / P16 SELECT PLAY ROW", "K5 LEVEL/OCT  TWO PADS LAYER", C_TRKC[0]);}return;}
+    if(!layer&&!toasting&&!rec&&(page==PG_SUPER||page==PG_OSC1||page==PG_OSC2||page==PG_OSCMOD)&&
+       (ed_patch(0)->v[P_O1_WAVE]==W_SUPER||ed_patch(0)->v[P_O2_WAVE]==W_SUPER)){
+        if(hints_key!=903u){hints_key=903u;ui_hints("SUPER: SYNC / XMOD BYPASS","PWM DOES NOT MODULATE DETUNE",C_AMBER);}return;
+    }
     if (held > 500u) {                          /* REC held: a bar fills up to the clear */
         uint32_t k, f = (held - 500u) * 12u / 700u;
         ring[0] = 0;
@@ -2474,7 +2494,12 @@ static void panel_encoders(void)
             if (context_changed || control_context != smk_control_context()) continue;
 #endif
             if (e > 1 || e < -1) e *= 3;        /* a fast turn goes further */
-            if(k==3u&&performance_transpose_control()){transpose_keys_set(e>0);dirty_hdr=dirty_steps=1;}
+            if(page==PG_SUPER && !layer){
+                unsigned o=k/2;patch_t *p=ed_patch(0);
+                if(k&1u){patch_super_mix_set(p,o,(uint32_t)clampi((int32_t)patch_super_mix(p,o)+e*2,0,127));trk_edited[seq_trk%NTRK]=1;}
+                else {unsigned id=o?P_O2_PW:P_O1_PW;set_param(id,(int32_t)p->v[id]+e*2);auto_rec(id);}
+                dirty_hdr=1;
+            }else if(k==3u&&performance_transpose_control()){transpose_keys_set(e>0);dirty_hdr=dirty_steps=1;}
             else if(page==PG_KEYBOARD&&!layer){keyboard_turn(k,e);dirty_hdr=1;}
             else if(page==PG_DSOUND && obv_drums_selected() && !layer){
                 uint32_t t=seq_trk%NTRK,l=drum_ui_lane[t]%8u;
@@ -2715,7 +2740,7 @@ static void app_main(void)
                             say(HINT[seq_view]);
                             entry_reset();
                         } else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
-                        else if (LL[k] == L_EDIT) np = obv_drums_selected() ? (page==PG_DKIT?PG_DSOUND:PG_DKIT) : cycle_page(PG_OSC1, 5);
+                        else if (LL[k] == L_EDIT) np = obv_drums_selected() ? (page==PG_DKIT?PG_DSOUND:PG_DKIT) : super_edit_page();
                         else if (LL[k] == L_FX) np = cycle_page(PG_CHORUS, 4);
                         else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : PG_GLOBAL;
 
@@ -2905,7 +2930,7 @@ static void app_main(void)
         }
         fm1_led_key(BTN_SEQ, seq_shown());
         fm1_led_key(BTN_HOME, page == PG_PERFORM);
-        fm1_led_key(BTN_EDIT, (page >= PG_OSC1 && page <= PG_FILTER2)||page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND);
+        fm1_led_key(BTN_EDIT, (page >= PG_OSC1 && page <= PG_FILTER2)||page==PG_SUPER||page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND);
         fm1_led_key(BTN_ENV, page == PG_FENV || page == PG_AENV);
         fm1_led_key(BTN_LFO, page >= PG_LFO && page <= PG_LFO2);
         fm1_led_key(BTN_FX, page >= PG_CHORUS && page <= PG_DRIVE);

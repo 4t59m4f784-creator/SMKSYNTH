@@ -70,3 +70,7 @@ Original source fixtures and the table generator are included for reproducible
 comparison; optional master effects and the global modulation matrix are not
 claimed equivalent. Corresponding source is included with the experimental
 firmware bundle.
+
+## Supersaw SS1 experimental
+
+`firmware/src/obv_supersaw.h` adapts the detune offsets and simplified detune curve from Clipper's `firmware/src/eng_hybrid.c`: Copyright (C) 2026 3dSam (Clipper), after Leo Kuroshita (@kurogedelic), Hügelton Instruments (Felucca), GPL-3.0-only. Clipper cites Adam Szabo's JP-8000 analysis. Source: https://github.com/isod89/clipper-fm1 . SMKSYNTH uses its own event-corrected oscillator and adds independent MIX and normalized gains. No Clipper samples, artwork, fonts, or factory patches are imported.
