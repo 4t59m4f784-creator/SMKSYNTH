@@ -1,0 +1,16 @@
+{
+  "release": {
+    "name": "Retornar \u00e0 vers\u00e3o est\u00e1vel 1.0.2",
+    "product": "SMK-37 Pro_19618",
+    "size": 651819,
+    "sha": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3",
+    "url": "./SMKSYNTH-1.0.2-return-SMK37-Pro.fwsc"
+  },
+  "update": {
+    "name": "Instalar supersaw SS1 experimental",
+    "product": "SMK-37 Pro_19619",
+    "size": 651819,
+    "sha": "edeb3f7982110d70787ffa361fd30afc0430d5392fbbed553f8868b4e4307dfe",
+    "url": "./SMKSYNTH-1.0.2-ss1-SMK37-Pro.fwsc"
+  }
+}

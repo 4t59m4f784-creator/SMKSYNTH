@@ -1,3 +1,36 @@
+# SMKSYNTH 1.0.2-ss2 — Supersaw performance revision
+
+SS2 follows hardware feedback: SS1 sounded good but simultaneous attacks of four notes stalled; a second SUPER made it worse. This is consistent with missed audio deadlines, but the physical cause is not proven without timing measurements. No voice cap, dropped saws, lower sample rate or altered detune/gain law is used here.
+
+## What changed
+
+- Render one saw across the block with phase/previous sample in registers, then move to the next; specialize the natural-wrap correction algebra exactly.
+- Cache frequency steps and gain normalization when their inputs have not changed. Pitch changes/drift invalidate frequency cache; smoothing and detune law remain identical.
+- Replace divisions by 16 and 6 with exact truncating arithmetic. The target compiler otherwise emits divides even for constants under -Os.
+- Execute the hot routine from `.ram_text.super`, using the existing platform's far-call pattern. Its offset table is in RAM. The compiler/link checks confirm no calls out of the RAM kernel.
+- If MIX is exactly zero, advance six inaudible sides directly; if oscillator LEVEL is zero, advance all seven directly. Final oscillator states match a full render exactly, so raising MIX/LEVEL resumes at the same phases.
+- Show P (peak render microseconds) and O (number of render blocks exceeding the nominal 5805-us budget) on the SUPER page. Counters reset on boot. P measures synthesis/effects, not all USB/output overhead.
+
+## Evidence and limits
+
+`tests/supersaw_performance_test.c` compares against the frozen SS1 renderer in `tests/reference/supersaw/ss1.h`: 32768 paired blocks over every MIDI note, varying pitch, detune and mix, variable block sizes, silent fast-forward and wave restarts. Both output samples and oscillator phases/delayed state are bit-identical. Tests also exhaust the relevant signed ranges for the replacement divisions. ASan/UBSan passes; existing controls/sequencer/layer/scene regressions pass. The legacy host WAV still hashes to `09998294144d7327cac2e74aa30d90417e3a0905ba8c162060843f79ff5ca441`.
+
+Target build: app 163156 bytes; data+bss 86208/98304 bytes; pool 325984/344064; RAM kernel has no outbound calls. Host microbenchmarks are included for transparency: different optimization/sanitizer settings give different ratios, and they do not predict keyboard CPU. **No hardware performance claim is made yet.**
+
+## Install and reproduce
+
+Use the current private test installer. SS2 identity is `SMK-37 Pro_19620`; it accepts stable 19618, SS1 19619 or SS2 19620. Stable return accepts SS1 and SS2. Transfer resume is pinned to SS2 separately; the original SS1 page/keys/packages are preserved under `legacy-ss1/` for interrupted SS1 transfers.
+
+SS1 saved SUPER presets/favorites/scenes/backups are compatible with SS2: all saved layouts and the SS extension are unchanged. No restore is required to upgrade from SS1. Keep a backup before testing. Stable 1.0.2 still does not support saved SUPER patches, so use a pre-SUPER backup if returning to stable.
+
+Repeat the exact four-note attack first with one SUPER (OSC2 OFF), then two. Observe P/O before and after attacks. Test 3/4/6/8 simultaneous notes and sustained releases. Then add effects, layer/sequencer/DRUM-X. Report whether the stall remains and the P/O readings for the failing combination. A new boot clears the peak/counter between cases. This comparison distinguishes deadline misses from another fault without changing the approved sound.
+
+Build: same command below, but `--release 1.0.2-ss2 --experimental-id 19620`. Known SS1 limitations (SYNC/XMOD bypass and no PWM on detune) remain.
+
+---
+
+## Original SS1 architecture and test notes
+
 # SMKSYNTH 1.0.2-ss1 — Supersaw experimental
 
 Base: stable 1.0.2, commit `4ab63cf6c5e04873833b9524e4dac0e3e383e156`. Branch `experimental/supersaw`. SMK-37 **Pro only**. Not a first install; requires an installed SMKSYNTH (identity 19618). Experimental identity: `SMK-37 Pro_19619`. Return: original stable 1.0.2 update, identity 19618.

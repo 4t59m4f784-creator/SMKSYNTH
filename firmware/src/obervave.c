@@ -1230,8 +1230,12 @@ static void draw_page(void)
 #else
             cpu[0] = 0; fmt_u(cpu, ui_render_us); scat(cpu, "us");
 #endif
+#if OBV_VOICE_HW
+            if(page==PG_SUPER){scat(cpu," O");fmt_u(cpu+slen(cpu),ui_render_overruns>99999u?99999u:ui_render_overruns);}
+            else
+#endif
             scat(cpu, set.sync_int ? " INT" : ctl_ext_quarter ? " CLK" : " AUTO");
-            ui_page(t, k, page==PG_KEYBOARD&&!layer?0:save_armed ? "SAVE?" : seq_shown() && pat_edited ? "EDITED" : page == PG_GLOBAL && !layer ? cpu : 0);
+            ui_page(t, k, page==PG_KEYBOARD&&!layer?0:save_armed ? "SAVE?" : seq_shown() && pat_edited ? "EDITED" : (page == PG_GLOBAL || page == PG_SUPER) && !layer ? cpu : 0);
         }
     }
 }

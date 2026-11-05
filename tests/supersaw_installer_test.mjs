@@ -10,7 +10,7 @@ const buffers={};for(const kind of Object.keys(PINS)){
 }
 const id=text=>({text,model:text.split('_')[0]});
 assert.equal(modeFor('release',id('SMK-37 Pro_19619')),'install');
-for(const text of ['SMK-37 Pro_19618']){assert.equal(modeFor('update',id(text)),'install');assert.throws(()=>modeFor('release',id(text)));}
+for(const text of ['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620']){assert.equal(modeFor('update',id(text)),'install');if(text.endsWith('19618'))assert.throws(()=>modeFor('release',id(text)));else assert.equal(modeFor('release',id(text)),'install');}
 assert.throws(()=>modeFor('update',id('SMK-37 Pro_016')));
 for(const kind of Object.keys(PINS)){
  for(const text of ['SMK-37 Pro_016','SMK-37 Elite_19618','FM-1_016','SMK-37 Pro_015','MKE-P37_19618'])assert.throws(()=>modeFor(kind,id(text)));
@@ -24,4 +24,14 @@ const map=new Map(),storage={getItem:k=>map.get(k),setItem:(k,v)=>map.set(k,v),r
 await assert.rejects(()=>service.execute('update',{...buffers,release:buffers.release.slice(1)}));assert.equal(queries,0);
 fail=true;await assert.rejects(()=>service.execute('update',buffers));source='ota-SMK-37 Pro_900';await assert.rejects(()=>service.execute('update',buffers));assert.equal(JSON.parse(map.get(PENDING)).source,'SMK-37 Pro_19618');fail=false;await service.execute('update',buffers);assert(!map.has(PENDING));
 source='SMK-37 Pro_19619';await service.execute('release',buffers);assert.equal(source,'SMK-37 Pro_19618');
-console.log('PASS: pinned SS1/stable-return, strict per-operation origins, same-ID update, two interrupted resumes retain original source, wrong model/source and tamper refusal before writes.');
+source='SMK-37 Pro_19620';await service.execute('release',buffers);assert.equal(source,'SMK-37 Pro_19618');
+console.log('PASS: pinned SS2/stable-return, SS1->SS2 and SS2 reinstall, strict per-operation origins, same-ID update, two interrupted resumes retain original source, wrong model/source and tamper refusal before writes.');
+
+const legacy=await import('../experimental/supersaw/legacy-ss1/service.js');
+for(const k of Object.keys(legacy.PINS)){
+ const raw=new Uint8Array(fs.readFileSync(new URL('../experimental/supersaw/legacy-ss1/'+legacy.PINS[k].url,import.meta.url)));
+ await legacy.validate(raw,k);
+}
+assert.notEqual(legacy.PENDING,PENDING);
+assert.equal(legacy.modeFor('update',id('ota-SMK-37 Pro_900'),{kind:'update',sha:legacy.PINS.update.sha,source:'SMK-37 Pro_19618'}),'resume');
+console.log('PASS: frozen SS1 packages/keys and interrupted-install resume preserved.');
