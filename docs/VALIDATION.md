@@ -1,38 +1,13 @@
-> Atualização de 02/11/2026: Marcus confirmou a primeira instalação física por USB no SMK-37 Pro. Os registros abaixo descrevem também os testes automatizados realizados antes dessa confirmação.
+# Validação da versão pública 1.0.3
 
-# Validação de lançamento 1.0.0
+- Runtime: SUPER SS3 (`0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`), aprovado por Marcus no SMK-37 Pro após testes de acordes.
+- Build público: aplicação 164052 bytes, RAM estática 86624/98304 bytes, pool 325984/344064 bytes; loader de atualização 7703 bytes. Código crítico em RAM sem chamadas externas.
+- DSP: 32768 blocos SUPER, 1572840 divisões e 32768 blocos SAW equivalentes à referência; acordes, notas agudas, release, modulações, dois SUPER e efeitos no teste integrado. Hash PCM: `7c7688bb6186498d7f9abe83db713e8ef7f4c98b69bfe094007965aa50471fba`.
+- Loader em flash simulada: atualização 1.0.2 → 1.0.3 e SS3 → 1.0.3 preserva o banco byte a byte, inclusive 42 pontos de interrupção e retomada. Áreas protegidas e journal verificados. Primeira instalação V016 usa pacote separado e inicializa conteúdo de fábrica.
+- Instalador: hashes, identidade, modelos, atualização com mesma identidade e origens SS1/SS2/SS3; retomada vinculada ao pacote e à origem. Pacotes históricos e suas páginas de retomada preservados.
+- Simulador recompilado com SUPER: boot real do firmware, cinco patterns, oito favoritos, 90 BPM, slots 6–16 livres e ausência de autosave; MIDI e controles físicos exercitados.
+- USB: implementação UA1/1.0.2 preservada. Testada no Mac e no iPhone com AudioShare; vídeos USB no iPhone ainda podem apresentar cliques/cortes.
 
-## Estado
+Hashes de pacotes, WASM e conteúdo de fábrica: [RELEASE.json](../RELEASE.json). Checksums dos downloads: `releases/1.0.3/SHA256SUMS.txt`. Créditos SUPER: [Clipper](https://github.com/isod89/clipper-fm1).
 
-DP2 aprovada por Marcus no SMK‑37 Pro. A 1.0.0 conserva a base funcional, acrescentando o seed musical e o perfil de primeira instalação. A primeira instalação física V016 → 1.0.0 foi posteriormente confirmada por Marcus. Teste de flash simulada não comprova USB real, alimentação ou CPU do chip.
-
-## Conteúdo
-
-- Backup de origem validado por SHA-256 e CRCs, extração usando os tipos reais.
-- Somente patterns 1–5 e respectivas cenas; slots 6–16 apagados.
-- Oito favoritos, incluindo as duas variações POLY BRASS e o INIT selecionado pelo autor.
-- Nenhum preset de usuário importado; ambos os setores de presets começam apagados e usam a base de fábrica.
-- Globals limpos: 90 BPM, afinação/oitava neutras, Pattern 1, MIDI omni e SYNC INTERNAL. Não foi copiado o conjunto pessoal de globals do autor.
-- Notas, sons e mixer preservados. Somente geração dos favoritos e badges de edição ajustados para representar snapshots independentes dos presets públicos.
-
-## Testes executados
-
-| Área | Evidência |
-|---|---|
-| Origem real | Pacote oficial enviado `SMK-37 Pro_016(1).fwsc`, SHA-256 `2d98ce72530e71d617384963423820536f094501299e2cfec0a8d3c3fb6bcfb0`; 36 marcadores de interleave |
-| Loader | Imagem final byte a byte; retomada em 154 pontos de erase e 22 pontos de program; repetição idempotente; boot head/BT/calibração/USR/key_mac intactos |
-| Pacote | CRCs do boot/app/cfg/EQ; seed fora de arquivos de boot; layout de app 320 KiB e dados SMK16P1 |
-| Instalador | Pin SHA/modelo/CRCs; somente Pro V016; outras versões/modelos e DP2 recusados antes da escrita; retomada vinculada ao pacote/origem |
-| Simulador | Boot do C real, cinco examples audíveis, oito recalls, onze slots livres, tempo 90, zero gravações automáticas |
-| Regressões | Oitava/transpose persistente, split/layer, bateria; PCM ANALOG e DRUM-X idênticos aos hashes da base |
-| Backup | Cliente 19618 contra servidor C real em flash simulada: exportação, retry, SHA/CRC, restore e retomada |
-
-Logs em `validation/release-*.log`. Hashes de entrega em `releases/1.0.0/SHA256SUMS.txt` e `RELEASE.json`.
-
-## Limites e recursos
-
-App 161660/327680 B; RAM estática 82896/98304 B; pool 325984/344064 B; loader de primeira instalação 7211 B. O cliente recusa origens diferentes, mas o pacote inicial é destrutivo para a área de aplicação/banco: não deve ser apresentado como atualizador que preserve o trabalho de um usuário existente.
-
-O firmware oficial foi usado apenas localmente nos testes, sem redistribuição. Os dados selecionados foram incluídos com autorização de Marcus. A ocorrência isolada de sessão de backup expirada na DP2 foi resolvida por reinício e permanece sem causa confirmada.
-
-Conferência visual local: apresentação, navegação para simulador e estado de fábrica P1–P5 preenchidos / P6–P16 vazios. O preview HTTP executa apenas a interface; o AudioWorklet foi verificado em Node e o áudio do dispositivo continua limitado à aprovação da base DP2.
+Testes de host e flash simulada não medem o tempo de CPU real. A aprovação sonora e de performance da SS3 é o teste de Marcus no instrumento; não implica garantia para qualquer combinação de unison, efeitos e polifonia.

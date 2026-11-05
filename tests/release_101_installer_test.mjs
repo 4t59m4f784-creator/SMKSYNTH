@@ -10,7 +10,7 @@ const buffers={};for(const kind of Object.keys(PINS)){
 }
 const id=text=>({text,model:text.split('_')[0]});
 assert.equal(modeFor('release',id('SMK-37 Pro_016')),'install');
-for(const text of ['SMK-37 Pro_19617','SMK-37 Pro_19618']){assert.equal(modeFor('update',id(text)),'install');assert.throws(()=>modeFor('release',id(text)));}
+for(const text of ['SMK-37 Pro_19617','SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621']){assert.equal(modeFor('update',id(text)),'install');assert.throws(()=>modeFor('release',id(text)));}
 assert.throws(()=>modeFor('update',id('SMK-37 Pro_016')));
 for(const kind of Object.keys(PINS)){
  for(const text of ['SMK-37 Elite_016','FM-1_016','SMK-37 Pro_015','MKE-P37_19618'])assert.throws(()=>modeFor(kind,id(text)));

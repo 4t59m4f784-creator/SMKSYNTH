@@ -321,7 +321,7 @@ def main():
     if a.identity and a.experimental_id: raise SystemExit("Choose one identity option")
     if a.first_install != bool(a.factory_bank): raise SystemExit("--first-install requires --factory-bank and vice versa")
     FIRST_INSTALL=a.first_install
-    if a.identity and (a.identity!="19618" or a.release not in ("1.0.0","1.0.1","1.0.2") or (a.release=="1.0.0" and not FIRST_INSTALL)): raise SystemExit("Stable profile: 19618; 1.0.0 first install or 1.0.1 first install/update")
+    if a.identity and (a.identity!="19618" or a.release not in ("1.0.0","1.0.1","1.0.2","1.0.3") or (a.release=="1.0.0" and not FIRST_INSTALL)): raise SystemExit("Stable profile: 19618; 1.0.0 first install or 1.0.1-1.0.3 first install/update")
     if not a.voice_hardware:
         raise SystemExit("OBERVAVE VOICE: installable builds require the explicit --voice-hardware profile")
     if (a.board or os.environ.get("BOARD"))!="smk37" or (a.model or os.environ.get("MODEL") or "pro").lower() not in ("pro","elite") or not (a.experimental_id or a.identity) or not a.release or (not a.identity and "-" not in a.release):

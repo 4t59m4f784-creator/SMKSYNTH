@@ -1,23 +1,23 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "identity": "SMK-37 Pro_19618",
   "required_origin": "SMK-37 Pro_016",
   "installation": "first-install-or-preserving-update",
-  "runtime_base": "6c11279e6bfcfb627dfb54628dddc2ee8a653f58",
+  "runtime_base": "0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853",
   "factory_patterns": 5,
   "favorites": 8,
   "extra_user_presets": 0,
   "tempo": 90,
   "dp2_runtime_hardware_approved": true,
   "first_install_hardware_approved": false,
-  "firmware_sha256": "0070522159f182f697b21aeb4cfc788981427de9bc54587366a9e41193f893aa",
-  "wasm_sha256": "6872a8c174f0bb9759e3b5df32bd94a0dc777b7a1d1a0faae57d1e1e88ce4f89",
+  "firmware_sha256": "f84844b56efc8421822a8ec64f2497c6759c3f71732d2a2a58d2f149e726c926",
+  "wasm_sha256": "aac3fd2e245859830a3e40e63cbea726255306c43ce3d07ca7112e6fc34cfecf",
   "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
-  "app_bytes": 160424,
-  "static_ram_bytes": 84576,
+  "app_bytes": 164052,
+  "static_ram_bytes": 86624,
   "pool_bytes": 325984,
   "loader_bytes": 7703,
-  "update_firmware_sha256": "79d09c98641fd7b9c1e8acf63997f76c7039ce9b54f66e6ae031c58b89b3e2a3",
+  "update_firmware_sha256": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870",
   "usb_audio": true,
   "fader_modes": [
     "JUMP",
@@ -30,5 +30,7 @@
   "known_issues": [
     "iPhone USB video recording clicks/dropouts"
   ],
-  "usb_audio_base": "UA1"
+  "usb_audio_base": "UA1",
+  "supersaw_hardware_approved": true,
+  "supersaw_origin": "https://github.com/isod89/clipper-fm1"
 }

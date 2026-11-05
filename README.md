@@ -8,10 +8,10 @@
 
 | Documento | Português | English |
 |---|---|---|
-| Quick start - 4 páginas | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Quick-Start-EN.pdf) |
-| Manual completo - 19 páginas | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.0-Manual-EN.pdf) |
+| Quick start | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Quick-Start-EN.pdf) |
+| Manual completo | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Manual-EN.pdf) |
 
-Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.0.0.
+Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.0.3.
 
 Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
@@ -20,6 +20,14 @@ Porém, um instrumento é muito mais que o som. A ideia aqui é transformar o M�
 Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequências, faça layers e splits, salve cenas e recupere seu conjunto com um botão. Os pads são o coração do SMKSYNTH: este projeto traduz minha visão de um instrumento para performance nesse formato compacto de 37 teclas.
 
 — **Marcus Padrini** · direção do projeto, fluxo de performance, seleção de sons, patterns e testes no instrumento
+
+## SUPER / Supersaw
+
+Sete serras por oscilador, DETUNE e MIX independentes, nos dois OSCs. Selecione WAVE = SUPER; PW vira DETUNE. A página SUPER, acessada por PARA, reúne DET1 / MIX1 / DET2 / MIX2. Presets, favoritos, cenas e backups guardam os ajustes. SYNC e X-MOD são ignorados com SUPER; UNISON consome vozes completas. [Controles e limites no manual](docs/MANUAL.md#super--supersaw).
+
+A supersaw se originou no **[Clipper, de 3dSam](https://github.com/isod89/clipper-fm1)**, sobre Felucca, que referencia a análise de Adam Szabo. Adaptamos a curva e os offsets de desafinação, com MIX independente e otimizações próprias. Créditos e avisos originais preservados; não é uma reprodução exata do Roland JP-8000/JP-8080.
+
+Áudio USB estéreo 16 bits, 44,1/48 kHz, testado no Mac e no iPhone com AudioShare. Gravação de vídeos USB no iPhone ainda pode apresentar cliques e cortes.
 
 ## Teclado MIDI no simulador
 
@@ -37,10 +45,10 @@ O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e
 
 ## O que está incluído
 
-| Recurso | SMKSYNTH 1.0.0 |
+| Recurso | SMKSYNTH 1.0.3 |
 |---|---|
 | Partes | Quatro, com seleção de ANALOG ou DRUM-X por parte |
-| Synth ANALOG | OberVave; oito vozes compartilhadas |
+| Synth ANALOG | OberVave; oito vozes compartilhadas; SUPER nos dois osciladores |
 | Bateria | DRUM-X; oito instrumentos por kit |
 | Performance | Favoritos, sends por parte, split/layer e transpose de sequências pelas teclas |
 | Sequenciador | Quatro tracks; até 256 steps por track; gravação ao vivo ou passo a passo |
@@ -64,25 +72,17 @@ KNOB BANK escolhe o banco de pads. PLAY, REC, seleção de engine e mudança de 
 
 Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. Trocar para ANALOG preserva esse banco, inativo. Selecionar uma voz de bateria, sozinho, **não** transforma os pads em bateria.
 
-## Instalação: M‑VAVE oficial V016 obrigatória
+## Instalação e atualização
 
-**Instalação inicial somente para SMK‑37 Pro executando M‑VAVE oficial V016, identidade `SMK-37 Pro_016`.** Elite, MKE-P37, FM-1, outras versões e firmwares alternativos são recusados pelo instalador.
+No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa SMKSYNTH 1.0.x ou SUPER SS1/SS2/SS3. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19618`.
 
-1. Guarde seu trabalho. Se já usa SMKSYNTH, exporte o banco antes de retornar ao firmware oficial.
-2. Instale a V016 para **SMK‑37 Pro**, obtida na [página oficial M‑VAVE](https://www.cuvave.com/appdownload), usando M‑UPGRADE.
-3. Abra o [instalador SMKSYNTH](https://4t59m4f784-creator.github.io/SMKSYNTH/install/) em Chrome/Edge no computador, com cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
-4. Consulte a identidade, confira a confirmação e aguarde a identidade final `SMK-37 Pro_19618`.
-5. O primeiro boot abre Pattern 1, parado. PLAY toca o exemplo; KNOB BANK → Patterns dá acesso a P1–P5. Os oito favoritos estão nos pads inferiores de Performance.
+Para **Instalar** pela primeira vez, o SMK-37 Pro precisa estar no firmware oficial M-VAVE V016 (`SMK-37 Pro_016`). Essa opção inicializa o banco com cinco patterns e oito favoritos. Outros modelos são recusados. Use Chrome/Edge no computador, cabo USB de dados e alimentação estável. Firmware oficial M-VAVE não é redistribuído aqui.
 
-Este pacote prepara o banco de fábrica: **não é um atualizador que preserve o banco de uma versão anterior do SMKSYNTH**. Uma transferência interrompida pode ser retomada pelo mesmo instalador, navegador e pacote. A primeira instalação não é atômica; o loader mantém a retomada até concluir. O firmware oficial M‑VAVE não é redistribuído aqui.
-
-[Instruções completas, recuperação e retorno à M‑VAVE](docs/INSTALLATION.md).
+Transferência interrompida: retome pelo mesmo instalador, navegador e pacote. O instalador mantém links para retomar versões anteriores. [Guia completo de instalação e recuperação](docs/INSTALLATION.md).
 
 ## Fonte, validação e estado do lançamento
 
-A experiência DP2 foi testada e aprovada por Marcus no SMK‑37 Pro. A 1.0.0 acrescenta conteúdo de fábrica e o pacote de primeira instalação. **M‑VAVE V016 → 1.0.0** foi testado com o arquivo oficial fornecido, em flash simulada, incluindo interrupções. A primeira instalação por USB foi confirmada por Marcus no instrumento real após a publicação.
-
-Distribuição pública 1.0.0. Site, instalador, simulador e backup têm seletor PT / EN. [Downloads da release](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.0.0).
+A versão pública 1.0.3 promove a implementação SUPER SS3 aprovada por Marcus no SMK-37 Pro. A primeira instalação foi validada em flash simulada com interrupções; a instalação USB original já havia sido confirmada no instrumento. Site, instalador, simulador e backup têm seletor PT / EN. [Downloads 1.0.3](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.0.3).
 
 - [Validação e hashes](docs/VALIDATION.md)
 - [Build a partir das fontes](docs/BUILD.md)

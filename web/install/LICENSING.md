@@ -1,5 +1,9 @@
 # Licensing
 
+## SMKSYNTH 1.0.0
+
+The approved DP2 runtime is retained: OberVave ANALOG and JIANT DRUM-X, with the original notices below. SMKSYNTH performance adaptations and example content are by Marcus Padrini. The factory distribution contains five patterns/scenes and eight favourite snapshots, with no extra user preset bank or third-party samples. Corresponding source and component licences accompany the firmware. This is a stock-V016 first-install package, not the bank-preserving DP2 updater. Historical checkpoint provenance follows.
+
 ## Current SMKSYNTH AD1
 
 AD1 retains Obervave ANALOG and the GPL-3.0-only JIANT DRUM-X adapter, with original copyright notices. The VOICE renderers, presets, tables and UI have been removed. The shared generated sine table and unchanged interpolator now live in `firmware/gen/obv_drum_sine.h`, used solely by DRUM-X. No samples are included. Distribution includes corresponding source and component licences. The Voice checkpoints described below are historical provenance, retained with their notices; they are not active engines in AD1.
@@ -67,3 +71,6 @@ comparison; optional master effects and the global modulation matrix are not
 claimed equivalent. Corresponding source is included with the experimental
 firmware bundle.
 
+## SUPER / Supersaw (public since 1.0.3)
+
+`firmware/src/obv_supersaw.h` adapts the detune offsets and simplified detune curve from Clipper's `firmware/src/eng_hybrid.c`: Copyright (C) 2026 3dSam (Clipper), after Leo Kuroshita (@kurogedelic), Hügelton Instruments (Felucca), GPL-3.0-only. Clipper cites Adam Szabo's JP-8000 analysis. Source: https://github.com/isod89/clipper-fm1 . SMKSYNTH uses its own event-corrected oscillator and adds independent MIX and normalized gains. No Clipper samples, artwork, fonts, or factory patches are imported.

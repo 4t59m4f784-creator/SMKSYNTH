@@ -13,6 +13,7 @@ SMKSYNTH was developed using AI. Marcus Padrini defined the goals and performanc
 | Contribuição | Autoria / projeto |
 |---|---|
 | Synth ANALOG e base OberVave | [zvenson / OberVave](https://github.com/zvenson/obervave) e colaboradores |
+| Origem da SUPER / Supersaw origin: detune offsets and curve | [3dSam / Clipper](https://github.com/isod89/clipper-fm1), after Felucca; Clipper references Adam Szabo’s JP-8000 analysis |
 | DRUM-X | [Juan Ignacio Antonucci / JIANT](https://github.com/juanjiant-bit/JIANT) e colaboradores |
 | Plataforma Felucca | Leo Kuroshita / Hügelton Instruments |
 | Dinghy | zvenson |

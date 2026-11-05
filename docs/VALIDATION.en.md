@@ -1,33 +1,19 @@
-> Update, 2026-11-02: Marcus confirmed physical USB first installation on his SMK-37 Pro. The records below also describe automated tests performed before that confirmation.
+# Public release 1.0.3 validation
 
-# Release 1.0.0 validation
+The public runtime promotes SUPER SS3 (`0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`), approved by Marcus on the SMK-37 Pro after chord tests.
 
-[Português](VALIDATION.md) · [English](VALIDATION.en.md)
+Public target build: application 164052 bytes; static RAM 86624/98304 bytes; pool 325984/344064 bytes; preserving-update loader 7703 bytes. RAM-critical code has no outbound calls.
 
-Marcus approved the DP2 runtime on his SMK‑37 Pro. Version 1.0.0 preserves it, adding factory content and the first-install profile. Marcus subsequently confirmed physical V016 → 1.0.0 USB first installation. Simulated flash does not prove real USB transport, power stability or chip CPU behaviour.
+DSP checks cover 32768 SUPER blocks, 1572840 exact reciprocal divisions and 32768 companion SAW blocks against reference results. The mixed-optimization integration fixture covers chords, high notes, release overlap, modulation, dual SUPER and effects. Its PCM SHA-256 is `7c7688bb6186498d7f9abe83db713e8ef7f4c98b69bfe094007965aa50471fba`.
 
-## Factory data
+Simulated-flash loader tests exercise 1.0.2 → 1.0.3 and SS3 → 1.0.3 updates, preserving the saved bank byte for byte, protected regions and restore journal, including 42 erase interruption/retry points. First installation uses a separate factory-seeded package.
 
-The source backup was verified with SHA-256 and CRCs and extracted using actual firmware types. Only patterns 1–5 and their scenes are included; 6–16 are erased. All eight selected favourites are included, including two POLY BRASS variants and INIT. No user presets are imported. Both user-preset sectors start erased and fall back to base presets.
+Installer checks validate pinned hashes, identities, model refusal, same-identity updates, experimental SUPER origins and interrupted resumes bound to package/source. Historical packages and installer pages remain available.
 
-Settings are clean: 90 BPM, neutral tuning/octave, Pattern 1, MIDI omni, internal sync. The author’s complete personal globals were not copied. Notes, sounds and mixer values are preserved; favourite generation and edited badges are normalized to the public base presets.
+The public WebAssembly simulator is rebuilt with SUPER. Real firmware boot checks verify five patterns, eight favourites, 90 BPM, empty slots 6–16 and no automatic writes. MIDI and physical controls are covered by regression tests.
 
-## Evidence
+USB audio keeps the UA1/1.0.2 implementation, tested on Mac and on iPhone with AudioShare. iPhone USB video recording clicks/dropouts remain a known issue.
 
-| Area | Result |
-|---|---|
-| Official source | Supplied `SMK-37 Pro_016(1).fwsc`, SHA-256 `2d98ce72530e71d617384963423820536f094501299e2cfec0a8d3c3fb6bcfb0`, 36 interleave markers |
-| Loader | Exact final image; resumed at 154 erase and 22 program interruption points; repeat is idempotent; boot header/BT/calibration/USR/key_mac preserved |
-| Package | Boot/app/cfg/EQ CRCs; seed outside boot files; 320 KiB application layout plus SMK16P1 data |
-| Installer | Pinned SHA/model/CRCs; Pro V016 only; DP2 and other versions/models rejected before writing; resume bound to source/package |
-| Simulator | Actual C boot; five audible examples; eight favourite recalls; eleven empty slots; 90 BPM; no automatic writes |
-| Regression | Octaves and persistent transpose, split/layer and drums; ANALOG and DRUM-X PCM hashes match the base |
-| Backup | 19618 client against actual C server in simulated flash: export, retry, SHA/CRC, restore and resume |
+Package, WASM and factory-content hashes are in [RELEASE.json](../RELEASE.json); download checksums are in `releases/1.0.3/SHA256SUMS.txt`. Supersaw origin: [Clipper](https://github.com/isod89/clipper-fm1).
 
-Logs: `validation/release-*.log`. Distribution hashes: `releases/1.0.0/SHA256SUMS.txt` and `RELEASE.json`.
-
-Application: 161660/327680 bytes; static RAM: 82896/98304; pool: 325984/344064; first-install loader: 7211. The initial package replaces the application/bank area and must not be described as preserving an existing bank.
-
-Official firmware was used locally for tests and is not redistributed. Marcus authorized the selected musical content. An isolated DP2 export-session expiry was resolved by reboot, without a confirmed root cause.
-
-The local visual review covered landing-page navigation and the simulator’s five occupied/eleven empty pattern slots. The HTTP preview ran interface mode; AudioWorklet execution was verified in Node. Hardware audio approval applies to the DP2 base. PT/EN browser translations do not alter firmware or protocol data.
+Host and simulated-flash checks do not measure physical CPU time. Hardware sound/performance approval is Marcus’s SS3 test; it does not guarantee every unison/effects/polyphony combination.
