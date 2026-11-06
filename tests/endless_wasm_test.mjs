@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import fs from 'node:fs';import assert from 'node:assert/strict';import {Engine} from '../web/simulator/engine.js';
-const wasm=fs.readFileSync(process.argv[2]||'build/endless-e3/SMKSYNTH-1.0.3-e3.wasm'),seed=fs.readFileSync('web/simulator/factory-session.bin');
+const wasm=fs.readFileSync(process.argv[2]||'build/endless-e4/SMKSYNTH-1.0.3-e4.wasm'),seed=fs.readFileSync('web/simulator/factory-session.bin');
 const e=new Engine(wasm,seed.buffer.slice(seed.byteOffset,seed.byteOffset+seed.byteLength));e.advance(5000);
 const b=(n,ms=80)=>{e.input({t:'btn',b:n,down:true});e.advance(ms);e.input({t:'btn',b:n,down:false});e.advance(180);};
 const pad=(p,ms=100)=>{e.input({t:'pad',p,v:100});e.advance(ms);e.input({t:'pad',p,v:0});e.advance(250);};
@@ -33,4 +33,9 @@ key(0,true);e.advance(30);const old=e.ex.sim_endless_transpose(0);e.input({t:'ke
 // No idle redraws after transient messages, plus actual saved-pattern recall.
 e.advance(2500);const traffic=()=>[e.ex.sim_lcd_fills(),e.ex.sim_lcd_blits(),e.ex.sim_lcd_pixels()];const before=traffic();e.advance(1200);assert.deepEqual(traffic(),before);
 b(0);b(0);b(0);assert.equal(e.frame().bank,2);pad(5,850);e.advance(8000);assert(e.frame().patternsUsed&(1<<5));pad(0);assert.equal(e.ex.sim_endless_mode(),0);pad(5);assert.equal(e.frame().pattern,6);assert.equal(e.ex.sim_endless_mode(),1);assert.equal(e.ex.sim_endless_hold(),1);assert.deepEqual([0,1,2].map(t=>e.ex.sim_seq_length(t)),[3,5,7]);
-console.log(JSON.stringify({result:'PASS',real_firmware_loop:true,all_parts_default:true,independent_lengths:[3,5,7],global_legato_retrigger:true,soft_q16_scheduled_harmony:true,global_hold_and_play_LED:true,drums_fixed_and_synced:true,analog_drum_focus_persistence:true,k5_tempo:120,idle_redraws:0,pattern6_saved_and_recalled:true}));
+// Physical OCT is recorded, but never offsets the ENDLESS launch root.
+b(12,900);b(5);assert.equal(e.ex.sim_part_octave(2),1);b(15);assert.equal(e.ex.sim_seq_view(),6);
+const append=e.ex.sim_seq_length(2);b(17);key(0,true);key(0,false);b(17);assert.equal(e.ex.sim_step_note(2,append,0),60);
+key(0,true);assert.equal(e.ex.sim_endless_transpose(0),0);key(0,false);b(16);
+enc(5,-1);b(12,900);b(4);assert.equal(e.ex.sim_part_octave(1),-1);b(15);key(0,true);assert.equal(e.ex.sim_endless_transpose(0),0);key(0,false);b(16);
+console.log(JSON.stringify({result:'PASS',real_firmware_loop:true,all_parts_default:true,independent_lengths:[3,5,7],global_legato_retrigger:true,soft_q16_scheduled_harmony:true,recorded_part_octave:true,fixed_c3_across_parts:true,global_hold_and_play_LED:true,drums_fixed_and_synced:true,analog_drum_focus_persistence:true,k5_tempo:120,idle_redraws:0,pattern6_saved_and_recalled:true}));

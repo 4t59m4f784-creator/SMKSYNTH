@@ -5,8 +5,8 @@ static uint32_t pat_save_armed, pat_save_t, q_edited;   /* q_edited: the next pa
 loader: image 8932 B at 0x1c0a800, bss end 0x1c0f710
 loader: ota.bin 7703 B
   ok    .ram_text: 1585 insns, no calls
-  ok    image 171144 B of 327680; RAM .data+.bss 86928 B of 98304; pool 325984 B of 344064
+  ok    image 171096 B of 327680; RAM .data+.bss 86928 B of 98304; pool 325984 B of 344064
   ok    register access: hal/ only (src/, loader/ clean)
-app      /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave.bin  171144 B
+app      /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave.bin  171096 B
 loader   /workspace/scratch/5c61352abec3/SMKSYNTH/build/loader/ota.bin  7703 B
-package  /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave-1.0.3-e3-smk37.fwsc  651819 B, identity SMK-37 Pro_19625, board smk37
+package  /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave-1.0.3-e4-smk37.fwsc  651819 B, identity SMK-37 Pro_19626, board smk37

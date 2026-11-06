@@ -1,7 +1,7 @@
 {
-  "version": "1.0.3-e3",
-  "identity": "SMK-37 Pro_19625",
-  "app_bytes": 171144,
+  "version": "1.0.3-e4",
+  "identity": "SMK-37 Pro_19626",
+  "app_bytes": 171096,
   "static_ram_bytes": 86928,
   "pool_bytes": 325984,
   "loader_bytes": 7703,
@@ -14,11 +14,11 @@
   },
   "artifacts": {
     "update": {
-      "name": "Instalar ENDLESS E3",
-      "product": "SMK-37 Pro_19625",
-      "url": "./SMKSYNTH-1.0.3-e3-SMK37-Pro.fwsc",
+      "name": "Instalar ENDLESS E4",
+      "product": "SMK-37 Pro_19626",
+      "url": "./SMKSYNTH-1.0.3-e4-SMK37-Pro.fwsc",
       "size": 651819,
-      "sha": "df0f5def9925f53578108a3b1ac551b2d974c8531cedda98e72fb089a57e1c1a"
+      "sha": "e18098b86f157827bd55a668d9e923fb0ee046d6ed24884ea2ebc6af8b0a8656"
     },
     "release": {
       "name": "Retornar à pública 1.0.3",
@@ -28,8 +28,9 @@
       "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870"
     },
     "simulator": {
-      "version": "1.0.3-e3",
-      "sha256": "499e06d42a6073cb3add8891ad554789fd362d276f55d88aedd8cae0a7c70550"
+      "version": "1.0.3-e4",
+      "sha256": "b41bb709a7661888101c29fba22af8640cc00d7cf55f21502df01349bc568323"
     }
-  }
+  },
+  "performance_root": "fixed key position C3=48, independent of part octave; recording retains octave"
 }

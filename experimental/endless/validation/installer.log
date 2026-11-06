@@ -1,3 +1,4 @@
-PASS: pinned E3/original 1.0.3 return, strict model/origin/hash guards, two interrupted resumes preserve source, UI1->E3->public.
+PASS: pinned E4/original 1.0.3 return, strict model/origin/hash guards, two interrupted resumes preserve source, UI1->E4->public.
 PASS: frozen E1 packages, resume identity and pending key preserved.
 PASS: original E2 package and pending key, interrupted resume and direct E3 -> E2 comparison.
+PASS: original E3 package/key, interrupted resume and direct E4 -> E3 comparison.

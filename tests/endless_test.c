@@ -8,7 +8,7 @@ static void render(unsigned n){while(n--){memset(audio,0,sizeof audio);engine_au
 static unsigned active(unsigned p){unsigned n=0;for(unsigned v=0;v<NV;v++)n+=vc[v].gate&&vc[v].part==p&&vc[v].seq_owned;return n;}
 static void key(unsigned on,unsigned note){panel_note_in(on,note,on?100:0);render(1);for(unsigned i=0;on&&end_pending&&i<1000;i++)render(1);assert(!on||!end_pending);}
 static void reset(void){
- endless_reset();end_mode=0;end_global_hold=1;end_stop_request=0;ctl_seq_run=0;ctl_panic=1;render(2);pat_init(&pat);seq_trk=0;page=PG_SEQ;seq_view=SV_ENDLESS;layer=L_NONE;step_held=-1;rec=0;rec_down=0;pat_queue=0;transpose_keys=0;ctl_seq_transpose=0;
+ endless_reset();end_mode=0;end_global_hold=1;end_stop_request=0;ctl_seq_run=0;ctl_panic=1;render(2);pat_init(&pat);seq_trk=0;page=PG_SEQ;seq_view=SV_ENDLESS;layer=L_NONE;step_held=-1;rec=0;rec_down=0;pat_queue=0;transpose_keys=0;ctl_seq_transpose=0;keyboard_physical=0;
  memset(seq_cur,0,sizeof seq_cur);memset(kb_press,0,sizeof kb_press);memset(kb_refs,0,sizeof kb_refs);
  for(unsigned t=0;t<NTRK;t++){patch_from_factory(&live_p[t],&FACT_INIT);live_p[t].v[P_MODE]=M_POLY;live_p[t].v[P_ARP_MODE]=0;live_p[t].v[P_VINTAGE]=0;}
  keyboard_pattern_gains(&pat);ctl_trk_on=15;ctl_trk_req=trk_req_seen=0;ctl_count=0;
@@ -77,6 +77,15 @@ int main(void){
  /* External tempo drives the same launch grid and explicit STOP cancels wait. */
  ctl_ext_quarter=FS;key(1,48);while(end_clock_phase<FS/8u)engine_audio(audio,CTL);
  panel_note_in(1,50,100);assert(end_pending);endless_stop();engine_audio(audio,CTL);assert(!end_pending&&!ctl_seq_run&&!end_clock_valid);ctl_ext_quarter=0;
+ /* E4: recording keeps the part octave; performance roots never inherit it. */
+ for(unsigned t=0;t<4;t++)for(int oct=-2;oct<=2;oct++){
+  reset();seq_trk=t;keyboard_physical=1;patch_keyboard_octave_set(&live_p[t],oct);endless_record_toggle();
+  key(1,48);key(0,48);assert(pat.st[t][0].note[0]==48+12*oct);endless_finish();
+  key(1,48);assert(end_global_transpose==0);key(0,48);key(1,50);assert(end_global_transpose==2);key(0,50);
+  seq_trk=(t+1)%4;patch_keyboard_octave_set(&live_p[seq_trk],-oct);key(1,48);assert(end_global_transpose==0);key(0,48);
+  keyboard_physical=0;key(1,60);assert(end_global_transpose==12);key(0,60);endless_stop();render(1);
+ }
+ reset();endless_enable();
  /* Unchanged display is idle; header redraw follows K5 tempo. */
  page=PG_SEQ;seq_view=SV_ENDLESS;seq_trk=0;toast=0;endless_draw(1);unsigned pix=host_lcd_pixels,blits=host_lcd_blits;for(unsigned i=0;i<1000;i++)endless_draw(0);assert(host_lcd_pixels==pix&&host_lcd_blits==blits);set.tempo++;endless_draw(0);assert(host_lcd_pixels-pix==240*44);
  /* Actual RGB565 frame: all parts retain their pad colour, including red A;
@@ -85,5 +94,5 @@ int main(void){
  for(unsigned t=0;t<4;t++){seq_trk=t;ui_trk=t;end_record=0;endless_draw(1);assert(fb[52*240+40]==C_TRKC[t]);char path[64];snprintf(path,sizeof path,"build/endless-play-%u.ppm",t);write_ppm_as(path);end_record=t+1;endless_draw(0);assert(fb[52*240+40]==RGB(255,255,255));assert(fb[1*240+195]==C_RED);}
  seq_trk=0;end_record=0;
  pat.trk[0].len=16;seq_cur[0]=6;pat.st[0][6].note[0]=60;pat.st[0][6].note[1]=64;pat.st[0][6].note[2]=67;ctl_seq_run=1;ui_seq_pos[0]=6;set.tempo=120;endless_draw(1);write_ppm_as("build/endless-play.ppm");end_record=1;end_pos=7;ctl_seq_run=0;endless_draw(0);write_ppm_as("build/endless-rec.ppm");
- puts("PASS E3: colors/white REC, soft clock grid, independent recording, global HOLD/last-key stop/PLAY reset, legato global retrigger, 3/5/7-step clocks, fixed DRUM-X, focus persistence, exclusive K5 tempo, unchanged storage/E1 migration and partial display.");
+ puts("PASS E4: octave-aware recording/fixed performance root, colors/white REC, soft clock grid, independent recording, global HOLD/last-key stop/PLAY reset, legato global retrigger, 3/5/7-step clocks, fixed DRUM-X, focus persistence, exclusive K5 tempo, unchanged storage/E1 migration and partial display.");
 }
