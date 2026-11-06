@@ -30,6 +30,10 @@ static volatile uint32_t end_keys[NTRK],end_restart[NTRK],end_record_mask;
 static volatile int32_t end_transpose[NTRK];
 static volatile uint32_t end_mode,end_global_hold=1,end_held,end_stop_request;
 static volatile int32_t end_global_transpose;
+/* E3 soft 1/16 launch grid. UI publishes a target; only the audio ISR commits it.
+ * A silent HOLD-OFF gap keeps the clock for one quarter, without sounding notes. */
+static volatile uint32_t end_pending,end_clock_valid,end_clock_phase,end_idle_frames;
+static volatile int32_t end_target_transpose;
 static uint32_t end_seen[NTRK];
 /* (OberVave 3) the knobs recorded: per track up to NLANE lanes, each one parameter of the track's sound with a value per
  * step (AUTO_NONE: that step leaves it as it is). REC running + a knob turned = the value written on the step playing;
@@ -311,8 +315,25 @@ static void seq_auto(uint32_t t, uint32_t i)
 }
 static void seq_tick(void)
 {
-    uint32_t t, q;
+    uint32_t t, q=(end_mode||ctl_seq_run)?quarter_len():0, launch=0, offset=0;
     if(end_stop_request){end_stop_request=0;for(t=0;t<NTRK;t++){seq_from_top(t);ui_seq_pos[t]=ui_seq_frac[t]=0;}seq_was=0;}
+    if(end_mode){
+        if(end_clock_valid){
+            end_clock_phase+=CTL;if(end_clock_phase>=q)end_clock_phase%=q;
+            if(!ctl_seq_run&&!end_pending){end_idle_frames+=CTL;if(end_idle_frames>=q)end_clock_valid=0;}
+            else end_idle_frames=0;
+        }
+        if(end_pending){
+            uint32_t grid=q/4u, phase=end_clock_phase%(grid?grid:1u);
+            uint32_t grace=FS/50u;if(grace>grid/4u)grace=grid/4u;
+            if(!end_clock_valid||phase<grace){
+                if(!end_clock_valid){end_clock_valid=1;end_clock_phase=0;seq_beat_n=0;phase=0;}
+                end_global_transpose=end_target_transpose;
+                for(t=0;t<NTRK;t++)end_transpose[t]=obv_patch_engine(&live_p[t])==OBV_DRUMS?0:end_global_transpose;
+                end_pending=0;end_idle_frames=0;launch=1;offset=phase;ctl_seq_run=1;
+            }
+        }
+    }
     if (!ctl_seq_run) {
         if (seq_was) { for (t = 0; t < NTRK; t++) seq_release_t(t); seq_was = 0; }
         seq_take_requests();                    /* (stopped: a pad switches its track at once) */
@@ -322,12 +343,13 @@ static void seq_tick(void)
         ctl_seq_restart = 0;
         seq_take_requests();
         for (t = 0; t < NTRK; t++) seq_from_top(t);
-        seq_beat_cnt = 0;
-        seq_beat_n = 0;
+        seq_beat_cnt = launch?end_clock_phase:0;
+        if(!launch)seq_beat_n = 0;
+        if(end_mode&&!launch){end_clock_valid=1;end_clock_phase=0;end_idle_frames=0;end_pending=0;}
         count_left = ctl_count ? 4u : 0u;
         seq_was = 1;
     }
-    q = quarter_len();
+    if(launch){for(t=0;t<NTRK;t++){seq_from_top(t);sr[t].cnt=offset;end_seen[t]=end_restart[t];}seq_beat_cnt=end_clock_phase;}
     if (seq_beat_cnt < CTL) {                   /* a beat (in this block): the PLAY light, the click, the count-in; a downbeat: requests */
         if (ctl_count && !count_left) {         /* counted in: the tracks from the top, now */
             ctl_count = 0;
@@ -340,7 +362,7 @@ static void seq_tick(void)
                 /* the next pattern (2 = being swapped in: the main loop leaves pat_q alone): the tracks from the top */
                 if (ctl_pat_keep) pat_old = pat;
                 keyboard_pattern_epoch++;
-                end_global_transpose=0;end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
+                end_global_transpose=0;end_pending=end_clock_valid=0;end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
                 pat = pat_q;seq_trk=pattern_focus(&pat);end_held=0;endless_pattern_state(&pat);
                 keyboard_pattern_gains(&pat);
                 if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) { snd_old[t] = live_p[t]; live_p[t] = snd_q[t]; } ctl_snd_swap = 0; ui_snd_swapped = 1; }

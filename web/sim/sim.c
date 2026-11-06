@@ -302,6 +302,8 @@ EXPORT uint32_t sim_endless_input_step(void){return end_pos;}
 EXPORT uint32_t sim_transport(void){return ctl_seq_run;}
 
 EXPORT uint32_t sim_endless_mode(void){return end_mode;}
+EXPORT uint32_t sim_endless_pending(void){return end_pending;}
+EXPORT uint32_t sim_endless_clock_phase(void){return end_clock_phase;}
 EXPORT uint32_t sim_endless_hold(void){return end_global_hold;}
 EXPORT uint32_t sim_endless_held_keys(void){return end_held;}
 EXPORT uint32_t sim_seq_div(uint32_t t){return pat.trk[t%NTRK].div;}

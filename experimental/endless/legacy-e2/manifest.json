@@ -1,0 +1,16 @@
+{
+  "update": {
+    "name": "Instalar ENDLESS E2",
+    "product": "SMK-37 Pro_19624",
+    "url": "./SMKSYNTH-1.0.3-e2-SMK37-Pro.fwsc",
+    "size": 651819,
+    "sha": "d95ca89958b079e97baf651c987f170ff9d36d6526982b4b611af101314e605c"
+  },
+  "release": {
+    "name": "Retornar à pública 1.0.3",
+    "product": "SMK-37 Pro_19618",
+    "url": "./SMKSYNTH-1.0.3-return-SMK37-Pro.fwsc",
+    "size": 651819,
+    "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870"
+  }
+}

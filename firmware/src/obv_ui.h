@@ -458,7 +458,7 @@ static void ui_drum_grid(uint32_t t,uint32_t w0,uint32_t cursor,int32_t ph,uint3
     cv_blit(0,152);
 }
 
-static void ui_seq_knobs(const knob_view_t *k)
+static void ui_seq_knobs_tint(const knob_view_t *k,uint16_t value_color)
 {
     int32_t i;
     cv_begin(240, 52, C_PANEL);
@@ -467,7 +467,7 @@ static void ui_seq_knobs(const knob_view_t *k)
         int32_t cx = 30 + 60 * i, f;
         if (!k[i].present) continue;
         cv_text(cx - text_w(&FONT_S, k[i].label) / 2, 3, &FONT_S, k[i].label, C_DIMT);
-        cv_text(cx - text_w(&FONT_S, k[i].value) / 2, 19, &FONT_S, k[i].value, C_CREAM);
+        cv_text(cx - text_w(&FONT_S, k[i].value) / 2, 19, &FONT_S, k[i].value, value_color);
         cv_rect(cx - 22, 42, 44, 3, C_KNOB);
         if (k[i].max > 0) {
             f = 44 * clampi(k[i].v, 0, k[i].max) / k[i].max;
@@ -477,6 +477,8 @@ static void ui_seq_knobs(const knob_view_t *k)
     }
     cv_blit(0, 188);
 }
+
+static void ui_seq_knobs(const knob_view_t*k){ui_seq_knobs_tint(k,C_CREAM);}
 
 /* TRACKS (as SLOOP's): A-D one under the other, 36 px each from y 24, the chosen one lit in its colour. A row: the
  * letter in a tile, the sound (number and name), its state on the right (PLAY, STOP, NEXT: starts on the bar, ENDS:
