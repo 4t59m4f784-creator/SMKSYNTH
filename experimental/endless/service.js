@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"update": {"name": "Instalar ENDLESS E4", "product": "SMK-37 Pro_19626", "url": "./SMKSYNTH-1.0.3-e4-SMK37-Pro.fwsc", "size": 651819, "sha": "e18098b86f157827bd55a668d9e923fb0ee046d6ed24884ea2ebc6af8b0a8656"}, "release": {"name": "Retornar à pública 1.0.3", "product": "SMK-37 Pro_19618", "url": "./SMKSYNTH-1.0.3-return-SMK37-Pro.fwsc", "size": 651819, "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870"}});
-export const PENDING="smksynth.endless.e4.pending.v1";
+export const PINS=Object.freeze({"update": {"name": "Instalar ENDLESS E5", "product": "SMK-37 Pro_19627", "url": "./SMKSYNTH-1.0.3-e5-SMK37-Pro.fwsc", "size": 651819, "sha": "8e38a7ae75c81eb9f0f04512f8eebf4652de97b0100d8a5cd2bb264afc2d9a3c"}, "release": {"name": "Retornar à pública 1.0.3", "product": "SMK-37 Pro_19618", "url": "./SMKSYNTH-1.0.3-return-SMK37-Pro.fwsc", "size": 651819, "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870"}});
+export const PENDING="smksynth.endless.e5.pending.v1";
 export async function validate(raw,kind){
  const p=PINS[kind];if(!p)throw Error('Operação inválida.');
  if(raw.length!==p.size)throw Error('Tamanho diferente do pacote esperado.');
@@ -14,14 +14,14 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626'].includes(source);
+const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627'].includes(source);
 export function modeFor(kind,id,pending){
  if(!PINS[kind])throw Error('Operação inválida.');
  if(!id?.text)throw Error('Conecte e consulte o teclado.');
  if(!['SMK-37 Pro','ota-SMK-37 Pro'].includes(id.model))throw Error('Modelo recusado: somente SMK-37 Pro.');
  if(originAllowed(kind,id.text))return 'install';
  if(id.text==='ota-SMK-37 Pro_900'&&(pending?.kind===kind&&pending.sha===PINS[kind].sha&&originAllowed(kind,pending.source)))return 'resume';
- throw Error('Esta página aceita SMKSYNTH 1.0.3, SS1/SS2/SS3, UI1, E1, E2, E3 ou E4 no SMK-37 Pro. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
+ throw Error('Esta página aceita SMKSYNTH 1.0.3, SS1/SS2/SS3, UI1, E1, E2, E3, E4 ou E5 no SMK-37 Pro. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
 }
 function guardFor(source){return (phase,id)=>{
  if(phase==='start'&&id.text!==source())throw Error('A identidade mudou antes da gravação: '+id.text);

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only
- * ENDLESS E4: OP-1-inspired append workflow, original SMKSYNTH UI and player.
+ * ENDLESS E5: OP-1-inspired append workflow, original SMKSYNTH UI and player.
  * Same 256-step records/clock/voice allocation; experimental, global performance in SINGLE.
  */
 static int endless_screen(void){return page==PG_SEQ&&seq_view==SV_ENDLESS&&!layer;}
@@ -89,14 +89,14 @@ static int endless_note(uint32_t on,unsigned raw,unsigned vel){
   end_owner[raw]=(uint8_t)(128u+t+1u);end_count++;pat_edited=1;return 1;
  }
  if(end_record)return 1;
- /* Performance root is a fixed key position (C3=48), independent of the
+ /* Performance root is a fixed key position (C4=60), independent of the
   * focused part's keyboard octave. Recording above still stores the heard pitch. */
  int pitch=(int)raw;
  if(pitch<0||pitch>127)return 1;
  end_owner[raw]=(uint8_t)(t+1u);end_keys[t]++;end_held++;
  /* Request publication is atomic with respect to the ISR; another key before
   * the boundary replaces the target. Releasing the final key cancels it. */
- fm1_irq_off();end_target_transpose=pitch-48;end_pending=1;fm1_irq_on();
+ fm1_irq_off();end_target_transpose=pitch-60;end_pending=1;fm1_irq_on();
  return 1;
 }
 static void endless_arrow(unsigned right){

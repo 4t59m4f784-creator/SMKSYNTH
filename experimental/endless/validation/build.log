@@ -9,4 +9,4 @@ loader: ota.bin 7703 B
   ok    register access: hal/ only (src/, loader/ clean)
 app      /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave.bin  171096 B
 loader   /workspace/scratch/5c61352abec3/SMKSYNTH/build/loader/ota.bin  7703 B
-package  /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave-1.0.3-e4-smk37.fwsc  651819 B, identity SMK-37 Pro_19626, board smk37
+package  /workspace/scratch/5c61352abec3/SMKSYNTH/build/obervave-1.0.3-e5-smk37.fwsc  651819 B, identity SMK-37 Pro_19627, board smk37

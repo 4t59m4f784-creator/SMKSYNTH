@@ -1,6 +1,6 @@
-# SMKSYNTH ENDLESS E4 — protótipo
+# SMKSYNTH ENDLESS E5 — protótipo
 
-Versão experimental `1.0.3-e4`, identidade `SMK-37 Pro_19626`. Parte da pública 1.0.3 e inclui a correção UI1 de redesenho. Não promove uma nova versão pública.
+Versão experimental `1.0.3-e5`, identidade `SMK-37 Pro_19627`. Parte da pública 1.0.3 e inclui a correção UI1 de redesenho. Não promove uma nova versão pública.
 
 ## Primeiro teste
 
@@ -10,7 +10,7 @@ Versão experimental `1.0.3-e4`, identidade `SMK-37 Pro_19626`. Parte da públic
 4. Toque nota ou acorde e solte todas as teclas. Avança quando a última tecla é solta. Até quatro notas por passo; no máximo 256 passos.
 5. Durante a entrada: `>` sem teclas insere uma pausa; com nota/acorde segurado acrescenta um passo ligado. `<` desfaz o último passo, com as teclas soltas. REC encerra a entrada. Segurar REC por 1,2 s mantém o comando de limpar a track; em ENDLESS a extensão volta a zero. PARA + OCT permite o undo existente.
 6. Ao entrar na vista ENDLESS, o modo é ativado para todas as partes ANALOG. Escolha outra parte com K6 para gravar uma frase independente. Cada track conserva sua quantidade de passos, RATE e direção; todas usam o relógio mestre. Por exemplo, 3, 5 e 7 passos repetem independentemente.
-7. PLAY inicia todas as tracks. Cada tecla, inclusive em legato, agenda o reinício de todas do começo na grade de semicolcheias Q16 e transpõe as partes ANALOG: C3 é zero. A última tecla pressionada define a transposição global de performance; a posição física da tecla é fixa e ignora a oitava da parte em foco; MIDI recebido permanece absoluto. Na gravação, a oitava da parte continua incorporada às notas. A transposição global KEY TR continua adicional; deixe-a zerada no primeiro teste. DRUM-X nunca transpõe.
+7. PLAY inicia todas as tracks. Cada tecla, inclusive em legato, agenda o reinício de todas do começo na grade de semicolcheias Q16 e transpõe as partes ANALOG: C4 é zero. A última tecla pressionada define a transposição global de performance; a posição física da tecla é fixa e ignora a oitava da parte em foco; MIDI recebido permanece absoluto. Na gravação, a oitava da parte continua incorporada às notas. A transposição global KEY TR continua adicional; deixe-a zerada no primeiro teste. DRUM-X nunca transpõe.
 8. K1 RATE, K2 GATE e K3 DIR (FWD/REV/RND) continuam por parte. **K4 HOLD é global**: ON continua após soltar; OFF para o transporte inteiro e apaga SEQ PLAY ao soltar a última tecla. Todos os cursores retornam ao início. Com duas teclas seguradas, soltar somente uma não para a reprodução. Releases e caudas naturais dos sons permanecem.
 9. **K5 controla somente o TEMPO na tela ENDLESS**, de 40 a 240 BPM. O valor fica visível no alto à direita. Com clock MIDI externo, o valor efetivo tem prefixo E; o clock externo continua mestre, como na base. K5 mantém suas funções habituais nas demais telas.
 10. PARA com toque curto na vista ENDLESS desliga/liga o modo global, conservando as frases. Fora da entrada, setas e pads de steps apenas selecionam a posição quando parado. Sair da vista encerra a entrada de notas, mas mantém o modo de performance. Ao trocar para DRUM-X, aparece seu editor normal; voltar para ANALOG restaura a vista ENDLESS. DRUM-X segue seu padrão, RATE e quantidade de passos, sincronizado ao transporte global: HOLD ON continua; HOLD OFF para com as demais partes. Cada novo disparo por tecla ou PLAY inicia todas do começo. Teclas no editor DRUM-X mantêm a edição normal de bateria; use uma parte ANALOG ou a tela de patch para disparar a performance pelo teclado.
@@ -43,8 +43,14 @@ Interação inspirada no [Endless do OP-1 / teenage engineering](https://teenage
 - STOP explícito, panic, pattern/undo e entrada REC limpam o pedido e a referência. PLAY explícito inicia imediatamente e ancora nova grade. Nenhum byte é acrescentado ao armazenamento.
 - [Comparar com E2 sem quantização](legacy-e2/): firmware e chave de retomada E2 preservados; instalador aceita também origens E3 e E4 para permitir o retorno direto. Voltar à versão atual pela página principal. A pública 1.0.3 permanece a mesma.
 
-## E4 — referência fixa do teclado
+## Referência fixa do teclado — atualizada na E5
 
-Na gravação, mantém a altura ouvida com a oitava da parte. Na performance, calcula a transposição a partir da posição física da tecla, ignorando a oitava da parte selecionada: C3=TR 0, D3=TR +2, C4=TR +12. Trocar de parte não muda essa referência. MIDI recebido continua absoluto. Não altera notas já gravadas nem acrescenta dados ao formato. O transpose da track e KEY TR continuam adicionais.
+Na gravação, mantém a altura ouvida com a oitava da parte. Na performance, calcula a transposição a partir da posição física da tecla, ignorando a oitava da parte selecionada: C4=TR 0, C3=TR −12, D4=TR +2, C5=TR +12. Trocar de parte não muda essa referência. MIDI recebido continua absoluto. Não altera notas já gravadas nem acrescenta dados ao formato. O transpose da track e KEY TR continuam adicionais.
 
-Validação nativa: quatro partes × cinco oitavas (−2 a +2), gravação, disparo C3/D3, troca de foco com oitavas opostas e MIDI absoluto. Validação WASM com botões OCT reais verifica gravação em +1 e disparos neutros ao alternar para outra parte em −1.
+Validação nativa: quatro partes × cinco oitavas (−2 a +2), gravação, disparo C4/D4 e C3/C5, troca de foco com oitavas opostas e MIDI absoluto. Validação WASM com botões OCT reais verifica gravação em +1 e disparos neutros ao alternar para outra parte em −1.
+
+## E5 — C4 como centro de transposição
+
+A posição física C4 (MIDI 60, segunda tecla Dó, contando a partir de C3 com OCT 0) é neutra. C3 abaixa uma oitava; C5 sobe uma oitava. A referência continua independente da oitava da parte em foco e aplica-se também ao MIDI absoluto. A gravação e as notas existentes são preservadas. Por exemplo, uma sequência começando em F3 toca F3 ao disparar C4, F2 ao disparar C3 e F4 ao disparar C5.
+
+Validação nativa: quatro partes × cinco oitavas, gravação preservada e transposições negativas/zero/positivas; vozes reais da engine conferidas em F3/F2/F4. Testes WASM mantêm o workflow e usam C4 neutro/C3 abaixo com as partes em +1 e −1.

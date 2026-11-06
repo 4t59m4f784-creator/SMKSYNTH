@@ -26,8 +26,8 @@ int main(void){
   key(1,72);endless_arrow(1);assert(pat.trk[t].len==4&&seq_step(t,2)->gate==GATE_TIE&&seq_step(t,3)->note[0]==72);key(0,72);
   endless_arrow(0);assert(pat.trk[t].len==3&&seq_step(t,2)->gate<GATE_TIE);endless_finish();assert(!end_record_mask);
   endless_turn(3,-1);for(unsigned p=0;p<4;p++)assert(!endless_hold(&pat.trk[p]));
-  key(1,50);assert(ctl_seq_run&&end_global_transpose==2);render(100);assert(ui_seq_pos[t]<3);key(0,50);assert(!ctl_seq_run&&!active(t));
-  key(1,48);render(2);assert(active(t));key(0,48);assert(!ctl_seq_run&&!active(t));
+  key(1,62);assert(ctl_seq_run&&end_global_transpose==2);render(100);assert(ui_seq_pos[t]<3);key(0,62);assert(!ctl_seq_run&&!active(t));
+  key(1,60);render(2);assert(active(t));key(0,60);assert(!ctl_seq_run&&!active(t));
   endless_turn(3,1);endless_turn(2,1);ctl_seq_restart=ctl_seq_run=1;render(1);assert(ui_seq_pos[t]==2);
   endless_turn(2,1);render(400);assert(ui_seq_pos[t]<3);
   endless_toggle();assert(!end_mode&&!ctl_seq_run&&pat.trk[t].len==3);for(unsigned p=0;p<4;p++)assert(!endless_enabled(&pat.trk[p]));
@@ -41,15 +41,15 @@ int main(void){
   * 3/5/7-step tracks stay independent after the common first boundary. */
  reset();for(unsigned t=0;t<4;t++)phrase(t,t==0?3:t==1?5:t==2?7:4);
  obv_drums_preset(&live_p[3],0);drum_pattern_set(&pat,3,0,1);endless_enable();endless_turn(3,-1);
- key(1,48);for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);render(100);
- key(1,50);for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);
+ key(1,60);for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);render(100);
+ key(1,62);for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);
  assert(end_transpose[0]==2&&end_transpose[1]==2&&end_transpose[2]==2&&end_transpose[3]==0);
  unsigned wrapped=0,previous=ui_seq_pos[0];
  for(unsigned i=0;i<10000&&!wrapped;i++){memset(audio,0,sizeof audio);engine_audio(audio,CTL);if(previous==2&&ui_seq_pos[0]==0){wrapped=1;assert(ui_seq_pos[1]==3&&ui_seq_pos[2]==3&&ui_seq_pos[3]==3);}previous=ui_seq_pos[0];}
  assert(wrapped);
- key(0,48);assert(ctl_seq_run&&end_held==1);render(5);assert(drum_stamp[3][0]);
- key(0,50);assert(!ctl_seq_run&&!end_held);for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);
- endless_turn(3,1);key(1,48);key(0,48);assert(ctl_seq_run);render(800);
+ key(0,60);assert(ctl_seq_run&&end_held==1);render(5);assert(drum_stamp[3][0]);
+ key(0,62);assert(!ctl_seq_run&&!end_held);for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);
+ endless_turn(3,1);key(1,60);key(0,60);assert(ctl_seq_run);render(800);
  for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]<pat.trk[t].len);assert(pat.trk[0].len==3&&pat.trk[1].len==5&&pat.trk[2].len==7);
  /* Drum focus preserves mode/HOLD and returning to ANALOG restores ENDLESS. */
  seq_trk=3;obv_context_refresh();assert(page==PG_DSEQ&&end_mode&&end_global_hold);seq_trk=1;obv_context_refresh();assert(page==PG_SEQ&&seq_view==SV_ENDLESS&&end_mode);
@@ -62,29 +62,35 @@ int main(void){
  /* Soft 1/16 scheduling, no premature transposition, no master phase reset.
   * Native CTL ticks resolve early, late and silent HOLD-OFF gaps. */
  reset();for(unsigned t=0;t<4;t++)phrase(t,8);endless_enable();ctl_tempo=120;
- key(1,48);assert(end_clock_valid&&end_global_transpose==0);
+ key(1,60);assert(end_clock_valid&&end_global_transpose==0);
  while(end_clock_phase<quarter_len()/8u){memset(audio,0,sizeof audio);engine_audio(audio,CTL);}
- unsigned before_phase=end_clock_phase;panel_note_in(1,50,100);assert(end_pending&&end_global_transpose==0);
+ unsigned before_phase=end_clock_phase;panel_note_in(1,62,100);assert(end_pending&&end_global_transpose==0);
  unsigned waited=0;while(end_pending&&waited<quarter_len()/4u+CTL){memset(audio,0,sizeof audio);engine_audio(audio,CTL);waited+=CTL;}
  assert(!end_pending&&end_global_transpose==2&&waited>CTL);assert(end_clock_phase>=before_phase&&end_clock_phase<quarter_len()/4u+2*CTL);
  for(unsigned t=0;t<4;t++)assert(ui_seq_pos[t]==0);
- unsigned phase=end_clock_phase;panel_note_in(1,52,100);engine_audio(audio,CTL);assert(!end_pending&&end_global_transpose==4&&end_clock_phase>=phase);
- endless_turn(3,-1);key(0,48);key(0,50);key(0,52);assert(!ctl_seq_run&&end_clock_valid);
+ unsigned phase=end_clock_phase;panel_note_in(1,64,100);engine_audio(audio,CTL);assert(!end_pending&&end_global_transpose==4&&end_clock_phase>=phase);
+ endless_turn(3,-1);key(0,60);key(0,62);key(0,64);assert(!ctl_seq_run&&end_clock_valid);
  for(unsigned i=0;i<20;i++)engine_audio(audio,CTL);
- panel_note_in(1,55,100);assert(end_pending&&!ctl_seq_run);panel_note_in(0,55,0);engine_audio(audio,CTL);assert(!end_pending&&!ctl_seq_run);
+ panel_note_in(1,67,100);assert(end_pending&&!ctl_seq_run);panel_note_in(0,67,0);engine_audio(audio,CTL);assert(!end_pending&&!ctl_seq_run);
  for(unsigned i=0;i<quarter_len()/CTL+2;i++)engine_audio(audio,CTL);assert(!end_clock_valid);
- seq_beat_n=3;key(1,48);assert(ctl_seq_run&&!end_pending&&end_clock_phase<FS/50u&&ui_seq_bar_beat==0);key(0,48);
+ seq_beat_n=3;key(1,60);assert(ctl_seq_run&&!end_pending&&end_clock_phase<FS/50u&&ui_seq_bar_beat==0);key(0,60);
  /* External tempo drives the same launch grid and explicit STOP cancels wait. */
- ctl_ext_quarter=FS;key(1,48);while(end_clock_phase<FS/8u)engine_audio(audio,CTL);
- panel_note_in(1,50,100);assert(end_pending);endless_stop();engine_audio(audio,CTL);assert(!end_pending&&!ctl_seq_run&&!end_clock_valid);ctl_ext_quarter=0;
- /* E4: recording keeps the part octave; performance roots never inherit it. */
+ ctl_ext_quarter=FS;key(1,60);while(end_clock_phase<FS/8u)engine_audio(audio,CTL);
+ panel_note_in(1,62,100);assert(end_pending);endless_stop();engine_audio(audio,CTL);assert(!end_pending&&!ctl_seq_run&&!end_clock_valid);ctl_ext_quarter=0;
+ /* E5: C4 is neutral across parts/octaves; recording retains actual pitch. */
  for(unsigned t=0;t<4;t++)for(int oct=-2;oct<=2;oct++){
   reset();seq_trk=t;keyboard_physical=1;patch_keyboard_octave_set(&live_p[t],oct);endless_record_toggle();
   key(1,48);key(0,48);assert(pat.st[t][0].note[0]==48+12*oct);endless_finish();
-  key(1,48);assert(end_global_transpose==0);key(0,48);key(1,50);assert(end_global_transpose==2);key(0,50);
-  seq_trk=(t+1)%4;patch_keyboard_octave_set(&live_p[seq_trk],-oct);key(1,48);assert(end_global_transpose==0);key(0,48);
-  keyboard_physical=0;key(1,60);assert(end_global_transpose==12);key(0,60);endless_stop();render(1);
+  key(1,60);assert(end_global_transpose==0);key(0,60);key(1,48);assert(end_global_transpose==-12);key(0,48);
+  key(1,62);assert(end_global_transpose==2);key(0,62);key(1,72);assert(end_global_transpose==12);key(0,72);
+  seq_trk=(t+1)%4;patch_keyboard_octave_set(&live_p[seq_trk],-oct);key(1,60);assert(end_global_transpose==0);key(0,60);
+  keyboard_physical=0;key(1,48);assert(end_global_transpose==-12);key(0,48);key(1,60);assert(end_global_transpose==0);key(0,60);endless_stop();render(1);
  }
+ /* An existing F3 phrase sounds F3 on C4, F2 on C3 and F4 on C5. */
+ reset();phrase(0,1);pat.st[0][0].note[0]=53;endless_enable();keyboard_physical=1;
+ key(1,60);assert(sr[0].nsnd==1&&sr[0].snd[0]==53);key(0,60);
+ key(1,48);assert(sr[0].nsnd==1&&sr[0].snd[0]==41);key(0,48);
+ key(1,72);assert(sr[0].nsnd==1&&sr[0].snd[0]==65);key(0,72);
  reset();endless_enable();
  /* Unchanged display is idle; header redraw follows K5 tempo. */
  page=PG_SEQ;seq_view=SV_ENDLESS;seq_trk=0;toast=0;endless_draw(1);unsigned pix=host_lcd_pixels,blits=host_lcd_blits;for(unsigned i=0;i<1000;i++)endless_draw(0);assert(host_lcd_pixels==pix&&host_lcd_blits==blits);set.tempo++;endless_draw(0);assert(host_lcd_pixels-pix==240*44);
@@ -94,5 +100,5 @@ int main(void){
  for(unsigned t=0;t<4;t++){seq_trk=t;ui_trk=t;end_record=0;endless_draw(1);assert(fb[52*240+40]==C_TRKC[t]);char path[64];snprintf(path,sizeof path,"build/endless-play-%u.ppm",t);write_ppm_as(path);end_record=t+1;endless_draw(0);assert(fb[52*240+40]==RGB(255,255,255));assert(fb[1*240+195]==C_RED);}
  seq_trk=0;end_record=0;
  pat.trk[0].len=16;seq_cur[0]=6;pat.st[0][6].note[0]=60;pat.st[0][6].note[1]=64;pat.st[0][6].note[2]=67;ctl_seq_run=1;ui_seq_pos[0]=6;set.tempo=120;endless_draw(1);write_ppm_as("build/endless-play.ppm");end_record=1;end_pos=7;ctl_seq_run=0;endless_draw(0);write_ppm_as("build/endless-rec.ppm");
- puts("PASS E4: octave-aware recording/fixed performance root, colors/white REC, soft clock grid, independent recording, global HOLD/last-key stop/PLAY reset, legato global retrigger, 3/5/7-step clocks, fixed DRUM-X, focus persistence, exclusive K5 tempo, unchanged storage/E1 migration and partial display.");
+ puts("PASS E5: octave-aware recording/fixed C4 root and actual F3/F2/F4 output, colors/white REC, soft clock grid, independent recording, global HOLD/last-key stop/PLAY reset, legato global retrigger, 3/5/7-step clocks, fixed DRUM-X, focus persistence, exclusive K5 tempo, unchanged storage/E1 migration and partial display.");
 }
