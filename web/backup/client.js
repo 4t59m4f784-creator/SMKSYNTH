@@ -2,7 +2,7 @@
 import {BackupClient,unpack} from './legacy-client.js';
 import {crc32,SIZE} from './bank.js';
 const prefix=[125,83,77,75,66,1];
-const B2_VERSIONS=['19615','19616','19617','19618','19619','19620','19621'];
+const B2_VERSIONS=['19615','19616','19617','19618','19619','19620','19621','19627'];
 export const hex=a=>Array.from(a,x=>x.toString(16).padStart(2,'0')).join('');
 export const digest=async a=>hex(new Uint8Array(await crypto.subtle.digest('SHA-256',a)));
 function pack(a){let v=0,bits=0,out=[];for(const b of a){v|=b<<bits;bits+=8;while(bits>=7){out.push(v&127);v>>>=7;bits-=7;}}if(bits)out.push(v);return out;}
