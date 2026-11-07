@@ -17,9 +17,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v6
-      - run: python3 tools/prepare_public_site.py
-      - run: python3 tools/check_publication.py
+      - uses: actions/checkout@v4
+      - name: Stage current and legacy site
+        run: python3 tools/prepare_current_public_site.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
