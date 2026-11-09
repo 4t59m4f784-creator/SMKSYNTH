@@ -1,9 +1,9 @@
 name: Supersaw experimental checks
 on:
   push:
-    branches: ['experimental/supersaw']
+    branches: ['experimental/supersaw', 'experimental/super-sp1']
   pull_request:
-    paths: ['firmware/src/obv_super*', 'tests/supersaw*', 'experimental/supersaw/**']
+    paths: ['firmware/src/obv_super*', 'tests/supersaw*', 'tests/super_sp1*', 'tests/sp1*', 'firmware/src/obv_store_read.h', 'experimental/supersaw/**']
 permissions:
   contents: read
 jobs:
@@ -17,15 +17,17 @@ jobs:
       - name: DSP, persistence and controls
         run: |
           mkdir -p build/supersaw
-          cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/supersaw/native tests/supersaw_test.c
+          cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/supersaw/native tests/supersaw_test.c
           ASAN_OPTIONS=detect_leaks=0 build/supersaw/native
-          cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/supersaw/equivalence tests/supersaw_performance_test.c
+          cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/supersaw/equivalence tests/supersaw_performance_test.c
           ASAN_OPTIONS=detect_leaks=0 build/supersaw/equivalence
           cc -O2 -DOBV_HOST -Ifirmware/src -Ifirmware/gen -c firmware/src/obv_supersaw.c -o build/supersaw/kernel.o
-          cc -Os -DOBV_HOST -DOBV_SUPER_EXTERNAL -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -c tests/supersaw_integration_test.c -o build/supersaw/integration.o
+          cc -Os -DOBV_HOST -DOBV_SUPER_EXTERNAL -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -c tests/super_sp1_stream.c -o build/supersaw/integration.o
           cc build/supersaw/integration.o build/supersaw/kernel.o -o build/supersaw/integration
           build/supersaw/integration build/supersaw/integration.pcm
-          python3 -c "import hashlib; assert hashlib.sha256(open('build/supersaw/integration.pcm','rb').read()).hexdigest() == '7c7688bb6186498d7f9abe83db713e8ef7f4c98b69bfe094007965aa50471fba'"
+          python3 -c "import hashlib; assert hashlib.sha256(open('build/supersaw/integration.pcm','rb').read()).hexdigest() == 'e5bb37e06c1dc145a62d1ec58db5b89d805ec2c305edd7a640d33a7ac1a82000'"
+          cc -O2 -o build/supersaw/read tests/sp1_read_test.c
+          build/supersaw/read
           sh tests/run_physical_controls_tests.sh
       - name: Pinned installer and stable return
         run: |

@@ -707,7 +707,7 @@ static void block_globals(part_t *g)            /* a sound's derived numbers, on
     g->pw1_base = ((uint32_t)pv[P_O1_PW] << 25) + (1u << 24);
     g->pw2_base = ((uint32_t)pv[P_O2_PW] << 25) + (1u << 24);
     g->w1 = pv[P_O1_WAVE];
-    g->w2 = pv[P_O2_WAVE];
+    g->w2 = pv[P_O2_WAVE]==W_SUPER?W_SAW:pv[P_O2_WAVE]; /* old OSC2 SUPER is read as SAW; stored bytes stay intact */
     g->ftype = pv[P_FTYPE];
     g->morph_q = pv[P_FMORPH];                  /* SEM: 0 LP, 64 notch, 127 HP */
     g->sync_on = pv[P_SYNC];
@@ -793,7 +793,8 @@ static void voice_block(voice_t *v, uint32_t card)
 }
 
 #include "obv_supersaw.h"
-static super_state_t super_state[NV][2];
+static super_state_t super_state[NV];
+static super_plain_state_t super_plain_state[NV];
 
 /* ---- the samples of one voice: oscillators -> mix -> drive -> filter -> amp -> pan */
 static void voice_render(voice_t *v, int32_t *out)
@@ -806,15 +807,15 @@ static void voice_render(voice_t *v, int32_t *out)
     int32_t hw1 = (ww1 & OSC_SAW ? -65536 : 0) + (ww1 & OSC_PLS ? -65536 : 0);
     int32_t hw2 = (ww2 & OSC_SAW ? -65536 : 0) + (ww2 & OSC_PLS ? -65536 : 0);
     int32_t super_buf[2][CTL];
-    super_state_t *ss = super_state[v - vc];
-    uint32_t has_super = ww1 == W_SUPER || ww2 == W_SUPER;
+    super_state_t *ss = &super_state[v - vc];
+    super_plain_state_t *ps = &super_plain_state[v - vc];
+    uint32_t has_super = ww1 == W_SUPER;
     uint32_t buffered1 = ww1 == W_SUPER || (has_super && ww1 == W_SAW);
-    uint32_t buffered2 = ww2 == W_SUPER || (has_super && ww2 == W_SAW);
+    uint32_t buffered2 = has_super && ww2 == W_SAW;
     if (has_super) { sy = 0; xq = 0; } /* SS1: deliberately bypassed */
-    if (ww1 == W_SUPER) super_render_call(&ss[0], &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
-    else {ss[0].active = 0;if(buffered1)super_plain_call(&ss[0],&v->o1,inc1,l1?super_buf[0]:0,CTL);}
-    if (ww2 == W_SUPER) super_render_call(&ss[1], &v->o2, inc2, g->p->v[P_O2_PW], patch_super_mix(g->p,1), l2 ? super_buf[1] : 0, CTL);
-    else {ss[1].active = 0;if(buffered2)super_plain_call(&ss[1],&v->o2,inc2,l2?super_buf[1]:0,CTL);}
+    if (ww1 == W_SUPER) super_render_call(ss, &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
+    else {ss->active = 0;if(buffered1)super_plain_call(ps,&v->o1,inc1,l1?super_buf[0]:0,CTL);}
+    if(buffered2)super_plain_call(ps,&v->o2,inc2,l2?super_buf[1]:0,CTL);
     for (i = 0; i < CTL; i++) {
         int32_t s1, s2, mix, lp, bp, hp, y, amp, rt = -1;
         uint32_t ie = inc1;

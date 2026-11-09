@@ -1,10 +1,10 @@
 {
   "update": {
-    "name": "Instalar ENDLESS E5",
-    "product": "SMK-37 Pro_19627",
-    "url": "./SMKSYNTH-1.0.3-e5-SMK37-Pro.fwsc",
+    "name": "Instalar SUPER SP1",
+    "product": "SMK-37 Pro_19628",
+    "url": "./SMKSYNTH-1.0.3-sp1-SMK37-Pro.fwsc",
     "size": 651819,
-    "sha": "8e38a7ae75c81eb9f0f04512f8eebf4652de97b0100d8a5cd2bb264afc2d9a3c"
+    "sha": "2209a118dc19985a25b2c0090728374f7ff0d23c021d9b114ea1cae4561ce3e5"
   },
   "release": {
     "name": "Retornar à pública 1.0.3",

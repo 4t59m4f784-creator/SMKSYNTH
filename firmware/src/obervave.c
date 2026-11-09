@@ -808,8 +808,7 @@ static const char *obv_voice_label(uint32_t p)
         if(p==DP_LENGTH)return "DECAY";if(p==DP_FOLD)return "FOLD";
         if(p==P_O2_SEMI)return "TUNE";return PDEF[p].name;
     }
-    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER) ||
-       (p==P_O2_PW && ed_patch(0)->v[P_O2_WAVE]==W_SUPER))return "DETUNE";
+    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER))return "DETUNE";
     return PDEF[p].name;
 }
 static uint32_t super_edit_page(void)
@@ -936,8 +935,8 @@ static void param_value(char *s, uint32_t p, uint32_t v)   /* <= 7 characters */
         if(p==DP_TONE||p==DP_LENGTH){fmt_s(s,(int32_t)v-64);return;}
     }
 
-    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER) ||
-       (p==P_O2_PW && ed_patch(0)->v[P_O2_WAVE]==W_SUPER)){fmt_u(s,v);return;}
+    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER)){fmt_u(s,v);return;}
+    if(p==P_O2_WAVE&&v==W_SUPER)v=W_SAW;
     switch (PDEF[p].kind) {
     case K_BIP: if (v < 64u) { scat(s, "-"); fmt_u(t, 64u - v); } else { scat(s, v > 64u ? "+" : ""); fmt_u(t, v - 64u); } scat(s, t); break;
     case K_ONOFF: scat(s, v ? "ON" : "OFF"); break;
@@ -1136,8 +1135,9 @@ static void draw_page(void)
         k[i].bip = 0;
         k[i].value[0] = 0;
         if(page==PG_SUPER && !layer){
-            static const char *const labels[4]={"DET1","MIX1","DET2","MIX2"};
-            const patch_t *p=ed_patch(0);unsigned o=i/2;
+            static const char *const labels[2]={"DETUNE","MIX"};
+            if(i>=2u)continue;
+            const patch_t *p=ed_patch(0);unsigned o=0;
             k[i].present=1;k[i].label=labels[i];k[i].max=127;
             k[i].v=(i&1u)?patch_super_mix(p,o):p->v[o?P_O2_PW:P_O1_PW];
             fmt_u(k[i].value,k[i].v);
@@ -1204,6 +1204,7 @@ static void draw_page(void)
         } else if (p >= 0) {
             k[i].label = obv_voice_label((uint32_t)p);
             k[i].v = ed_patch((uint32_t)p)->v[p];
+            if(p==P_O2_WAVE&&k[i].v==W_SUPER)k[i].v=W_SAW;
             k[i].max = obv_param_max(ed_patch((uint32_t)p),(uint32_t)p);
             if(k[i].v>k[i].max)k[i].v=k[i].max;
             k[i].bip = PDEF[p].kind == K_BIP || PDEF[p].kind == K_SEMI || PDEF[p].kind == K_MORPH;
@@ -1279,7 +1280,7 @@ static void draw_hints(void)
     if(perf_drum_bank()&&!layer&&!toasting&&!rec){uint32_t dk=obv_drums_selected()?901u:902u;if(hints_key!=dk){hints_key=dk;ui_hints(obv_drums_selected()?"PADS 1-8: PLAY / REC":"SELECT A DRUM-X PART",obv_drums_selected()?"PADS 9-16 UNUSED":"KNOB BANK: EXIT",obv_drums_selected()?RGB(166,66,255):C_AMBER);}return;}
     if(page==PG_KEYBOARD&&!layer&&!toasting&&!rec){if(hints_key!=900u){hints_key=900u;ui_hints("P8 / P16 SELECT PLAY ROW", "K5 LEVEL/OCT  TWO PADS LAYER", C_TRKC[0]);}return;}
     if(!layer&&!toasting&&!rec&&(page==PG_SUPER||page==PG_OSC1||page==PG_OSC2||page==PG_OSCMOD)&&
-       (ed_patch(0)->v[P_O1_WAVE]==W_SUPER||ed_patch(0)->v[P_O2_WAVE]==W_SUPER)){
+       (ed_patch(0)->v[P_O1_WAVE]==W_SUPER)){
         if(hints_key!=903u){hints_key=903u;ui_hints("SUPER: SYNC / XMOD BYPASS","PWM DOES NOT MODULATE DETUNE",C_AMBER);}return;
     }
     if (held > 500u) {                          /* REC held: a bar fills up to the clear */
@@ -1643,7 +1644,7 @@ static void pat_go(uint32_t n)
     if (pend_slot == n + 1u) {                  /* back to the one left with its edits (not saved yet): those */
         pat_q = pat_old; pend_slot = 0; q_edited = 1;
     } else { pat_fetch(n, &pat_q); q_edited = 0; }
-    ctl_pat_keep = !pend_slot;                  /* (the one left comes back in pat_old, with its edits; pat_old waiting
+    ctl_pat_keep = !OBV_MANUAL_STORAGE && !pend_slot;                  /* (the one left comes back in pat_old, with its edits; pat_old waiting
                                                  * for the stop is never overwritten) */
     snd_target(n, snd_q); ctl_snd_swap = 1;
     mx_prepare(n); ctl_mx_swap = 1;
@@ -2516,7 +2517,8 @@ static void panel_encoders(void)
 #endif
             if (e > 1 || e < -1) e *= 3;        /* a fast turn goes further */
             if(page==PG_SUPER && !layer){
-                unsigned o=k/2;patch_t *p=ed_patch(0);
+                if(k>=2u)continue;
+                unsigned o=0;patch_t *p=ed_patch(0);
                 if(k&1u){patch_super_mix_set(p,o,(uint32_t)clampi((int32_t)patch_super_mix(p,o)+e*2,0,127));trk_edited[seq_trk%NTRK]=1;}
                 else {unsigned id=o?P_O2_PW:P_O1_PW;set_param(id,(int32_t)p->v[id]+e*2);auto_rec(id);}
                 dirty_hdr=1;

@@ -1,3 +1,3 @@
 PASS: pending/invalid restore journal refuses firmware update before app erase.
-PASS: 4 erase-interruption/retry points keep bank byte-identical.
+PASS: 43 erase-interruption/retry points keep bank byte-identical.
 PASS: B1->B2 bank byte-identical, app updated, protected ranges intact, unknown owner refuses before erases, disconnect/resume preserves bank.

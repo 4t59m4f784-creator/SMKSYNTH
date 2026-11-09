@@ -1,8 +1,8 @@
 {
-  "version": "1.0.3-e5",
-  "identity": "SMK-37 Pro_19627",
-  "app_bytes": 171096,
-  "static_ram_bytes": 86928,
+  "version": "1.0.3-sp1",
+  "identity": "SMK-37 Pro_19628",
+  "app_bytes": 171688,
+  "static_ram_bytes": 86160,
   "pool_bytes": 325984,
   "loader_bytes": 7703,
   "ui_base": "UI1",
@@ -14,11 +14,11 @@
   },
   "artifacts": {
     "update": {
-      "name": "Instalar ENDLESS E5",
-      "product": "SMK-37 Pro_19627",
-      "url": "./SMKSYNTH-1.0.3-e5-SMK37-Pro.fwsc",
+      "name": "Instalar SUPER SP1",
+      "product": "SMK-37 Pro_19628",
+      "url": "./SMKSYNTH-1.0.3-sp1-SMK37-Pro.fwsc",
       "size": 651819,
-      "sha": "8e38a7ae75c81eb9f0f04512f8eebf4652de97b0100d8a5cd2bb264afc2d9a3c"
+      "sha": "2209a118dc19985a25b2c0090728374f7ff0d23c021d9b114ea1cae4561ce3e5"
     },
     "release": {
       "name": "Retornar à pública 1.0.3",
@@ -28,9 +28,14 @@
       "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870"
     },
     "simulator": {
-      "version": "1.0.3-e5",
-      "sha256": "8c6c29aa076e11759f3e8421932d786e35f8bdfc54a0709996406dc0d69b2b1b"
+      "version": "1.0.3-sp1",
+      "sha256": "660a72a0839c99195820da483490ccb408fdd755730d28ab1f2919b96d10f776"
     }
   },
-  "performance_root": "fixed key position C4=60, independent of part octave; recording retains octave"
+  "performance_root": "fixed key position C4=60, independent of part octave; recording retains octave",
+  "super_osc1_only": true,
+  "baseline_commit": "8a927e692f18a6dddb1362a6251381ff51732137",
+  "audio_reference_sha256": "e5bb37e06c1dc145a62d1ec58db5b89d805ec2c305edd7a640d33a7ac1a82000",
+  "read_chunk_bytes": 32,
+  "manual_outgoing_copy_bytes_avoided": 14476
 }

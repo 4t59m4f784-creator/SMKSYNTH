@@ -1,0 +1,14 @@
+{
+  "before": {
+    "bytes": 5701632,
+    "sha256": "e5bb37e06c1dc145a62d1ec58db5b89d805ec2c305edd7a640d33a7ac1a82000"
+  },
+  "after": {
+    "bytes": 5701632,
+    "sha256": "e5bb37e06c1dc145a62d1ec58db5b89d805ec2c305edd7a640d33a7ac1a82000"
+  },
+  "external": {
+    "bytes": 5701632,
+    "sha256": "e5bb37e06c1dc145a62d1ec58db5b89d805ec2c305edd7a640d33a7ac1a82000"
+  }
+}

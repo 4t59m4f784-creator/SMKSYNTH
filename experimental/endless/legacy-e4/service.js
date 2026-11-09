@@ -14,7 +14,7 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627'].includes(source);
+const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627','SMK-37 Pro_19628'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627','SMK-37 Pro_19628'].includes(source);
 export function modeFor(kind,id,pending){
  if(!PINS[kind])throw Error('Operação inválida.');
  if(!id?.text)throw Error('Conecte e consulte o teclado.');

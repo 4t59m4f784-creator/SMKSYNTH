@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* SS3: seven saws inside one oscillator. Offsets and detune curve adapted
+/* SP1: seven saws inside one oscillator. Offsets and detune curve adapted
  * from isod89/clipper-fm1 eng_hybrid.c (3dSam / Leo Kuroshita, 2026),
  * itself referencing Adam Szabo's JP-8000 analysis. Independent MIX and
  * peak-normalized gains are SMKSYNTH additions; this is not a JP emulator.
@@ -9,9 +9,11 @@ typedef struct {
     int32_t det_sm, mix_sm;               /* Q8 controls; slew only while SUPER */
     uint8_t active;
     uint32_t inc_cached, det_cached, si[6];
+    int32_t det_offset[6]; /* exact off[j]*curve, changes only with detune */
     int32_t mix_cached, cg;
     uint32_t reciprocal[7];
 } super_state_t;
+typedef struct {uint32_t inc_cached, reciprocal;} super_plain_state_t;
 
 #if (defined(OBV_HOST) && !defined(OBV_SUPER_EXTERNAL)) || defined(OBV_SUPER_KERNEL)
 static inline __attribute__((always_inline)) uint32_t super_curve(uint32_t shape)
@@ -67,6 +69,22 @@ static inline __attribute__((always_inline)) void super_saw_run(osc_t *o, uint32
     o->ph = ph; o->prev = prev;
 }
 
+/* Two independent saws per pass: same delayed/wrap equations and exact sum,
+ * three buffer passes instead of zeroing plus six read/modify/write passes. */
+static inline __attribute__((always_inline)) void super_saw_pair(osc_t *a,osc_t *b,
+ uint32_t ia,uint32_t ib,uint32_t ra,uint32_t rb,int32_t*out,uint32_t n,int add){
+ uint32_t pa=a->ph,pb=b->ph,da=ia>>15,db=ib>>15;
+ int32_t va=a->prev,vb=b->prev;
+ for(uint32_t i=0;i<n;i++){
+  uint32_t oa=pa,ob=pb;pa+=ia;pb+=ib;
+  int32_t y=va+vb,ca=(int32_t)(pa>>16)-32768,cb=(int32_t)(pb>>16)-32768;
+  if(pa<oa&&da){int32_t t=(int32_t)super_fraction(pa,da,ra),u=32767-t;y-=(t*t)>>15;ca+=(u*u)>>15;}
+  if(pb<ob&&db){int32_t t=(int32_t)super_fraction(pb,db,rb),u=32767-t;y-=(t*t)>>15;cb+=(u*u)>>15;}
+  if(add)out[i]+=y;else out[i]=y;va=ca;vb=cb;
+ }
+ a->ph=pa;a->prev=va;b->ph=pb;b->prev=vb;
+}
+
 /* An inaudible oscillator still advances to exactly the same state as a full
  * render. Only the last naive sample and its wrap correction affect prev. */
 static inline __attribute__((always_inline)) void super_saw_skip(osc_t *o, uint32_t inc, uint32_t reciprocal, uint32_t n)
@@ -115,16 +133,20 @@ SUPER_LINKAGE SUPER_HOT void super_render(super_state_t *s, osc_t *center, uint3
     uint32_t shape = (uint32_t)s->det_sm >> 8;
     /* Keep every side below Nyquist even at extreme MIDI pitches. */
     if (inc > 0x70000000u) inc = 0x70000000u;
-    if (inc != s->inc_cached || shape != s->det_cached) {
-        uint32_t d = super_curve(shape);
+    uint32_t changed = shape != s->det_cached;
+    if(changed){
+        uint32_t d=super_curve(shape);
+        for(j=0;j<6;j++)s->det_offset[j]=off[j]*(int32_t)d;
+        s->det_cached=shape;
+    }
+    if (inc != s->inc_cached || changed) {
         for (j = 0; j < 6; j++) {
-            uint32_t next = (uint32_t)((int64_t)inc + (((int64_t)inc * off[j] * d) >> 32));
-            /* Fine drift often changes inc without changing its divisor. */
+            uint32_t next = (uint32_t)((int64_t)inc + (((int64_t)inc * s->det_offset[j]) >> 32));
             if ((next >> 15) != (s->si[j] >> 15)) s->reciprocal[j] = super_reciprocal(next >> 15);
             s->si[j] = next;
         }
         if ((inc >> 15) != (s->inc_cached >> 15)) s->reciprocal[6] = super_reciprocal(inc >> 15);
-        s->inc_cached = inc; s->det_cached = shape;
+        s->inc_cached = inc;
     }
     /* Central + six sides at up to half its level, peak normalized.
      * Compute the side average first: every multiply fits in int32. */
@@ -146,29 +168,28 @@ SUPER_LINKAGE SUPER_HOT void super_render(super_state_t *s, osc_t *center, uint3
         return;
     }
     int32_t side[CTL];
-    for (i = 0; i < n; i++) side[i] = 0;
-    for (j = 0; j < 6; j++) super_saw_run(&s->side[j], s->si[j], s->reciprocal[j], side, n, 1);
+    for (j = 0; j < 6; j+=2) super_saw_pair(&s->side[j],&s->side[j+1],s->si[j],s->si[j+1],s->reciprocal[j],s->reciprocal[j+1],side,n,j!=0);
     for (i = 0; i < n; i++) out[i] = (out[i] * cg + super_div6(side[i]) * sg) >> 15;
 }
 
 /* Companion SAW in a SUPER voice: the same exact natural-wrap kernel, with
  * no sync/XMOD (already bypassed for this voice). Legacy voices are untouched. */
-SUPER_LINKAGE SUPER_HOT void super_plain_saw(super_state_t *s, osc_t *o, uint32_t inc,
+SUPER_LINKAGE SUPER_HOT void super_plain_saw(super_plain_state_t *s, osc_t *o, uint32_t inc,
                                             int32_t *out, uint32_t n)
 {
     if (s->inc_cached != inc) {
-        if ((inc >> 15) != (s->inc_cached >> 15)) s->reciprocal[6] = super_reciprocal(inc >> 15);
+        if ((inc >> 15) != (s->inc_cached >> 15)) s->reciprocal = super_reciprocal(inc >> 15);
         s->inc_cached = inc;
     }
-    if (out) super_saw_run(o, inc, s->reciprocal[6], out, n, 0);
-    else super_saw_skip(o, inc, s->reciprocal[6], n);
+    if (out) super_saw_run(o, inc, s->reciprocal, out, n, 0);
+    else super_saw_skip(o, inc, s->reciprocal, n);
 }
 #undef SUPER_HOT
 #undef SUPER_LINKAGE
 #else
 void super_render(super_state_t *s, osc_t *center, uint32_t inc,
                   uint32_t det, uint32_t mix, int32_t *out, uint32_t n);
-void super_plain_saw(super_state_t *s, osc_t *o, uint32_t inc, int32_t *out, uint32_t n);
+void super_plain_saw(super_plain_state_t *s, osc_t *o, uint32_t inc, int32_t *out, uint32_t n);
 #endif
 
 static inline void super_render_call(super_state_t *s, osc_t *center, uint32_t inc,
@@ -184,7 +205,7 @@ static inline void super_render_call(super_state_t *s, osc_t *center, uint32_t i
 #endif
 }
 
-static inline void super_plain_call(super_state_t *s, osc_t *o, uint32_t inc, int32_t *out, uint32_t n)
+static inline void super_plain_call(super_plain_state_t *s, osc_t *o, uint32_t inc, int32_t *out, uint32_t n)
 {
 #ifdef OBV_HOST
     super_plain_saw(s,o,inc,out,n);

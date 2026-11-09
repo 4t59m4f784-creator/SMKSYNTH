@@ -1,6 +1,10 @@
-# SMKSYNTH ENDLESS E5 — protótipo
+# SMKSYNTH SUPER SP1 — teste de performance
 
-Versão experimental `1.0.3-e5`, identidade `SMK-37 Pro_19627`. Parte da pública 1.0.3 e inclui a correção UI1 de redesenho. Não promove uma nova versão pública.
+Leia [SP1.md](SP1.md) para as mudanças de DSP, compatibilidade com SUPER no OSC2 e roteiro de validação física. Inclui o ENDLESS E5 descrito abaixo.
+
+# SMKSYNTH SUPER SP1 — teste de performance com ENDLESS E5
+
+Versão experimental `1.0.3-sp1`, identidade `SMK-37 Pro_19628`. Parte da pública 1.0.3 e inclui a correção UI1 de redesenho. Não promove uma nova versão pública.
 
 ## Primeiro teste
 

@@ -1,0 +1,3 @@
+     0 ms  pattern slot 0 saved (14476 + 380 B)
+     0 ms  pattern slot 1 saved (14476 + 380 B)
+PASS: 80 stopped recalls, 4 queued audio-ISR recalls, full patches/ARP/FX/mixer/steps/automation, K1 retained, zero recall writes.

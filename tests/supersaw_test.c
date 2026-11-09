@@ -61,13 +61,15 @@ static void dsp(void){
 }
 static void controls(void){
     page=PG_OSC1;set_param(P_O1_WAVE,W_SUPER);set_param(P_O2_WAVE,W_SUPER);
-    assert(!strcmp(obv_voice_label(P_O1_PW),"DETUNE"));
+    assert(!strcmp(obv_voice_label(P_O1_PW),"DETUNE"));assert(live.v[P_O2_WAVE]==W_BOTH);assert(obv_param_max(&live,P_O2_WAVE)==W_BOTH);
     unsigned seq[]={PG_OSC2,PG_OSCMOD,PG_FILTER,PG_FILTER2,PG_SUPER,PG_OSC1};
     for(unsigned i=0;i<6;i++){page=super_edit_page();assert(page==seq[i]);}
     page=PG_SUPER;unsigned olddet=live.v[P_O1_PW],oldmix=patch_super_mix(&live,0);
     host_enc[ENC_KNOB2]=1;panel_encoders();
     assert(patch_super_mix(&live,0)==oldmix+2&&live.v[P_O1_PW]==olddet);
     host_enc[ENC_KNOB1]=1;panel_encoders();assert(live.v[P_O1_PW]==olddet+2);
+    patch_t before=live;host_enc[ENC_KNOB3]=1;host_enc[ENC_KNOB4]=1;panel_encoders();assert(!memcmp(&before,&live,sizeof before));
+    live.v[P_O2_WAVE]=W_SUPER;before=live;block_globals(&pt[0]);assert(pt[0].w2==W_SAW&&!memcmp(&before,&live,sizeof before));char text[16];param_value(text,P_O2_WAVE,W_SUPER);assert(!strcmp(text,"SAW"));
     draw_header();draw_page();draw_scope();hints_key=~0u;draw_hints();write_ppm_as("build/supersaw/super-page.ppm");
     page=PG_OSC1;draw_page();write_ppm_as("build/supersaw/osc1-page.ppm");
     obv_drums_choose(0,0);page=PG_SUPER;obv_context_refresh();assert(page==PG_DKIT);
@@ -86,10 +88,10 @@ static void stress(void){
     }
     assert(energy>1000000);
     /* First prototype bypasses SYNC/XMOD when either oscillator is SUPER. */
-    voice_t saved=vc[0];super_state_t states[2];memcpy(states,super_state[0],sizeof states);
+    voice_t saved=vc[0];super_state_t state=super_state[0];super_plain_state_t plain=super_plain_state[0];
     int32_t a[CTL*2]={0},b[CTL*2]={0};voice_render(&vc[0],a);
-    vc[0]=saved;memcpy(super_state[0],states,sizeof states);
+    vc[0]=saved;super_state[0]=state;super_plain_state[0]=plain;
     pt[0].sync_on=0;pt[0].xmod_q=0;voice_render(&vc[0],b);assert(!memcmp(a,b,sizeof a));
 }
 int main(void){init();storage();dsp();init();controls();init();stress();
-    puts("PASS SS1: all 128 MIDI pitches/extremes, MIX=0 exact saw, bounded output, independent knobs, page/drum routing, presets/favorites/flash-scene recall/name/octave/layout, 8-voice/4-part dual SUPER and explicit SYNC/XMOD bypass.");return 0;}
+    puts("PASS SP1: OSC1-only controls, all 128 MIDI pitches/extremes, MIX=0 exact saw, bounded output, independent knobs, page/drum routing, presets/favorites/flash-scene recall/name/octave/layout, 8-voice/4-part legacy OSC2 SUPER fallback, original stored bytes retained and explicit SYNC/XMOD bypass.");return 0;}

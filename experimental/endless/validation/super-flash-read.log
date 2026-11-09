@@ -1,0 +1,1 @@
+PASS: exact raw reads, odd lengths, interruption service between <=32-byte transfers, error unlock/no later reads. Flash layout/encryption/write paths unchanged.

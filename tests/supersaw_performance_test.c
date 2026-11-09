@@ -71,7 +71,7 @@ int main(void)
         assert(super_fraction(n,d,super_reciprocal(d))==n/d);
     }
     for(unsigned note=0;note<128;note++){
-        osc_t a={xorshift(&seed),0},b=a;super_state_t state={0};int32_t out[CTL];
+        osc_t a={xorshift(&seed),0},b=a;super_plain_state_t state={0};int32_t out[CTL];
         for(unsigned k=0;k<256;k++){
             uint32_t inc=pitch_inc(note*256+k);int silent=k%11==0;
             super_plain_saw(&state,&a,inc,silent?0:out,CTL);
