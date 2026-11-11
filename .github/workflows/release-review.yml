@@ -19,9 +19,12 @@ jobs:
           python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc
       - name: Validate first-install guard and seeded simulator
         run: |
+          node tests/pedal_installer_test.mjs
           node tests/release_101_installer_test.mjs
           cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/controls tests/physical_controls_test.c
           /tmp/controls
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/pedal tests/sustain_panic_test.c
+          /tmp/pedal
           cc -O2 -o /tmp/midi-only tests/usb_midi_only_test.c
           /tmp/midi-only
           node tests/release_demo_wasm_test.mjs

@@ -2252,6 +2252,14 @@ static void keys_in(uint32_t notes_only)
     }
 }
 
+static uint32_t midi_sustain;
+static void sustain_apply(void);
+#if BOARD_SMK37
+#include "smk_sustain.h"
+#else
+static void sustain_apply(void) { ctl_sustain = midi_sustain; }
+#endif
+
 static uint8_t midi_back[4];                    /* a message left for the main loop (app_idle met a program change) */
 static void midi_in(uint32_t notes_only)
 {
@@ -2314,7 +2322,7 @@ static void midi_in(uint32_t notes_only)
         else if (kind == 0xC0u && d1 < NPROG) { trk_load(set.midi_ch ? 0u : seq_trk, d1); dirty_hdr = dirty_page = dirty_tags = dirty_steps = 1; }
         else if (kind == 0xB0u) {
             if (d1 == 7u) ctl_cc7 = d2;
-            else if (d1 == 64u) ctl_sustain = d2 >= 64u;
+            else if (d1 == 64u) { midi_sustain = d2 >= 64u; sustain_apply(); }
             else if (d1 == 120u || d1 == 123u) ctl_panic = 1;
             else if (cc_map[d1]) {
                 uint32_t p = cc_map[d1] - 1u;
@@ -2349,6 +2357,8 @@ static void app_idle(void)                      /* lcd.c while a strip goes out,
     keys_in(1);
 #if BOARD_SMK37
     smk_outer((uint32_t)(KEY0 + 12 * keyboard_base_octave()), 1, &dirty_steps);
+    smk_sustain_poll();
+    smk_midi_controls_poll();
     smk_wheels(); /* service physical controllers while LCD transfers/rendering yield */
 #endif
     midi_in(1);
@@ -2704,6 +2714,7 @@ static void app_main(void)
          * then only lets it go); PLAY, REC, OCT work inside a layer */
         b = fm1_input_edges(&rel);
 #if BOARD_SMK37
+        b = smk_panic_buttons(b, &rel);
         if(pb_confirm&&(b>>BTN_HOME&1u)){pb_cancel();b&=~(1u<<BTN_HOME);}
         b=save_button_poll(b,rel);
         b=pf_home_poll(b,rel);
@@ -2866,6 +2877,8 @@ static void app_main(void)
         smk_control_seen = smk_control_context();
         smk_faders(&dirty_page, &dirty_hdr, &dirty_tags);
         smk_wheels();
+        smk_sustain_poll();
+        smk_midi_controls_poll();
 #endif
         midi_in(0);
         if (ctl_ext_quarter && fm1_ms - clk_last > 1000u) { ctl_ext_quarter = 0; clk_n = 0; }   /* (the clock stopped: our own tempo) */
