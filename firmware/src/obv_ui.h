@@ -176,6 +176,16 @@ static void ui_header(uint32_t prog, const uint8_t *name, uint32_t edited, const
     cv_text(66, 4, &FONT_S, n, trk ? c : C_CREAM);
     cv_text(54, 22, &FONT_S, tags, C_DIMT);
     draw_logo_small(240 - 4 - text_w(&FONT_S, "SMKSYNTH"), 4);
+#if BOARD_SMK37
+    /* Below the logo, beyond the longest header tags; no extra LCD region.
+     * Same four-bar indication as SMKTRON, red only in the lowest band. */
+    {
+        uint16_t color=obv_battery.level==1u?C_RED:C_DIMT;
+        cv_rect(216,25,18,10,color);cv_rect(234,28,2,4,color);
+        cv_rect(218,27,14,6,C_PANEL);
+        for(uint32_t bar=0;bar<obv_battery.level;bar++)cv_rect(218+(int32_t)bar*3,27,2,6,color);
+    }
+#endif
     cv_rect(0, 42, 240, 1, C_RULE);
     cv_blit(0, 0);
 }

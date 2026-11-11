@@ -898,6 +898,9 @@ static void randomize(void)
 }
 
 /* ---- the screen (obv_ui.h draws; this decides what and when) */
+#if BOARD_SMK37
+#include "obv_battery.h"
+#endif
 #include "obv_ui.h"
 
 static void fmt_u(char *s, uint32_t v)          /* decimal, no leading zeros */
@@ -2664,6 +2667,9 @@ static void app_main(void)
     for (;;) {
         uint32_t rel, b, lit = 0, base = (uint32_t)(KEY0 + 12 * keyboard_base_octave()), np = page;
         platform_poll();
+#if BOARD_SMK37
+        if(obv_battery_poll(fm1_ms,fm1_in.batt))dirty_hdr=1;
+#endif
 #if OBV_VOICE_HW && !defined(OBV_HOST)
         b1_ready=1;
         static unsigned b1_shown;
