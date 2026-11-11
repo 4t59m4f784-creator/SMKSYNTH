@@ -30,6 +30,7 @@ jobs:
           mkdir -p build
           cc -O2 -o build/backup_server tests/backup_server.c
           node tests/backup_compatibility_test.mjs --protocol
+          sh tests/run_elite_tests.sh
           python3 tools/package_release.py build/audit-site
           python3 tools/check_public_web.py build/audit-site
           node tests/simulator_midi_test.mjs

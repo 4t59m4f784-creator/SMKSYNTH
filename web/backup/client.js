@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {canRestore,supportedFirmware} from './compatibility.js?v=backup-exp-1';
+import {canRestore,supportedFirmware} from './compatibility.js?v=backup-elite2';
 import {BackupClient,unpack} from './legacy-client.js';
 import {crc32,SIZE} from './bank.js';
 const prefix=[125,83,77,75,66,1];
@@ -9,7 +9,7 @@ function pack(a){let v=0,bits=0,out=[];for(const b of a){v|=b<<bits;bits+=8;whil
 const le=n=>Uint8Array.of(n&255,n>>>8&255,n>>>16&255,n>>>24);
 export function expand(a,n){if(!a.length)throw Error('Bloco vazio.');if(a[0]===0){if(a.length!==n+1)throw Error('Bloco incompleto.');return a.slice(1);}if(a[0]!==1||(a.length-1)%2)throw Error('Compressão inválida.');const out=new Uint8Array(n);let k=0;for(let i=1;i<a.length;i+=2){if(!a[i]||k+a[i]>n)throw Error('Run inválido.');out.fill(a[i+1],k,k+a[i]);k+=a[i];}if(k!==n)throw Error('Run incompleto.');return out;}
 export class BankClient extends BackupClient{
- constructor(link,firmware='19615'){super(link);this.firmware=firmware;this.stats={commands:0,retries:0,rxBytes:0,txBytes:0};}
+ constructor(link,firmware='19615',model='SMK-37 Pro'){super(link);this.firmware=firmware;this.model=model;this.stats={commands:0,retries:0,rxBytes:0,txBytes:0};}
  async command(cmd,off=0,n=0,payload=null){
   const seq=++this.seq&16383,r=[...prefix,cmd,seq&127,seq>>7,off&127,off>>7&127,off>>14&127,n&127,n>>7];r.push(r.reduce((a,b)=>a^b,0));
   const extra=payload?[...pack(payload),...pack(le(crc32(payload)))]:[],wire=[240,...r,...extra,247];
@@ -26,12 +26,12 @@ export class BankClient extends BackupClient{
    }
   }throw Error('Sem resposta válida. Se a restauração já começou, retome com o mesmo arquivo.');
  }
- async check(){if(!supportedFirmware(this.firmware))throw Error('Firmware não compatível com esta ferramenta: '+this.firmware);const info=await this.command(1);if(new TextDecoder().decode(info.slice(0,7))!=='SMK16P1'||info.length!==11||new DataView(info.buffer,info.byteOffset).getUint32(7,true)!==SIZE)throw Error('Layout incompatível.');if(canRestore(this.firmware)&&new TextDecoder().decode(await this.command(5))!=='B2R1')throw Error('B2 incompatível.');}
+ async check(){if(!supportedFirmware(this.firmware,this.model))throw Error('Firmware não compatível com esta ferramenta: '+this.firmware);const info=await this.command(1);if(new TextDecoder().decode(info.slice(0,7))!=='SMK16P1'||info.length!==11||new DataView(info.buffer,info.byteOffset).getUint32(7,true)!==SIZE)throw Error('Layout incompatível.');if(canRestore(this.firmware,this.model)&&new TextDecoder().decode(await this.command(5))!=='B2R1')throw Error('B2 incompatível.');}
  async readBank(progress=()=>{},cancel=()=>false,verify=true){const bank=new Uint8Array(SIZE);for(let off=0;off<SIZE;off+=512){if(cancel())throw Error('Exportação cancelada.');bank.set(expand(await this.command(6,off,512),512),off);progress((off+512)/SIZE*(verify?0.85:1));}if(verify)for(let off=0;off<SIZE;off+=4096){if(cancel())throw Error('Exportação cancelada.');const c=await this.command(7,off,4096);if(c.length!==4||new DataView(c.buffer,c.byteOffset).getUint32(0,true)!==crc32(bank.subarray(off,off+4096)))throw Error('Leitura e conferência divergem; arquivo não criado.');progress(.85+.15*(off+4096)/SIZE);}return bank;}
  async export(progress=()=>{},cancel=()=>false){if(this.firmware==='19614')return super.export(progress,cancel);await this.check();await this.command(2);try{return await this.readBank(progress,cancel);}finally{await this.command(4).catch(()=>{});}}
- async state(){if(!canRestore(this.firmware))return null;const a=await this.command(12);if(a.length!==105)throw Error('Estado incompleto.');return {pending:!!a[0],valid:!!a[1],complete:!!a[2],sha:hex(a.slice(3,35)),marks:a.slice(35)};}
+ async state(){if(!canRestore(this.firmware,this.model))return null;const a=await this.command(12);if(a.length!==105)throw Error('Estado incompleto.');return {pending:!!a[0],valid:!!a[1],complete:!!a[2],sha:hex(a.slice(3,35)),marks:a.slice(35)};}
  async restore(bank,sha,progress=()=>{}){
-  if(!canRestore(this.firmware))throw Error('Restauração exige B2.');await this.check();
+  if(!canRestore(this.firmware,this.model))throw Error('Restauração exige B2.');await this.check();
   if(bank.length!==SIZE||await digest(bank)!==sha)throw Error('Banco não corresponde ao hash.');
   const meta=new Uint8Array(36);meta.set(Uint8Array.from(sha.match(/../g),x=>parseInt(x,16)));meta.set(le(crc32(bank)),32);
   await this.command(8,0,36,meta);const state=await this.state();if(!state.pending||!state.valid||state.sha!==sha)throw Error('Journal não corresponde ao arquivo.');

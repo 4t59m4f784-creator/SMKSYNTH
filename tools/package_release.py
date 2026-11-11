@@ -22,7 +22,7 @@ def package(destination,reuse_release=False):
   (out/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.name+'\n' for p in assets))
  dest=Path(destination);dest.mkdir(parents=True,exist_ok=True)
  for name in ['index.html','style.css','i18n.js']:shutil.copy2(ROOT/'web/site'/name,dest/name)
- for source,name in [(ROOT/'web/install','install'),(ROOT/'web/backup','backup'),(ROOT/'web/simulator','simulator'),(ROOT/'docs','docs'),(ROOT/'docs/images','assets'),(out,'downloads')]:shutil.copytree(source,dest/name,dirs_exist_ok=True)
+ for source,name in [(ROOT/'web/install','install'),(ROOT/'web/install-elite','install-elite'),(ROOT/'web/backup','backup'),(ROOT/'web/simulator','simulator'),(ROOT/'docs','docs'),(ROOT/'docs/images','assets'),(out,'downloads')]:shutil.copytree(source,dest/name,dirs_exist_ok=True)
  for name in ['README.md','LICENSE','LICENSING.md','CREDITS.md','CHANGELOG.md','RELEASE.json']:shutil.copy2(ROOT/name,dest/name)
  print(json.dumps(dict(destination=str(dest),version=version,source_sha256=sha(archive))))
 if __name__=='__main__':
