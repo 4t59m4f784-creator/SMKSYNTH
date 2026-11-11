@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
+import {canRestore,supportedFirmware} from './compatibility.js?v=backup-exp-1';
 import {BackupClient,unpack} from './legacy-client.js';
 import {crc32,SIZE} from './bank.js';
 const prefix=[125,83,77,75,66,1];
@@ -25,12 +26,12 @@ export class BankClient extends BackupClient{
    }
   }throw Error('Sem resposta válida. Se a restauração já começou, retome com o mesmo arquivo.');
  }
- async check(){const info=await this.command(1);if(new TextDecoder().decode(info.slice(0,7))!=='SMK16P1'||info.length!==11||new DataView(info.buffer,info.byteOffset).getUint32(7,true)!==SIZE)throw Error('Layout incompatível.');if(['19615','19616','19617','19618'].includes(this.firmware)&&new TextDecoder().decode(await this.command(5))!=='B2R1')throw Error('B2 incompatível.');}
+ async check(){if(!supportedFirmware(this.firmware))throw Error('Firmware não compatível com esta ferramenta: '+this.firmware);const info=await this.command(1);if(new TextDecoder().decode(info.slice(0,7))!=='SMK16P1'||info.length!==11||new DataView(info.buffer,info.byteOffset).getUint32(7,true)!==SIZE)throw Error('Layout incompatível.');if(canRestore(this.firmware)&&new TextDecoder().decode(await this.command(5))!=='B2R1')throw Error('B2 incompatível.');}
  async readBank(progress=()=>{},cancel=()=>false,verify=true){const bank=new Uint8Array(SIZE);for(let off=0;off<SIZE;off+=512){if(cancel())throw Error('Exportação cancelada.');bank.set(expand(await this.command(6,off,512),512),off);progress((off+512)/SIZE*(verify?0.85:1));}if(verify)for(let off=0;off<SIZE;off+=4096){if(cancel())throw Error('Exportação cancelada.');const c=await this.command(7,off,4096);if(c.length!==4||new DataView(c.buffer,c.byteOffset).getUint32(0,true)!==crc32(bank.subarray(off,off+4096)))throw Error('Leitura e conferência divergem; arquivo não criado.');progress(.85+.15*(off+4096)/SIZE);}return bank;}
  async export(progress=()=>{},cancel=()=>false){if(this.firmware==='19614')return super.export(progress,cancel);await this.check();await this.command(2);try{return await this.readBank(progress,cancel);}finally{await this.command(4).catch(()=>{});}}
- async state(){if(!['19615','19616','19617','19618'].includes(this.firmware))return null;const a=await this.command(12);if(a.length!==105)throw Error('Estado incompleto.');return {pending:!!a[0],valid:!!a[1],complete:!!a[2],sha:hex(a.slice(3,35)),marks:a.slice(35)};}
+ async state(){if(!canRestore(this.firmware))return null;const a=await this.command(12);if(a.length!==105)throw Error('Estado incompleto.');return {pending:!!a[0],valid:!!a[1],complete:!!a[2],sha:hex(a.slice(3,35)),marks:a.slice(35)};}
  async restore(bank,sha,progress=()=>{}){
-  if(!['19615','19616','19617','19618'].includes(this.firmware))throw Error('Restauração exige B2.');await this.check();
+  if(!canRestore(this.firmware))throw Error('Restauração exige B2.');await this.check();
   if(bank.length!==SIZE||await digest(bank)!==sha)throw Error('Banco não corresponde ao hash.');
   const meta=new Uint8Array(36);meta.set(Uint8Array.from(sha.match(/../g),x=>parseInt(x,16)));meta.set(le(crc32(bank)),32);
   await this.command(8,0,36,meta);const state=await this.state();if(!state.pending||!state.valid||state.sha!==sha)throw Error('Journal não corresponde ao arquivo.');
