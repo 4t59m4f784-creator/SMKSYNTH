@@ -577,7 +577,9 @@ static void engine_events(void)
     uint32_t sus = 0, p;
     for (p = 0; p < NPART; p++) sus |= part_sus(p) << p;
     if (ctl_panic) {
+        uint32_t hard = ctl_panic > 1u;
         ctl_panic = 0;
+        if (hard) { nq_r = nq_w; memset(vc, 0, sizeof vc); }
         for (p = 0; p < NPART; p++) {
             obv_pending_n[p]=0;
             parts_off(p);

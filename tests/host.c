@@ -43,7 +43,7 @@ static struct {
     uint32_t notes, buttons, frames, adc_ok, adc_miss;
     uint64_t keys;
     uint8_t key_vel[FM1_NKEY], fader[4];
-    uint16_t wheel[2], batt, pad_raw[16], pad_base[16];
+    uint16_t wheel[2], pedal, batt, pad_raw[16], pad_base[16];
 } fm1_in = {.wheel = {535, 620}};               /* (the wheels at rest, as a unit reads them) */
 static uint8_t smk_store_cleared, smk_trim_ok;
 static uint32_t smk_jedec;
@@ -233,7 +233,12 @@ static int midi_get(uint8_t *st, uint8_t *d1, uint8_t *d2)
     mq_r++;
     return 1;
 }
-static void midi_send(uint32_t st, uint32_t d1, uint32_t d2) { printf("%6u ms  MIDI out %02X %u %u\n", fm1_ms, st, d1, d2); }
+static unsigned host_midi_blocked, host_midi_count;
+static uint8_t host_midi_sent[256][3];
+static int midi_send_ready(void) { return !host_midi_blocked; }
+static void midi_send(uint32_t st, uint32_t d1, uint32_t d2) {
+    unsigned i=host_midi_count++%256u;host_midi_sent[i][0]=st;host_midi_sent[i][1]=d1;host_midi_sent[i][2]=d2;
+    printf("%6u ms  MIDI out %02X %u %u\n", fm1_ms, st, d1, d2); }
 
 static void app_audio(int32_t *out, uint32_t n);
 static void app_main(void);
