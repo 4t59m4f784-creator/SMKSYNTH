@@ -4,7 +4,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: pages
+  group: smksynth-publication
   cancel-in-progress: false
 jobs:
   deploy:
@@ -18,12 +18,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
-      - run: python3 tools/prepare_public_site.py
-      - run: python3 tools/check_publication.py
+      - run: python3 tools/package_release.py build/public-site
+      - run: python3 tools/check_public_web.py build/public-site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: site
+          path: build/public-site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
