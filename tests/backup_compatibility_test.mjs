@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {webcrypto} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import vm from 'node:vm';
-import {B2_FIRMWARES,canRestore,supportedFirmware,supportedIdentity} from '../web/backup/compatibility.js';
+import {B2_FIRMWARES,ELITE_FIRMWARES,canRestore,supportedFirmware,supportedIdentity} from '../web/backup/compatibility.js';
 import {BankClient,digest} from '../web/backup/client.js';
 import {parseFile} from '../web/backup/file.js';
 if(!globalThis.crypto)Object.defineProperty(globalThis,'crypto',{value:webcrypto});
@@ -37,24 +37,29 @@ for(const model of ['SMK-37 Elite','FM-1','ota-SMK-37 Pro'])assert(!supportedIde
 await assert.rejects(()=>parseFile(file('19628',{sha256:'0'.repeat(64)})),/SHA/);
 await assert.rejects(()=>parseFile(file('19628',{layout:'other'})),/Formato/);
 await assert.rejects(()=>parseFile(file('19628',{model:'SMK-37 Elite'})),/Formato/);
+for(const firmware of ELITE_FIRMWARES){
+ assert(supportedIdentity({model:'SMK-37 Elite',text:'SMK-37 Elite_'+firmware}));
+ assert.deepEqual((await parseFile(file(firmware,{model:'SMK-37 Elite'}))).bank,bank);
+}
+await assert.rejects(()=>parseFile(file('19618',{model:undefined})),/Formato/);
 // Exercise the real page's Connect handler as well as its shared compatibility rules.
 const app=fs.readFileSync(new URL('../web/backup/app.js',import.meta.url),'utf8').replace(/^import .*$/gm,'');
-for(const firmware of ['19614',...B2_FIRMWARES,'19629']){
+for(const [model,firmware] of [...['19614',...B2_FIRMWARES,'19629'].map(f=>['SMK-37 Pro',f]),...ELITE_FIRMWARES.map(f=>['SMK-37 Elite',f]),['SMK-37 Elite','19628']]){
  const elements=new Map();const get=id=>{if(!elements.has(id))elements.set(id,{disabled:false,textContent:''});return elements.get(id);};
  let checks=0;
  vm.runInNewContext(app,{canRestore,supportedIdentity,document:{getElementById:get},window:{addEventListener(){}},navigator:{requestMIDIAccess:async()=>({})},
-  Updater:class{async find(filter){const id={model:'SMK-37 Pro',text:'SMK-37 Pro_'+firmware};return filter(id)?{id,link:{}}:null;}},
+  Updater:class{async find(filter){const id={model,text:model+'_'+firmware};return filter(id)?{id,link:{}}:null;}},
   BankClient:class{async check(){checks++;}async state(){return null;}}
  });
  await get('connect').onclick();
- assert.equal(checks,supportedFirmware(firmware)?1:0);
- assert.equal(!!get('export').disabled,!supportedFirmware(firmware));
+ assert.equal(checks,supportedFirmware(firmware,model)?1:0);
+ assert.equal(!!get('export').disabled,!supportedFirmware(firmware,model));
  assert(get('restore').disabled,'Restore must require a file and a fresh backup');
- if(supportedFirmware(firmware))assert(get('device').textContent.includes(firmware));
- else assert(get('status').textContent.includes('SMK-37 Pro_'+firmware),'Show the rejected identity');
+ if(supportedFirmware(firmware,model))assert(get('device').textContent.includes(firmware));
+ else assert(get('status').textContent.includes(model+'_'+firmware),'Show the rejected identity');
 }
 console.log('PASS: stable/SS/UI/ENDLESS/SP1 identities and files; B2 signature, unknown identity, model, layout and SHA guards before restore writes');
-if(process.argv.includes('--protocol'))for(const firmware of B2_FIRMWARES){
- execFileSync(process.execPath,[new URL('./release_backup_client_test.mjs',import.meta.url).pathname,new URL('../factory/bank-SMK16P1.bin',import.meta.url).pathname,firmware],{stdio:'pipe'});
- console.log(`PASS: ${firmware} full export, CRC retry, interrupted restore/resume and exact bank readback`);
+if(process.argv.includes('--protocol'))for(const [model,firmware] of [...B2_FIRMWARES.map(f=>['SMK-37 Pro',f]),...ELITE_FIRMWARES.map(f=>['SMK-37 Elite',f])]){
+ execFileSync(process.execPath,[new URL('./release_backup_client_test.mjs',import.meta.url).pathname,new URL('../factory/bank-SMK16P1.bin',import.meta.url).pathname,firmware,model],{stdio:'pipe'});
+ console.log(`PASS: ${model}_${firmware} full export, CRC retry, interrupted restore/resume and exact bank readback`);
 }

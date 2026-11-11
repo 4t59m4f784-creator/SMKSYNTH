@@ -50,7 +50,14 @@ def check(site):
             if 'docs/' in link and link.endswith('.md') and not link.endswith('.en.md'):
                 dependency(page, link[:-3] + '.en.md')
 
-    for folder in ('install', 'backup', 'simulator'):
+    parser = Links()
+    elite = site / 'install-elite/index.html'
+    parser.feed(elite.read_text())
+    assert 'language.js' in (elite.parent / 'controller.js').read_text()
+    for link in parser.links:
+        dependency(elite, link)
+
+    for folder in ('install', 'install-elite', 'backup', 'simulator'):
         for script in (site / folder).glob('*.js'):
             for link in re.findall(r'''(?:from\s*|fetch\(|addModule\(|new URL\()\s*['"]([^'"]+)['"]''', script.read_text()):
                 dependency(script, link)
