@@ -1,16 +1,36 @@
 {
-  "release": {
-    "name": "Instalar SMKSYNTH 1.0.3",
-    "product": "SMK-37 Pro_19618",
-    "size": 651327,
-    "sha": "f84844b56efc8421822a8ec64f2497c6759c3f71732d2a2a58d2f149e726c926",
-    "url": "./firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc"
+  "pro": {
+    "model": "SMK-37 Pro",
+    "release": {
+      "name": "SMKSYNTH 1.1.0 · first-install",
+      "product": "SMK-37 Pro_19634",
+      "url": "./firmware/SMKSYNTH-1.1.0-first-install-SMK37-Pro.fwsc",
+      "size": 651327,
+      "sha": "e0e2c4a9eb2412f4dcbd802e39fabb54c83725d62ac35213b39d99f33fb2daf7"
+    },
+    "update": {
+      "name": "SMKSYNTH 1.1.0 · update",
+      "product": "SMK-37 Pro_19634",
+      "url": "./firmware/SMKSYNTH-1.1.0-update-SMK37-Pro.fwsc",
+      "size": 651819,
+      "sha": "4e4c777f0ff9b1b7e5a8292bf6b13aadda6937c14825291b65019c94a0d12909"
+    }
   },
-  "update": {
-    "name": "Atualizar SMKSYNTH 1.0.3",
-    "product": "SMK-37 Pro_19618",
-    "size": 651819,
-    "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870",
-    "url": "./firmware/SMKSYNTH-1.0.3-update-SMK37-Pro.fwsc"
+  "elite": {
+    "model": "SMK-37 Elite",
+    "release": {
+      "name": "SMKSYNTH 1.1.0 · first-install",
+      "product": "SMK-37 Elite_19634",
+      "url": "./firmware/SMKSYNTH-1.1.0-first-install-SMK37-Elite.fwsc",
+      "size": 651327,
+      "sha": "b1fd98d3b5833e4c2fb29475cde7a3db42fc3f853959e8f58fb979c264d1ab34"
+    },
+    "update": {
+      "name": "SMKSYNTH 1.1.0 · update",
+      "product": "SMK-37 Elite_19634",
+      "url": "./firmware/SMKSYNTH-1.1.0-update-SMK37-Elite.fwsc",
+      "size": 651819,
+      "sha": "f98ea632bbbfcad3701fecfd89e8d3ebbfa1d7d31989260c3ffaeb63c10c23a1"
+    }
   }
 }

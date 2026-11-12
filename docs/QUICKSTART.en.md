@@ -1,8 +1,8 @@
-# SMKSYNTH 1.0.3 - Quick start guide
+# SMKSYNTH 1.1.0 - Quick start guide
 
-[PDF](pdf/SMKSYNTH-1.0.3-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.1.0-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Reference: firmware 1.0.3, SMK-37 Pro_19618.
+Reference: firmware 1.1.0, SMK-37 Pro_19634 / SMK-37 Elite_19634.
 
 ## Contents
 
@@ -10,6 +10,8 @@ Reference: firmware 1.0.3, SMK-37 Pro_19618.
 - Quick start / 2. Favourites and Split/Layer
 - Quick start / 3. Patterns and drums
 - Quick start / 4. Record, save and restore
+- MIDI OUT - USB and TRS/DIN
+- Sustain and MIDI PANIC
 
 ## AI-assisted development
 
@@ -17,7 +19,7 @@ Developed using AI: Marcus Padrini defined and directed the experience, created 
 
 ## Quick start / 1. First steps
 
-SMKSYNTH 1.0.3 - M-VAVE SMK-37 Pro. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
+SMKSYNTH 1.1.0 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
 
 1. Set K8/master to a suitable level and press PLAY.
 2. K6 selects A-D; K7 changes the part preset.
@@ -97,6 +99,40 @@ With ANALOG selected, an already selected Drum Pads bank becomes inactive. Retur
 6. Restoration replaces the entire bank: export the current one, choose the .smksynth and confirm. RESTORE PENDING requires the same file.
 
 Holding REC over 1.2 s clears the selected track. Persistent transpose: SEQ > TRANSPOSE K1 enables capture; K2 adjusts, K3 resets. Performance K4 KEY TR disables capture without resetting its value.
+
+## MIDI OUT - USB and TRS/DIN
+
+MIDI output transmits all four parts, independently of panel focus. GLOBAL > MIDI CH sets A’s base channel (1-13). B, C and D use base +1, +2 and +3. OMNI input uses output channels 1-4.
+
+| Part | Output channel | Example: base 3 |
+| --- | --- | --- |
+| A / 1 | BASE | 3 |
+| B / 2 | BASE + 1 | 4 |
+| C / 3 | BASE + 2 | 5 |
+| D / 4 | BASE + 3 | 6 |
+
+USB and TRS receive the same musical messages. Keys, pads, Split/Layer, arpeggios and sequencers transmit notes. DRUM-X uses its part channel, with no mandatory channel 10. Split/Layer transmits each part’s actual notes and octaves. Every Note Off retains the destination of its original Note On.
+
+Connect 3.5 mm MIDI OUT to the destination’s MIDI IN using the keyboard’s appropriate TRS-DIN adapter. Audio uses a separate jack. TRS works on battery without a computer; USB requires a MIDI host.
+
+Pitch Bend is sent in 14 bits (centre 8192); the mod wheel uses CC1 (0-127). Both follow only the selected part, including Split/Layer, matching the local engine. Changing focus neutralizes the previous channel. Wheel state is resent after Panic.
+
+MIDI Clock/Start/Stop output and automatic Program Change on internal preset selection are not included. Received notes are not simple MIDI Thru; generated arpeggios can transmit. Incoming bend remains global on the base channel, inherited from the engine; this differs from per-part output.
+
+## Sustain and MIDI PANIC
+
+### Sustain pedal
+
+1. Connect the pedal before power-on and keep it released during startup.
+2. Switch-pedal polarity is detected at startup. No half-pedal support; restart after changing pedals.
+3. Press the pedal, play and release a chord: it continues until the pedal is released. Sustain applies to the four melodic parts, including Split/Layer and ARP. DRUM-X keeps its internal one-shot behaviour.
+4. CC64 is sent to the four part channels and notes still held on previous channels. Pedal-up releases those channels. Physical and received MIDI sustain are independently combined.
+
+### Panic: GLOBE + PLAY
+
+Press GLOBE and PLAY together in either order. This stops PLAY/REC, clears HOLD/sustain and pending notes, and cuts internal voices. USB and TRS send CC64=0, CC123=0 and CC120=0 on all 16 channels. Release the pedal before using sustain again. Effect tails may finish normally.
+
+1.1.0 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
 
 ## Links
 

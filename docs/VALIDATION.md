@@ -1,3 +1,17 @@
+# Validação da versão pública 1.1.0
+
+- Marcus aprovou todas as funções da base MIDI M1.2 no SMK-37 Pro: MIDI TRS/USB, pitch bend e mod wheel por parte, pedal de sustain, MIDI PANIC e correção de notas presas. Um usuário real validou o fluxo de instalação no SMK-37 Elite.
+- Os pacotes finais 1.1.0 foram recompilados dessa base com identificação própria (19634 em ambos os modelos). A validação física citada é a da base testada e do fluxo Elite, não uma nova instalação destes quatro arquivos finais.
+- Aplicação: 167200 bytes; RAM estática: 94480/98304 bytes; pool: 325984/344064 bytes; loader: 7703 bytes.
+- Instalador unificado: quatro pacotes separados por modelo/operação, hashes e CRCs, seleção automática, recusa de troca de modelo/dispositivo, origem desconhecida e loader incompatível. Retomada vinculada ao modelo, pacote e origem inicial. Instalação inicial prepara o banco; atualização o preserva.
+- Regressão em host: notas por parte; CC1/pitch bend/CC64; Panic em 16 canais; liberação de notas após mudança de modo; sustain com outras teclas pressionadas; split/layer e sequenciador; USB; backup; simulador e PT/EN. Testes de flash Elite incluem interrupção/retomada e preservação do banco.
+- Os quatro pacotes finais são inspecionados quanto a modelo, identidade, loader, aplicação e dados de fábrica. Documentação e links públicos são verificados na publicação.
+- ENDLESS permanece separado. USB áudio mantém a limitação conhecida na gravação de vídeo do iPhone. Testes de host não medem CPU nem substituem a validação no instrumento.
+
+Hashes: [RELEASE.json](../RELEASE.json). Download checksums: `releases/1.1.0/SHA256SUMS.txt`.
+
+## Registro histórico da 1.0.3
+
 # Validação da versão pública 1.0.3
 
 - Runtime: SUPER SS3 (`0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`), aprovado por Marcus no SMK-37 Pro após testes de acordes.

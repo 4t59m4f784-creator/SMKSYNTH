@@ -23,3 +23,7 @@ SMKSYNTH was developed using AI. Marcus Padrini defined the goals and performanc
 | Propostas técnicas, geração e revisão de código das adaptações e ferramentas, documentação e materiais gráficos, sob orientação de Marcus / Technical proposals, code generation and review for adaptations and tools, documentation and graphics, under Marcus’s direction | ChatGPT / OpenAI (assistência de IA / AI assistance) |
 
 [LICENSING.md](LICENSING.md) preserva os avisos originais, referências e licenças de componentes. Não há samples de terceiros ou firmware oficial M‑VAVE redistribuído.
+
+## MIDI TRS/USB — 1.1.0
+
+SMK-37 UART1 TX hardware driver adapted from `nzimas/tonitor-smk37/firmware/hal/smk_uart_tx.h` (blob `90497ba274eedf4985eeae2d8b46684d8b91903b`), credited there to M. Geisler (genkigenki/makkuro), from the SLOOP SMK37 branch. GPL-3.0-only. MIDI part routing, ownership ledger and transport integration are SMKSYNTH adaptations.

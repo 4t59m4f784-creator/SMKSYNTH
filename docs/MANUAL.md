@@ -1,8 +1,8 @@
-# SMKSYNTH 1.0.3 - Manual completo
+# SMKSYNTH 1.1.0 - Manual completo
 
-[PDF](pdf/SMKSYNTH-1.0.3-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.1.0-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Referência: firmware 1.0.3, SMK-37 Pro_19618.
+Referência: firmware 1.1.0, SMK-37 Pro_19634 / SMK-37 Elite_19634.
 
 ## Índice
 
@@ -23,6 +23,8 @@ Referência: firmware 1.0.3, SMK-37 Pro_19618.
 - 15. Salvamento, instalação e backup
 - 16. Simulador, problemas e referência
 - SUPER / Supersaw
+- MIDI OUT - USB e TRS/DIN
+- Sustain e MIDI PANIC
 - Apêndice MIDI / 1
 - Apêndice MIDI / 2
 - Apêndice MIDI / 3
@@ -34,7 +36,7 @@ Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os 
 
 ## 1. Visão geral e navegação
 
-Firmware 1.0.3 para M-VAVE SMK-37 Pro. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
+Firmware 1.1.0 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
 
 ![knobs](diagrams/knobs-pt.svg)
 
@@ -322,7 +324,7 @@ Mute e solo por parte: GLOBE segurado mais as teclas correspondentes. Os estados
 | --- | --- | --- | --- | --- |
 | GLOBAL | TEMPO | CLICK | MIDI CH | TUNE |
 
-TEMPO: 40-240 BPM. CLICK: OFF, REC, ON ou COUNT-IN. Em COUNT-IN, arme REC parado e use PLAY para a contagem. MIDI CH: OMNI ou canal base 1-16. TUNE: -50 a +50 cents. Na página GLOBAL, SCALE alterna SYNC AUTO / INTERNAL.
+TEMPO: 40-240 BPM. CLICK: OFF, REC, ON ou COUNT-IN. Em COUNT-IN, arme REC parado e use PLAY para a contagem. MIDI CH: OMNI ou canal base 1-13. TUNE: -50 a +50 cents. Na página GLOBAL, SCALE alterna SYNC AUTO / INTERNAL.
 
 | Mensagem | Comportamento |
 | --- | --- |
@@ -333,7 +335,7 @@ TEMPO: 40-240 BPM. CLICK: OFF, REC, ON ou COUNT-IN. Em COUNT-IN, arme REC parado
 | Pitch Bend / CC 1 | Pitch MIDI e profundidade de modulação; controles físicos têm roteamento da parte selecionada. |
 | Clock / Start / Continue / Stop | AUTO aceita relógio e transporte MIDI recebido; INTERNAL ignora essas mensagens. |
 
-As notas MIDI recebidas são absolutas: não aplique a elas a oitava física do SMK como se fossem teclas locais. A saída MIDI das teclas usa a oitava física; canal da parte selecionada (OMNI: canal 1). Não presuma que o instrumento transmite clock ou todas as tracks como um sequenciador MIDI externo.
+As notas MIDI recebidas são absolutas: não aplique a elas a oitava física do SMK como se fossem teclas locais. A saída MIDI USB/TRS transmite as quatro partes: A usa o canal-base; B-D os seguintes. OMNI transmite em 1-4. Teclas, pads, Split/Layer, ARP e sequenciadores enviam notas com suas oitavas e transposições. Não há MIDI Clock/Start/Stop de saída.
 
 O apêndice lista os CCs dos parâmetros ANALOG. Em DRUM-X, vários endereços internos são reutilizados para macros/lanes; use a interface DRUM para editar e o mapa de notas da seção 7 para acionar bateria.
 
@@ -348,10 +350,10 @@ O apêndice lista os CCs dos parâmetros ANALOG. Em DRUM-X, vários endereços i
 
 Salvamento manual: uma edição na tela não é uma escrita em flash. Pare o transporte, solte notas/sustain e aguarde a mensagem de conclusão. Pattern e preset pendentes bloqueiam outras operações que conflitem. Exporte somente depois de salvar no instrumento.
 
-1. Para primeira instalação, parta do firmware oficial M-VAVE SMK-37 Pro V016, identidade SMK-37 Pro_016. Use o M-UPGRADE oficial para retornar a essa versão.
+1. Para primeira instalação, parta do firmware oficial M-VAVE V016 do seu modelo Pro ou Elite. Use o M-UPGRADE oficial para retornar a essa versão.
 2. Exporte seu .smksynth antes de retornar ao oficial. A primeira instalação inicializa/substitui o banco.
 3. Use Chrome/Edge no computador, HTTPS, cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
-4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19618.
+4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19634 / SMK-37 Elite_19634.
 5. Se interromper, retome no mesmo navegador/site com o mesmo pacote. Não troque de instalador no meio.
 
 Backup: pare PLAY/REC, solte controles/notas e conecte a ferramenta. Exporte o banco atual nesta sessão antes de restaurar. Escolha o arquivo, revise e digite RESTAURAR (também na interface inglesa). Restauração substitui o banco inteiro; não mescla. Ao concluir, reinicie e confira seus sons.
@@ -373,7 +375,7 @@ Sua memória é local ao navegador/domínio. SAVE no painel grava nessa memória
 | Não grava notas | LENGTH maior que zero, K6 na parte correta, roteamento Split e REC/step entry corretos. |
 | Save não termina | Pare PLAY/REC, solte notas/sustain e aguarde silêncio. Não desligue durante a escrita. |
 | Exportação com sessão expirada | Pare tudo, aguarde saves, reinicie e reconecte antes de nova exportação. Não conte arquivo incompleto como backup válido. |
-| Instalador recusa firmware | Primeira instalação exige exatamente SMK-37 Pro_016; outras origens são bloqueadas. |
+| Instalador recusa firmware | Primeira instalação exige V016 do modelo conectado (Pro ou Elite); outras origens são bloqueadas. |
 
 Projeto independente. Síntese ANALOG: OberVave/zvenson; DRUM-X: JIANT; SUPER: originada do Clipper/3dSam (github.com/isod89/clipper-fm1); direção e testes SMKSYNTH: Marcus Padrini; soluções técnicas, código das adaptações e documentação com ChatGPT (OpenAI), sob sua orientação. Consulte CREDITS.md e LICENSING.md no repositório para todas as atribuições. GPL-3.0-only.
 
@@ -398,6 +400,40 @@ Os ajustes são salvos em presets, favoritos, cenas e backups. Sons antigos abre
 P mostra o pico de processamento em microssegundos; O conta blocos que excederam o prazo. Ambos reiniciam no boot. A implementação SS3 foi aprovada no instrumento por Marcus; o consumo depende da polifonia, do unison e dos efeitos.
 
 Origem: Clipper, de 3dSam, sobre Felucca, com curva e offsets de desafinação derivados da análise de Adam Szabo citada pelo Clipper. Fonte: https://github.com/isod89/clipper-fm1 . O SMKSYNTH adapta essa base com MIX independente e otimizações próprias; não é uma reprodução exata do Roland JP-8000/JP-8080. GPL-3.0-only; atribuições em CREDITS.md e LICENSING.md.
+
+## MIDI OUT - USB e TRS/DIN
+
+A saída MIDI transmite as quatro partes, independentemente da parte selecionada no painel. GLOBAL > MIDI CH define o canal-base de A (1-13). B, C e D usam base +1, +2 e +3. OMNI na recepção corresponde a canais de saída 1-4.
+
+| Parte | Canal de saída | Exemplo: base 3 |
+| --- | --- | --- |
+| A / 1 | BASE | 3 |
+| B / 2 | BASE + 1 | 4 |
+| C / 3 | BASE + 2 | 5 |
+| D / 4 | BASE + 3 | 6 |
+
+USB e TRS recebem as mesmas mensagens musicais. Teclas, pads, Split/Layer, arpejos e sequenciadores transmitem notas. DRUM-X usa o canal da sua parte, sem canal 10 obrigatório. Split/Layer transmite as notas reais de cada parte, com suas oitavas. Cada Note Off conserva o destino do Note On original.
+
+Conecte MIDI OUT de 3,5 mm ao MIDI IN do destino com o adaptador TRS-DIN adequado ao teclado. A saída de áudio é outro conector. TRS funciona com bateria e sem computador; USB requer host MIDI.
+
+Pitch Bend é enviado em 14 bits (centro 8192); mod wheel usa CC1 (0-127). Ambos acompanham somente a parte selecionada, inclusive em Split/Layer, como a engine local. Trocar a parte neutraliza o canal anterior. O estado das rodas é reenviado após Panic.
+
+Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program Change ao trocar um preset interno. Notas MIDI recebidas não fazem Thru simples; os arpejos gerados podem transmitir. A recepção de bend é global no canal-base, herdada da engine; isto é diferente do envio por parte.
+
+## Sustain e MIDI PANIC
+
+### Pedal de sustain
+
+1. Conecte o pedal antes de ligar e mantenha-o solto durante a inicialização.
+2. A polaridade de um pedal de chave é detectada ao ligar. Não há meio pedal; reinicie após trocar o pedal.
+3. Pressione o pedal, toque e solte um acorde: ele continua até soltar o pedal. O sustain atende as quatro partes melódicas, inclusive Split/Layer e ARP. DRUM-X mantém seu disparo único interno.
+4. CC64 é enviado aos canais das quatro partes e às notas ainda mantidas em canais anteriores. Ao soltar, esses canais recebem pedal off. O sustain físico e o recebido por MIDI têm controle independente.
+
+### Panic: GLOBE + PLAY
+
+Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
+
+A 1.1.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Apêndice MIDI / 1
 
@@ -491,7 +527,7 @@ Constantes: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. Para cada 
 
 ## Atualização e áudio USB
 
-Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões 1.0.x e SUPER SS1/SS2/SS3 são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A identidade pública continua SMK-37 Pro_19618.
+Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas, MIDI M1-M1.2 e testes compatíveis são aceitos e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A identidade pública continua SMK-37 Pro_19634 / SMK-37 Elite_19634.
 
 Áudio USB estéreo de 16 bits, 44,1/48 kHz: testado no Mac e no iPhone com AudioShare. Problema conhecido: vídeos gravados no iPhone com áudio USB podem conter cliques ou cortes.
 

@@ -1,0 +1,16 @@
+{
+  "release": {
+    "name": "Instalar SMKSYNTH 1.0.3",
+    "product": "SMK-37 Pro_19618",
+    "size": 651327,
+    "sha": "f84844b56efc8421822a8ec64f2497c6759c3f71732d2a2a58d2f149e726c926",
+    "url": "./firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc"
+  },
+  "update": {
+    "name": "Atualizar SMKSYNTH 1.0.3",
+    "product": "SMK-37 Pro_19618",
+    "size": 651819,
+    "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870",
+    "url": "./firmware/SMKSYNTH-1.0.3-update-SMK37-Pro.fwsc"
+  }
+}

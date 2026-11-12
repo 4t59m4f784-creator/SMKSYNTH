@@ -1,46 +1,47 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"release": {"name": "Instalar SMKSYNTH 1.0.3", "product": "SMK-37 Pro_19618", "size": 651327, "sha": "f84844b56efc8421822a8ec64f2497c6759c3f71732d2a2a58d2f149e726c926", "url": "./firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc"}, "update": {"name": "Atualizar SMKSYNTH 1.0.3", "product": "SMK-37 Pro_19618", "size": 651819, "sha": "9b2b779f7eaa9d5228fc93c314ae1aa4b9e3ff12ef0c0a11534123da2468e870", "url": "./firmware/SMKSYNTH-1.0.3-update-SMK37-Pro.fwsc"}});
-export const PENDING="smksynth.1.0.3.pending.v1";
-export async function validate(raw,kind){
- const p=PINS[kind];if(!p)throw Error('Operação inválida.');
- if(raw.length!==p.size)throw Error('Tamanho diferente do pacote esperado.');
- if(!crypto.subtle)throw Error('Abra este instalador em HTTPS para verificar o arquivo.');
- const sha=[...new Uint8Array(await crypto.subtle.digest('SHA-256',raw))].map(x=>x.toString(16).padStart(2,'0')).join('');
- if(sha!==p.sha)throw Error('SHA-256 diferente. Selecione o arquivo original, sem alterações.');
- const product=productOf(raw),image=logicalImage(raw);
- if(product!==p.product||!filesOk(image))throw Error('Identidade ou CRCs inválidos.');
- return {raw,image,product,sha};
+import {PINS} from './pins.js';
+import {t} from './language.js';
+export {PINS};
+export const PENDING='smksynth.1.1.0.pro-elite.pending.v1';
+const PRO=['19615','19616','19617','19618','19619','19620','19621','19622','19623','19624','19625','19626','19627','19628','19630','19631','19632','19633','19634'];
+const ELITE=['19618','19629','19634'];
+export function modelOf(id){
+ for(const model of Object.keys(PINS)){const name=PINS[model].model;if([name,'ota-'+name].includes(id?.model)&&new RegExp('^(ota-)?'+name+'_[0-9]{3,5}$').test(id?.text||''))return model;}
+ throw Error(t('Modelo não compatível. Conecte SMK-37 Pro ou SMK-37 Elite.','Unsupported model. Connect an SMK-37 Pro or SMK-37 Elite.'));
 }
-export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const originAllowed=(kind,source)=>kind==='release'?source==='SMK-37 Pro_016':kind==='update'&&['SMK-37 Pro_19617','SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621'].includes(source);
-export function modeFor(kind,id,pending){
- if(!PINS[kind])throw Error('Operação inválida.');
- if(!id?.text)throw Error('Conecte e consulte o teclado.');
- if(!['SMK-37 Pro','ota-SMK-37 Pro'].includes(id.model))throw Error('Modelo recusado: somente SMK-37 Pro.');
- if(originAllowed(kind,id.text))return 'install';
- if(id.text==='ota-SMK-37 Pro_900'&&(pending?.kind===kind&&pending.sha===PINS[kind].sha&&originAllowed(kind,pending.source)))return 'resume';
- throw Error('Escolha Instalar para M-VAVE V016 ou Atualizar para SMKSYNTH. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
+const allowed=(model,kind,source)=>{const name=PINS[model]?.model;if(!name)return false;return kind==='release'?source===name+'_016':kind==='update'&&(model==='pro'?PRO:ELITE).some(v=>source===name+'_'+v);};
+export async function validate(raw,model,kind){
+ const pin=PINS[model]?.[kind];if(!pin||raw.length!==pin.size)throw Error(t('Pacote ou tamanho incorreto.','Wrong package or size.'));
+ if(!globalThis.crypto?.subtle)throw Error(t('Use HTTPS e Chrome/Edge no computador.','Use HTTPS and desktop Chrome/Edge.'));
+ const sha=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),v=>v.toString(16).padStart(2,'0')).join('');
+ if(sha!==pin.sha)throw Error(t('O pacote não corresponde ao arquivo aprovado.','Package does not match the approved file.'));
+ const product=productOf(raw),image=logicalImage(raw);if(product!==pin.product||!filesOk(image))throw Error(t('Modelo ou integridade do pacote inválidos.','Invalid package model or integrity.'));
+ return {product,image,sha};
 }
-function guardFor(source){return (phase,id)=>{
- if(phase==='start'&&id.text!==source())throw Error('A identidade mudou antes da gravação: '+id.text);
- if(phase!=='start'&&id.text!=='ota-SMK-37 Pro_900')throw Error('Loader recusado: '+id.text);
-}}
+export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.model]?.[p.kind]?.sha===p.sha&&allowed(p.model,p.kind,p.source)?p:null;}catch{return null;}}
+export function chooseOperation(id,pending){
+ const model=modelOf(id),name=PINS[model].model;
+ if(id.text==='ota-'+name+'_900'){
+  if(pending?.model===model&&allowed(model,pending.kind,pending.source)&&pending.sha===PINS[model][pending.kind]?.sha)return {model,kind:pending.kind,mode:'resume',source:pending.source,deviceIdentity:id.text};
+  throw Error(t('Atualização anterior pendente. Retome pelo instalador que iniciou a transferência.','An earlier update is pending. Resume with the installer that started the transfer.'));
+ }
+ const kind=id.text===name+'_016'?'release':'update';if(!allowed(model,kind,id.text))throw Error(t('Firmware de origem não habilitado: ','Unsupported source firmware: ')+id.text);
+ return {model,kind,mode:'install',source:id.text,deviceIdentity:id.text};
+}
 export class InstallService{
- constructor(access,storage,log=()=>{},UpdaterType=Updater){this.access=access;this.storage=storage;this.log=log;this.UpdaterType=UpdaterType}
- async identify(){const up=new this.UpdaterType(this.access,this.log);const d=await up.find();if(!d)throw Error('Teclado não encontrado. Confira o cabo USB de dados e feche outros aplicativos MIDI.');d.link.close();return d.id}
- async execute(kind,buffers,step=()=>{}){
-  // Every install/return package must be present and pinned before a MIDI query.
-  const validated={};for(const k of Object.keys(PINS))validated[k]=await validate(buffers[k],k);
-  if(!PINS[kind])throw Error('Operação inválida.');const pkg=validated[kind];let source;
-  const up=new this.UpdaterType(this.access,this.log,{guard:guardFor(()=>source)});
-  const d=await up.find();if(!d)throw Error('Teclado não encontrado.');
-  const id=d.id;const pending=readPending(this.storage);d.link.close();const mode=modeFor(kind,id,pending);source=mode==='resume'?pending.source:id.text;
-  this.storage.setItem(PENDING,JSON.stringify({kind,sha:PINS[kind].sha,source}));
-  if(mode==='resume'){if(!await up.resume(pkg.image,step,{product:pkg.product}))throw Error('Retomada incompleta. Preserve o log.');}
-  else await up.install(pkg.image,pkg.product,step);
+ constructor(access,storage,log=()=>{},UpdaterType=Updater){Object.assign(this,{access,storage,log,UpdaterType});}
+ async identify(){const up=new this.UpdaterType(this.access,this.log);const d=await up.find();if(!d)throw Error(t('Teclado não encontrado. Confira o cabo USB e feche outros aplicativos MIDI.','Keyboard not found. Check the USB cable and close other MIDI apps.'));d.link.close();return d.id;}
+ async execute(selection,buffers,step=()=>{}){
+  const {model,kind}=selection||{};if(!PINS[model]?.[kind])throw Error(t('Operação inválida.','Invalid operation.'));
+  const checked={};for(const k of ['release','update'])checked[k]=await validate(buffers[model]?.[k]||new Uint8Array(),model,k);
+  const pkg=checked[kind];let current;
+  const guard=(phase,id)=>{if(phase==='start'&&id.text!==current)throw Error(t('A identidade mudou antes da gravação.','Identity changed before writing.'));if(phase!=='start'&&id.text!=='ota-'+PINS[model].model+'_900')throw Error(t('Loader de outro modelo recusado.','A different model loader was rejected.'));};
+  const up=new this.UpdaterType(this.access,this.log,{guard});const d=await up.find();if(!d)throw Error(t('Teclado não encontrado.','Keyboard not found.'));const id=d.id;d.link.close();current=id.text;
+  const actual=chooseOperation(id,readPending(this.storage));if(actual.model!==model||actual.kind!==kind||actual.deviceIdentity!==selection.deviceIdentity||actual.source!==selection.source)throw Error(t('O teclado mudou. Conecte e confira novamente.','The keyboard changed. Connect and check again.'));
+  this.storage.setItem(PENDING,JSON.stringify({model,kind,sha:pkg.sha,source:actual.source}));
+  if(actual.mode==='resume'){if(!await up.resume(pkg.image,step,{product:pkg.product}))throw Error(t('Retomada incompleta. Guarde o log.','Resume incomplete. Keep the log.'));}else await up.install(pkg.image,pkg.product,step);
   this.storage.removeItem(PENDING);return pkg.product;
  }
 }
-

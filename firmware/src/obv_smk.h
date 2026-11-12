@@ -87,7 +87,7 @@ static void smk_seq_pad_event(int32_t e,uint32_t *dirty)
                     uint32_t n = q < (pen_n ? pen_n : 1u) ? (pen_n ? pen_chord[q] : pen) : 0u;
                     smk_live[p][q] = (uint8_t)n;
                     if (!n) continue;
-                    play_note(1, n, vel); midi_send(0x90u | MIDI_OUT_CH, n, vel);
+                    play_note(1, n, vel);
                     if (rec_keys()) rec_note(1, n, vel);
                 }
             } else {                                /* a step: as its white key in the SEQ layer */
@@ -109,7 +109,7 @@ static void smk_seq_pad_event(int32_t e,uint32_t *dirty)
                 uint32_t n = smk_live[p][q];
                 smk_live[p][q] = 0;
                 if (!n) continue;
-                play_note(0, n, 0); midi_send(0x80u | MIDI_OUT_CH, n, 0);
+                play_note(0, n, 0);
                 if (rec_keys()) rec_note(0, n, 0);
                 for (uint32_t u = 0; u < NTRK; u++) ctl_live_hold[u][n >> 5 & 3u] &= ~(1u << (n & 31u));   /* (let go: the sequencer's) */
             }
@@ -141,10 +141,10 @@ static void smk_pads(uint32_t base, uint32_t *dirty)
         else if(pf_role[p]==3u)pb_event(p,vel);
         else if(pf_role[p]==5u){if(vel){drum_grid_pad(p,vel);dirty_steps=dirty_page=1;}*dirty=1;}
         else if(pf_role[p]==4u){
-            if(vel){drum_pad_part[p]=(uint8_t)seq_trk;drum_pad_channel[p]=(uint8_t)MIDI_OUT_CH;drum_pad_down[p]=1;drum_ui_lane[seq_trk]=(uint8_t)p;dirty_page=1;note_event_p(seq_trk,1,DRUM_NOTE[p],vel);rec_note_at(seq_trk,1,DRUM_NOTE[p],vel);midi_send(0x90u|drum_pad_channel[p],DRUM_NOTE[p],vel);}
+            if(vel){drum_pad_part[p]=(uint8_t)seq_trk;drum_pad_channel[p]=(uint8_t)MIDI_OUT_CH;drum_pad_down[p]=1;drum_ui_lane[seq_trk]=(uint8_t)p;dirty_page=1;note_event_p(seq_trk,1,DRUM_NOTE[p],vel);rec_note_at(seq_trk,1,DRUM_NOTE[p],vel);}
             else {uint32_t t=drum_pad_part[p],n=DRUM_NOTE[p];drum_pad_down[p]=0;
                 note_event_p(t,0,n,0);rec_note_at(t,0,n,0);ctl_live_hold[t][n>>5]&=~(1u<<(n&31u));
-                midi_send(0x80u|drum_pad_channel[p],n,0);}
+                }
             *dirty=1;
         }
         if(!vel)pf_role[p]=0;
@@ -322,6 +322,18 @@ static void smk_wheels(void)
     mw = clampi(mw, 0, 127);
     b = smk_pw_bend(&pw, fm1_in.wheel[0], fm1_ms) * 8192 / (SMK_PW_ST * 4096);   /* -> the MIDI bend's -8192..8191 */
     b = clampi(b, -8192, 8191);
+    static int32_t out_ch=-1,out_b=0x7FFFFFFF,out_m=-1;
+    static uint32_t out_epoch;
+    unsigned ch=mout_channel(seq_trk%NTRK);
+    fm1_irq_off();
+    if(!mout_blocked){
+        if(out_epoch!=mout_epoch){out_epoch=mout_epoch;out_b=0x7FFFFFFF;out_m=-1;}
+        if(out_ch>=0&&(unsigned)out_ch!=ch){mout_emit(0xE0u|(unsigned)out_ch,0,64);mout_emit(0xB0u|(unsigned)out_ch,1,0);out_b=0x7FFFFFFF;out_m=-1;}
+        out_ch=(int32_t)ch;
+        if(b!=out_b){unsigned v=(unsigned)(b+8192);mout_emit(0xE0u|ch,v&127u,v>>7);out_b=b;}
+        if(mw!=out_m){mout_emit(0xB0u|ch,1,(unsigned)mw);out_m=mw;}
+    }
+    fm1_irq_on();
     if (b != last_b) { last_b = b; ctl_wheel_bend = b; }   /* (only on a change: a MIDI bend in still works at rest) */
     if (mw != last_m) {
         last_m = mw; ctl_vib = mw;

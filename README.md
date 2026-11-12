@@ -1,6 +1,6 @@
 # SMKSYNTH
 
-**O SMK‑37 Pro como instrumento de performance.**
+**SMK‑37 Pro e SMK‑37 Elite como instrumentos de performance.**
 
 [Site e instalação](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Simulador](https://4t59m4f784-creator.github.io/SMKSYNTH/simulator/) · [Backup e restauração](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
 
@@ -8,10 +8,10 @@
 
 | Documento | Português | English |
 |---|---|---|
-| Quick start | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Quick-Start-EN.pdf) |
-| Manual completo | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.0.3-Manual-EN.pdf) |
+| Quick start | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Quick-Start-EN.pdf) |
+| Manual completo | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Manual-EN.pdf) |
 
-Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.0.3.
+Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.1.0.
 
 Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
@@ -29,6 +29,10 @@ A supersaw se originou no **[Clipper, de 3dSam](https://github.com/isod89/clippe
 
 Áudio USB estéreo 16 bits, 44,1/48 kHz, testado no Mac e no iPhone com AudioShare. Gravação de vídeos USB no iPhone ainda pode apresentar cliques e cortes.
 
+## MIDI TRS/DIN e USB
+
+A parte A transmite no canal GLOBAL (1–13); B, C e D nos três seguintes. OMNI transmite em 1–4. Todas as partes transmitem notas, incluindo teclado, pads, split/layer, ARP e sequenciador. Pitch bend e CC1 seguem a parte selecionada; o pedal envia CC64 nos quatro canais. GLOBE + PLAY libera notas e sustain, interrompe PLAY/REC e envia Panic nos 16 canais. Não há transmissão de Clock/Start/Stop nem Program Change automático. [Manual MIDI e sustain](docs/MANUAL.md).
+
 ## Teclado MIDI no simulador
 
 O simulador aceita entrada MIDI com velocity, sustain, pitch bend e modulação. Inicie o áudio, clique em **Conectar teclado MIDI** e escolha a entrada. Use um navegador com Web MIDI, como Chrome ou Edge no computador. [Como conectar e tocar](docs/SIMULATOR-MIDI.md).
@@ -45,7 +49,7 @@ O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e
 
 ## O que está incluído
 
-| Recurso | SMKSYNTH 1.0.3 |
+| Recurso | SMKSYNTH 1.1.0 |
 |---|---|
 | Partes | Quatro, com seleção de ANALOG ou DRUM-X por parte |
 | Synth ANALOG | OberVave; oito vozes compartilhadas; SUPER nos dois osciladores |
@@ -74,7 +78,7 @@ Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. T
 
 ## Instalação e atualização
 
-No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa SMKSYNTH 1.0.x ou SUPER SS1/SS2/SS3. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19618`.
+No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa SMKSYNTH 1.0.x ou SUPER SS1/SS2/SS3. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19634`.
 
 Para **Instalar** pela primeira vez, o SMK-37 Pro precisa estar no firmware oficial M-VAVE V016 (`SMK-37 Pro_016`). Essa opção inicializa o banco com cinco patterns e oito favoritos. Outros modelos são recusados. Use Chrome/Edge no computador, cabo USB de dados e alimentação estável. Firmware oficial M-VAVE não é redistribuído aqui.
 
@@ -82,7 +86,7 @@ Transferência interrompida: retome pelo mesmo instalador, navegador e pacote. O
 
 ## Fonte, validação e estado do lançamento
 
-A versão pública 1.0.3 promove a implementação SUPER SS3 aprovada por Marcus no SMK-37 Pro. A primeira instalação foi validada em flash simulada com interrupções; a instalação USB original já havia sido confirmada no instrumento. Site, instalador, simulador e backup têm seletor PT / EN. [Downloads 1.0.3](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.0.3).
+A versão oficial 1.1.0 promove a base MIDI M1.2 aprovada no instrumento: saída MIDI TRS/USB com canais por parte, rodas na parte selecionada, sustain físico e MIDI PANIC (GLOBE + PLAY), além da correção de notas presas ao mudar o modo de vozes. Um único [instalador Pro e Elite](https://4t59m4f784-creator.github.io/SMKSYNTH/install/) identifica o modelo e a operação automaticamente; atualizar preserva o banco salvo. O fluxo Elite foi validado por um usuário real. ENDLESS continua separado. [Notas completas](docs/RELEASE-1.1.0.md) · [Downloads 1.1.0](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.1.0).
 
 - [Validação e hashes](docs/VALIDATION.md)
 - [Build a partir das fontes](docs/BUILD.md)

@@ -16,12 +16,24 @@ jobs:
       - name: Validate curated content and boot layout
         run: |
           python3 tests/release_factory_test.py
-          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.0.3-first-install-SMK37-Pro.fwsc
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.1.0-first-install-SMK37-Pro.fwsc
       - name: Validate first-install guard and seeded simulator
         run: |
-          node tests/release_101_installer_test.mjs
+          node tests/release_110_installer_test.mjs
+          python3 tests/release_110_packages_test.py
           cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/controls tests/physical_controls_test.c
           /tmp/controls
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/pedal tests/sustain_panic_test.c
+          /tmp/pedal
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/midi-parts tests/midi_parts_test.c
+          /tmp/midi-parts
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/controllers tests/midi_controller_audit_test.c
+          /tmp/controllers
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/live-params tests/live_parameter_release_test.c
+          /tmp/live-params
+          cc -O1 -o /tmp/midi-transport tests/midi_transport_test.c
+          /tmp/midi-transport
+          node tests/release_110_installer_test.mjs
           cc -O2 -o /tmp/midi-only tests/usb_midi_only_test.c
           /tmp/midi-only
           node tests/release_demo_wasm_test.mjs

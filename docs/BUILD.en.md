@@ -1,8 +1,8 @@
-# Building SMKSYNTH 1.0.3
+# Building SMKSYNTH 1.1.0
 
 [Português](BUILD.md) · [English](BUILD.en.md)
 
-Identity: `SMK-37 Pro_19618`. Runtime base: approved SUPER SS3 commit `0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`. Synthesis, sequencing, interface and data formats are preserved from that base.
+Identity: `SMK-37 Pro_19634`. Runtime base: approved SUPER SS3 commit `0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`. Synthesis, sequencing, interface and data formats are preserved from that base.
 
 ## Requirements
 
@@ -24,11 +24,11 @@ The author’s backup is not needed to rebuild. `tools/prepare_factory_seed.c` d
 ```sh
 export JIELI_TOOLCHAIN=/path/to/jieli-linux-toolchains
 python3 tools/build.py --voice-hardware --board smk37 --model pro \
-  --release 1.0.3 --identity 19618 --first-install \
+  --release 1.1.0 --identity 19634 --first-install \
   --factory-bank factory/bank-SMK16P1.bin --sdk /path/to/SDK
 ```
 
-Output: `build/obervave-1.0.3-smk37.fwsc`; distribution name: `SMKSYNTH-1.0.3-SMK37-Pro.fwsc`.
+Output: `build/obervave-1.1.0-smk37.fwsc`; distribution name: `SMKSYNTH-1.1.0-SMK37-Pro.fwsc`.
 
 The first-install profile uses the platform’s standard full-area loader to initialize `0x4000..0x9CFFF`, including the SMK16P1 seed. The application retains SMK16P1 storage. The browser requires official V016; this is not the SUPER SS3 bank-preserving updater.
 
@@ -38,7 +38,7 @@ The restore journal starts erased at `0x55000..0x56FFF`; the seed occupies `0x57
 
 ```sh
 sh tools/build_controls_sim.sh
-cp build/controls/SMKSYNTH-1.0.3.wasm web/simulator/obervave-voice.wasm
+cp build/controls/SMKSYNTH-1.1.0.wasm web/simulator/obervave-voice.wasm
 node tests/release_demo_wasm_test.mjs
 node tests/release_101_installer_test.mjs
 node tests/release_i18n_test.mjs

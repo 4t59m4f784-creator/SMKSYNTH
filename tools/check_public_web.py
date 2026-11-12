@@ -64,10 +64,14 @@ def check(site):
 
     assert (site / 'i18n.js').read_bytes() == (ROOT / 'web/site/i18n.js').read_bytes()
     pins = json.loads((site / 'install/manifest.json').read_text())
-    for kind, pin in pins.items():
-        assert version in pin['name'], f'Wrong release label: {kind}'
-        path = site / 'install' / pin['url']
-        assert path.stat().st_size == pin['size'] and digest(path) == pin['sha'], f'Invalid package: {kind}'
+    assert set(pins)=={'pro','elite'}
+    for model, config in pins.items():
+        for kind in ['release','update']:
+            pin=config[kind]
+            assert version in pin['name'], f'Wrong release label: {model}/{kind}'
+            assert pin['product'].startswith(config['model']+'_')
+            path=site/'install'/pin['url']
+            assert path.stat().st_size==pin['size'] and digest(path)==pin['sha'], f'Invalid package: {model}/{kind}'
     assert digest(site / 'simulator/obervave-voice.wasm') == release['wasm_sha256'], 'Changed simulator WASM'
     assert (site / 'simulator/factory-session.bin').read_bytes() == (ROOT / 'factory/simulator-session.bin').read_bytes(), 'Changed factory session'
     for language in ('PT', 'EN'):

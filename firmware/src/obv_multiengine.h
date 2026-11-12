@@ -18,7 +18,7 @@ typedef struct { uint8_t active, target, phase; int32_t gain; } obv_engine_track
 static obv_engine_track_t obv_engine_track[NPART];
 static uint8_t obv_voice_engine[NV];
 static uint8_t obv_patch_seen[NPART], obv_flushing[NPART];
-typedef struct { uint8_t note,vel,physical,sequenced,combined; } obv_pending_t;
+typedef struct { uint8_t note,vel,physical,sequenced,combined,external; } obv_pending_t;
 static obv_pending_t obv_pending[NPART][NHELD];
 static uint8_t obv_pending_n[NPART];
 static int obv_engine_available(uint32_t id)

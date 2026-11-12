@@ -65,7 +65,7 @@ static voice_t vc[NV];
 static uint32_t vseq, rr;                       /* allocation counter, round-robin pointer */
 
 /* main loop -> ISR: note events */
-typedef struct { uint8_t type, note, vel, part, combined; } nev_t;   /* type 1 on, 0 off; part: the track's sound */
+typedef struct { uint8_t type, note, vel, part, combined, external; } nev_t;   /* type 1 on, 0 off; part: the track's sound */
 #define NQ 64u
 static nev_t nq[NQ];
 static volatile uint32_t nq_w, nq_r;
@@ -73,6 +73,9 @@ static void note_event_p(uint32_t part, uint32_t on, uint32_t note, uint32_t vel
 {
     if (nq_w - nq_r >= NQ) return;              /* a flood: drop (the ISR drains 64 per block) */
     nq[nq_w % NQ].combined = 0;
+#if BOARD_SMK37
+    nq[nq_w % NQ].external = (uint8_t)midi_input_active;
+#endif
     nq[nq_w % NQ].part = (uint8_t)part;
     nq[nq_w % NQ].type = (uint8_t)on;
     nq[nq_w % NQ].note = (uint8_t)note;
@@ -94,7 +97,13 @@ static int obv_engine_request(uint32_t part, uint32_t id)
 static volatile uint32_t keyboard_off[NPART][4];
 static int keyboard_event(uint32_t p,uint32_t on,uint32_t n,uint32_t vel,uint32_t combined){
  if(nq_w-nq_r>=NQ){if(!on)keyboard_off[p][n>>5]|=1u<<(n&31u);return 0;}
- nq[nq_w%NQ]=(nev_t){(uint8_t)on,(uint8_t)n,(uint8_t)vel,(uint8_t)p,(uint8_t)combined};RING_PUBLISH();nq_w++;return 1;
+ nq[nq_w%NQ]=(nev_t){(uint8_t)on,(uint8_t)n,(uint8_t)vel,(uint8_t)p,(uint8_t)combined,
+#if BOARD_SMK37
+ (uint8_t)midi_input_active
+#else
+ 0
+#endif
+ };RING_PUBLISH();nq_w++;return 1;
 }
 static uint8_t keyboard_source;
 static volatile uint8_t keyboard_gain[NPART]={100,100,100,100};
@@ -117,6 +126,7 @@ static volatile int32_t ctl_wheel_bend;
 static volatile int32_t ctl_vib;                /* the SMK-37's mod wheel 0..127: a vibrato from the LFO, up to +-1/2 semitone */
 #endif
 static volatile int32_t ctl_seq_transpose; /* latched, all ANALOG sequences only */
+static volatile uint32_t eng_t; /* rendered audio frames */
 static uint8_t seq_note_source; /* ISR-scoped origin, including deferred engine-switch events */
 static volatile int32_t ctl_tune8;              /* global tune, Q8 semitones */
 static volatile uint32_t ctl_tempo = 120, ctl_ext_quarter;   /* MIDI clock: frames per quarter, 0 = none */
@@ -177,7 +187,13 @@ static void obv_pending_add(uint32_t p,uint32_t note,uint32_t vel)
     for(i=0;i<obv_pending_n[p];i++)if(obv_pending[p][i].note==note&&obv_pending[p][i].sequenced==seq_note_source)break;
     if(i==NHELD)i=0;
     else if(i==obv_pending_n[p])obv_pending_n[p]++;
-    obv_pending[p][i]=(obv_pending_t){(uint8_t)note,(uint8_t)vel,(uint8_t)phys,seq_note_source,keyboard_source};
+    obv_pending[p][i]=(obv_pending_t){(uint8_t)note,(uint8_t)vel,(uint8_t)phys,seq_note_source,keyboard_source,
+#if BOARD_SMK37
+ (uint8_t)mout_suppress
+#else
+ 0
+#endif
+ };
 }
 
 /* ---- vintage: each voice card has its own small offsets, scaled by the knob */
@@ -279,6 +295,14 @@ static void voice_trigger(uint32_t part, uint32_t note, uint32_t vel)
     obv_engine_check_patch(part);
     const obv_engine_track_t *es = &obv_engine_track[part];
     if (es->phase == OBV_ENGINE_OUT) { obv_pending_add(part,note,vel); return; }
+#if BOARD_SMK37
+    unsigned kind=seq_note_source?MOUT_SEQ:pt[part].p->v[P_ARP_MODE]!=A_OFF?MOUT_ARP:MOUT_KEY;
+    mout_on(part,note,vel,kind,seq_note_source&&es->active!=OBV_DRUMS?ctl_seq_transpose:0);
+    if(seq_note_source&&es->active==OBV_DRUMS){
+        static const uint8_t notes[8]={36,38,39,42,46,45,37,56};
+        for(unsigned d=0;d<8;d++)if(notes[d]==note){mout_drum_note[part][d]=(uint8_t)note;mout_drum_due[part][d]=eng_t+FS/50u+1u;}
+    }
+#endif
     if (obv_engines[es->active]->hit) {
         obv_engines[es->active]->hit(part, note, vel);
         return;
@@ -343,6 +367,9 @@ static void voice_trigger(uint32_t part, uint32_t note, uint32_t vel)
 /* the key (or the arp, the sequencer) let go of a note. In MONO / UNISON a key still held takes over (legato) */
 static void voice_release(uint32_t part, uint32_t note, uint32_t from_arp)
 {
+#if BOARD_SMK37
+    mout_off(part,note,seq_note_source?MOUT_SEQ:from_arp?MOUT_ARP:MOUT_KEY);
+#endif
     if (!obv_flushing[part] && obv_engine_track[part].phase == OBV_ENGINE_OUT && obv_engine_track[part].target != OBV_DRUMS)
         for(uint32_t j=0;j<obv_pending_n[part];j++)if(obv_pending[part][j].note==note&&obv_pending[part][j].sequenced==seq_note_source)obv_pending[part][j].vel=0;
 
@@ -363,7 +390,9 @@ static void voice_release(uint32_t part, uint32_t note, uint32_t from_arp)
             }
             pt[part].last_pitch16 = v0->target16;
         }
-        return;
+        /* A mode edit can leave POLY/DUAL voices outside the mono group.
+         * Always release the old pitch below; retargeted legato voices now
+         * carry the still-held pitch and therefore survive this cleanup. */
     }
     for (v = 0; v < NV; v++)
         if (vc[v].gate && vc[v].note == note && vc[v].part == part && vc[v].seq_owned==seq_note_source) vc[v].gate = 0;
@@ -419,7 +448,7 @@ static void arp_post(uint32_t p, uint32_t on, uint32_t note, uint32_t vel)
     arp_qw++;
 }
 
-static volatile uint32_t eng_t;                 /* frames the engine has made (the MIDI clock is measured in them) */
+
 
 /* a quarter in frames. The internal tempo rounded to 48 frames (~1 ms): the beat (counted in blocks of CTL) and every
  * step length (q / 1, 2, 3, 4, 6, 8, 12) come out whole, so the arp, the tracks and the bar stay locked forever (else
@@ -481,7 +510,11 @@ static void arp_tick(uint32_t p)
         if (a->was_on) { arp_stop_note(p); a->was_on = 0; }
         return;
     }
-    if (!a->was_on) { voices_release_part(p); a->was_on = 1; a->pos = 0; a->cnt = 0xFFFFFFFFu; }
+    if (!a->was_on) {
+#if BOARD_SMK37
+        for(unsigned n=0;n<128;n++)mout_off(p,n,MOUT_KEY);
+#endif
+        voices_release_part(p); a->was_on = 1; a->pos = 0; a->cnt = 0xFFFFFFFFu; }
     if (!nheld[p]) { arp_stop_note(p); a->pos = 0; a->cnt = 0xFFFFFFFFu; return; }
     q = quarter_len();
     a->period = q / div;
@@ -566,6 +599,9 @@ static void ev_sustain_up(uint32_t p)           /* the pedal / its HOLD let go: 
 
 static void parts_off(uint32_t p)               /* a panic: its keys, its arp, its notes */
 {
+#if BOARD_SMK37
+    mout_part_off(p);
+#endif
     nheld[p] = 0;
     arp_stop_note(p);
     arp[p].was_on = 0;
@@ -575,9 +611,22 @@ static void parts_off(uint32_t p)               /* a panic: its keys, its arp, i
 static void engine_events(void)
 {
     uint32_t sus = 0, p;
+#if BOARD_SMK37
+    for(unsigned t=0;t<4;t++)for(unsigned d=0;d<8;d++)if(mout_drum_due[t][d]&&(int32_t)(eng_t+1u-mout_drum_due[t][d])>=0){mout_off(t,mout_drum_note[t][d],MOUT_SEQ);mout_drum_due[t][d]=0;}
+    static int32_t previous_transpose;
+    if(previous_transpose!=ctl_seq_transpose){
+        previous_transpose=ctl_seq_transpose;
+        for(unsigned t=0;t<4;t++)if(obv_patch_engine(&live_p[t])!=OBV_DRUMS)
+            for(unsigned n=0;n<128;n++)if(mout_owner[MOUT_SEQ][t][n]){
+                unsigned vel=mout_seq_vel[t][n];mout_on(t,n,vel,MOUT_SEQ,ctl_seq_transpose);
+            }
+    }
+#endif
     for (p = 0; p < NPART; p++) sus |= part_sus(p) << p;
     if (ctl_panic) {
+        uint32_t hard = ctl_panic > 1u;
         ctl_panic = 0;
+        if (hard) { nq_r = nq_w; memset(vc, 0, sizeof vc); }
         for (p = 0; p < NPART; p++) {
             obv_pending_n[p]=0;
             parts_off(p);
@@ -596,11 +645,21 @@ static void engine_events(void)
         p = e.part % NPART;
         nq_r++;
         if (e.type == 2) { obv_engine_accept(p, e.note); continue; }
+#if BOARD_SMK37
+        mout_suppress=e.external;
+#endif
         keyboard_source=e.combined;
-        if(e.combined&&e.type&&obv_patch_engine(&live_p[p])!=OBV_ANALOG){keyboard_source=0;continue;}
+        if(e.combined&&e.type&&obv_patch_engine(&live_p[p])!=OBV_ANALOG){keyboard_source=0;
+#if BOARD_SMK37
+ mout_suppress=0;
+#endif
+ continue;}
         if (e.type) ev_note_on(p, e.note, e.vel);
         else ev_note_off(p, e.note);
         keyboard_source=0;
+#if BOARD_SMK37
+        mout_suppress=0;
+#endif
     }
     for(p=0;p<NPART;p++)for(unsigned w=0;w<4;w++){
         uint32_t bits=keyboard_off[p][w];keyboard_off[p][w]=0;
@@ -928,7 +987,13 @@ static void engine_audio(int32_t *out, uint32_t n)
                     held[p][nheld[p]].combined=q->combined;held[p][nheld[p]++].phys=1;
                 }
                 uint8_t source=seq_note_source,ks=keyboard_source;seq_note_source=q->sequenced;keyboard_source=q->combined;
+                #if BOARD_SMK37
+                mout_suppress=q->external;
+#endif
                 voice_trigger(p,q->note,q->vel);seq_note_source=source;keyboard_source=ks;
+#if BOARD_SMK37
+                mout_suppress=0;
+#endif
             }
             obv_pending_n[p]=0;
         }
@@ -1007,6 +1072,9 @@ static int engine_quiet(void)                   /* nothing sounds: a flash erase
 
 static void engine_init(void)
 {
+#if BOARD_SMK37
+ mout_clear();mout_blocked=0;mout_used_channels=0;
+#endif
     uint32_t v;
     obv_engines[OBV_VOICE] = 0; /* retired id, unavailable */
     obv_engines[OBV_DRUMS] = &obv_drums_ops;

@@ -1,56 +1,23 @@
-> Update, 2026-11-02: Marcus confirmed physical USB first installation on his SMK-37 Pro. The records below also describe automated tests performed before that confirmation.
+# SMKSYNTH 1.1.0 - Installation and recovery
 
-Stereo USB audio tested on Mac and on iPhone with AudioShare. iPhone video recording using USB audio may contain clicks and dropouts; a known issue under investigation.
+The same [installer](../install/?lang=en) supports SMK-37 Pro and SMK-37 Elite. It identifies the model and selects a specific package automatically. Use desktop Chrome/Edge over HTTPS, a USB data cable and stable power; close other MIDI apps.
 
-## Updating to 1.0.3
+1. Connect and identify. The keyboard is not accessed until you click Connect.
+2. From official V016 of the connected model, the page offers first installation. This initializes/replaces the bank with five patterns and eight favourites.
+3. From supported SMKSYNTH builds, the page offers Update, preserving saved programs, favourites, patterns and settings. Save changes and export a [backup](../backup/?lang=en) before updating.
+4. Check the detected model and operation, confirm and keep the connection until target identity `SMK-37 Pro_19634` or `SMK-37 Elite_19634` is confirmed.
+5. Connect the sustain pedal before restarting and keep it released during startup.
 
-Choose Update in the installer if SMKSYNTH is already installed: it preserves the bank without reinstalling V016. Choose Install only for a first installation from official M‑VAVE V016; it replaces the bank with the factory examples. Export a backup before updating. USB provides stereo audio, MIDI, backup/restore and firmware updates.
+## Interrupted transfers
 
-GLOBAL → FADER MODE: JUMP applies the physical position; CATCH engages when the fader crosses the current value and rearms after page, part, bank or pattern changes. Save GLOBAL to retain the choice. All eight encoders remain relative.
+Resume on the same page/browser. The pending operation is bound to model, original source, package SHA and operation type. A Pro loader cannot accept an Elite package or vice versa. An unknown loader without a matching pending operation is refused.
 
+For an older interrupted operation, use the preserved [Pro 1.0.3 installer](../install/legacy-1-0-3/) or [Elite2 installer](../install-elite/legacy-elite2/). Their original packages and pending keys are retained. Earlier Pro links remain on the main installer. Do not switch versions during a pending restore/update.
 
-# SMKSYNTH 1.0.3 installation
+## Returning to stock
 
-[Português](INSTALLATION.md) · [English](INSTALLATION.en.md)
+Export a backup before returning to M-VAVE firmware. Use the manufacturer's M-UPGRADE with the exact official V016 package for your model. The preserved Elite2 page also retains its verified Elite V016 return flow. Returning to stock can replace SMKSYNTH data. Reinstalling SMKSYNTH is a first installation; restore the saved backup afterward.
 
-**Model: M‑VAVE SMK‑37 Pro. First-install source: official V016, identifying as `SMK-37 Pro_016`. Target: `SMK-37 Pro_19618`.** Other models, versions and alternative firmware are rejected.
+## After installation
 
-Download V016 for **SMK‑37 PRO** and M‑UPGRADE from the [manufacturer](https://www.cuvave.com/appdownload). Official firmware is not redistributed. The tested V016 file has SHA-256 `2d98ce72530e71d617384963423820536f094501299e2cfec0a8d3c3fb6bcfb0`.
-
-If you already use SMKSYNTH, save edits on the panel, export your `.smksynth` bank and choose **Update** without returning to V016. Returning to official firmware and first installation can replace SMKSYNTH data. There is no bank merging.
-
-## Install
-
-1. Install official SMK‑37 Pro V016 with M‑UPGRADE following the manufacturer’s instructions, then reboot.
-2. Use up-to-date Chrome/Edge on a computer, HTTPS, a USB data cable and stable power. Close DAWs, MIDI editors and other installer/backup tabs.
-3. Open the [installer](https://4t59m4f784-creator.github.io/SMKSYNTH/install/?lang=en). It verifies SHA-256, model and CRCs before enabling installation.
-4. Click **Connect and identify**. Check `SMK-37 Pro_016`.
-5. Choose **Install SMKSYNTH 1.0.3**. Review the source, target and factory-bank replacement, then confirm.
-6. Keep the tab, cable and power connected until reboot and the target identity `SMK-37 Pro_19618` are confirmed.
-7. Pattern 1 opens stopped at 90 BPM. PLAY starts the example. KNOB BANK → Patterns provides P1–P5; P6–P16 are empty. The eight lower Performance pads recall favourites.
-
-The package writes the application area and initializes the SMK16P1 bank. It is **not** a bank-preserving update. Boot header, BTIF, USRTRIM calibration, USR and key_mac are outside its write windows. Simulated-flash interruption tests passed; physical USB first installation was subsequently confirmed by Marcus.
-
-## Interrupted installation
-
-Use the same browser, website origin and package. Pending installation is bound to the package SHA-256 and V016 source. Resume is only enabled for `ota-SMK-37 Pro_900` with that binding. An unidentified loader is not automatically authorized.
-
-Reconnect and identify again, confirm resume if offered, and wait. Download the log if it does not complete. Do not start a bank restoration while firmware installation is pending. First installation is not atomic; the loader retains responsibility for resuming until completion.
-
-## Backup and restoration
-
-The [backup tool](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/?lang=en) exports **saved** data, including user presets, favourites, patterns/scenes and settings. Save panel edits first. Your bank files stay on your computer.
-
-Restoration replaces the entire bank, including empty slots; it is not selective import. Export the current destination bank in the same session before confirming restoration. Type the displayed confirmation word **RESTAURAR** exactly, also in the English interface. If the instrument shows RESTORE PENDING, select the same file and finish before changing firmware. The instrument remains locked for playing until completion and reboot.
-
-After installing 1.0.3, you can restore an earlier compatible `.smksynth` backup to recover your personal bank. This replaces the five-pattern/eight-favourite demonstration bank with your saved content. Simulator sessions are separate files and are not hardware backups.
-
-An isolated DP2 export-session expiry was resolved by rebooting the instrument; its cause was not reproduced. An incomplete export is not presented as a verified backup.
-
-## Return to official firmware
-
-Export the SMKSYNTH bank first. Use M‑UPGRADE with official **SMK‑37 Pro V016**, following the manufacturer’s instructions. Do not use Elite/MKE/FM-1 files. Official firmware does not import `.smksynth` files. After reinstalling SMKSYNTH, use the backup tool to restore your work.
-
-## Direct update from SUPER
-
-SMKSYNTH 1.0.x and SUPER SS1/SS2/SS3 are accepted by Update. Export a bank backup first; do not return to stock V016. Update preserves the saved bank. Resume interrupted older installations using their original installer before upgrading. Keep a pre-SUPER backup if you plan to return to firmware predating SUPER: older versions cannot interpret WAVE 4 and all new favourites.
+See the [manual](MANUAL.en.md) for USB/TRS routing, physical sustain and GLOBE + PLAY Panic. ENDLESS remains a separate line; this release preserves saved-bank bytes on update but does not add ENDLESS features. Restoring the prior backup is required to undo edits made in another line.

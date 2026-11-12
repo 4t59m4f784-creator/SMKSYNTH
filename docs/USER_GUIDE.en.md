@@ -32,3 +32,7 @@ Step recording, live recording and the arpeggiator account for physical keyboard
 Patterns store sequences, four sounds, mixer and keyboard configurations as scenes. Tempo is global; examples start at 90 BPM. Scene and favourite sounds are snapshots independent of the preset bank. No extra personal presets are installed.
 
 SAVE on the panel, then export your bank. Hardware and simulator use separate memories. A simulator session is not a hardware bank backup.
+
+## MIDI and pedal in version 1.1.0
+
+See [MIDI OUT, sustain and MIDI PANIC in the manual](MANUAL.en.md). TRS/DIN and USB send all four parts on consecutive channels starting at GLOBAL MIDI CH (OMNI sends on 1–4). Wheels follow the selected part; the physical pedal sends CC64 on all four parts. GLOBE + PLAY releases notes/sustain and stops transport. [Pro and Elite installer](INSTALLATION.en.md).

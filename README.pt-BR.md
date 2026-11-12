@@ -1,53 +1,105 @@
 # SMKSYNTH
 
-**Sintetizador de performance para o M-VAVE SMK-37 Pro.**
+**SMK‑37 Pro e SMK‑37 Elite como instrumentos de performance.**
 
-[English](README.md) · [Instalação](docs/INSTALLATION.md) · [Backup](docs/BACKUP.md) · [Compilação](docs/BUILD.md) · [Créditos](CREDITS.md)
+[Site e instalação](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Simulador](https://4t59m4f784-creator.github.io/SMKSYNTH/simulator/) · [Backup e restauração](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
 
-Do ponto de vista sonoro, o SMKSYNTH é a união do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X, do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
+## Documentação
 
-Mas um instrumento vai além do som. A ideia deste projeto é transformar o M-VAVE SMK-37 em um instrumento voltado à performance, criando recursos e reimaginando uma experiência que aproveita os pads e controles do teclado.
+| Documento | Português | English |
+|---|---|---|
+| Quick start | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Quick-Start-EN.pdf) |
+| Manual completo | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Manual-EN.pdf) |
 
-Alterne facilmente entre partes, salve timbres favoritos e acesse-os com um toque, grave sequências, crie layers e splits e salve cenas para recuperar suas configurações durante a performance.
+Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.1.0.
 
-Os pads são o coração do SMKSYNTH. Neste projeto, busquei implementar minha visão de um instrumento ideal para performance nesse formato compacto de 37 teclas.
+Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
-> **Material para revisão, ainda sem lançamento público.** A base é a B2, identidade `SMK-37 Pro_19615`, com exportação e restauração confirmadas no teclado físico de Marcus. A seleção de fábrica está em preparação. O instalador incluído atualiza instalações compatíveis do SMKSYNTH; ainda não faz a primeira instalação a partir do firmware de fábrica.
+Porém, um instrumento é muito mais que o som. A ideia aqui é transformar o M‑VAVE SMK‑37 Pro em um instrumento voltado para a performance, criando recursos e reimaginando uma experiência que usa os pads e controles do teclado.
 
-## Guias dos pad banks
+Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequências, faça layers e splits, salve cenas e recupere seu conjunto com um botão. Os pads são o coração do SMKSYNTH: este projeto traduz minha visão de um instrumento para performance nesse formato compacto de 37 teclas.
 
-[Performance e favoritos](docs/pad-banks/01-performance-favoritos.png) · [SPLIT / LAYER](docs/pad-banks/02-split-layer.png) · [Cenas e patterns](docs/pad-banks/03-cenas-patterns.png)
+— **Marcus Padrini** · direção do projeto, fluxo de performance, seleção de sons, patterns e testes no instrumento
 
-PNGs em alta resolução e fontes SVG editáveis em `docs/pad-banks/`.
+## SUPER / Supersaw
 
-## Recursos
+Sete serras por oscilador, DETUNE e MIX independentes, nos dois OSCs. Selecione WAVE = SUPER; PW vira DETUNE. A página SUPER, acessada por PARA, reúne DET1 / MIX1 / DET2 / MIX2. Presets, favoritos, cenas e backups guardam os ajustes. SYNC e X-MOD são ignorados com SUPER; UNISON consome vozes completas. [Controles e limites no manual](docs/MANUAL.md#super--supersaw).
 
-| Recurso | Base atual |
-| --- | --- |
-| Partes | Quatro: A–D |
-| ANALOG | Oito vozes melódicas compartilhadas; dois osciladores, filtros, envelopes, LFO e arpejador |
-| DRUM-X | Oito instrumentos de bateria sintetizados, cinco kits, sem samples |
-| Sequenciador | Quatro tracks, até 256 steps por track, automação e trocas sincronizadas |
-| Patterns | 16 posições com timbres, mixer e cenas |
-| Presets e favoritos | 99 posições de programa e oito favoritos; salvamento manual |
-| Teclado | Oitava por parte; SINGLE, SPLIT e LAYER; duas configurações salvas de teclado |
-| Efeitos | Sends de chorus, delay e reverb, drive e processamento master |
-| Segurança do banco | Exportação e restauração integral por USB-MIDI, em arquivos `.smksynth` |
+A supersaw se originou no **[Clipper, de 3dSam](https://github.com/isod89/clipper-fm1)**, sobre Felucca, que referencia a análise de Adam Szabo. Adaptamos a curva e os offsets de desafinação, com MIX independente e otimizações próprias. Créditos e avisos originais preservados; não é uma reprodução exata do Roland JP-8000/JP-8080.
 
-BT salva presets. Patterns são salvos pelos pads, com confirmação de sobrescrita. PLAY e REC mantêm o banco de pads selecionado. Consulte o [guia rápido](docs/QUICKSTART.md).
+Áudio USB estéreo 16 bits, 44,1/48 kHz, testado no Mac e no iPhone com AudioShare. Gravação de vídeos USB no iPhone ainda pode apresentar cliques e cortes.
 
-## Tudo em um site
+## MIDI TRS/DIN e USB
 
-A pasta `site/` reúne instalador, backup/restaurador e simulador, pronta para hospedagem estática. Não depende de uma conta ChatGPT quando hospedada publicamente. A publicação será manual, após aprovação.
+A parte A transmite no canal GLOBAL (1–13); B, C e D nos três seguintes. OMNI transmite em 1–4. Todas as partes transmitem notas, incluindo teclado, pads, split/layer, ARP e sequenciador. Pitch bend e CC1 seguem a parte selecionada; o pedal envia CC64 nos quatro canais. GLOBE + PLAY libera notas e sustain, interrompe PLAY/REC e envia Panic nos 16 canais. Não há transmissão de Clock/Start/Stop nem Program Change automático. [Manual MIDI e sustain](docs/MANUAL.md).
 
-O simulador usa a base musical P16.2 aprovada. Ele não instala firmware nem reproduz o protocolo USB da B2. Sua sessão de navegador não é intercambiável com o backup físico `.smksynth`.
+## Teclado MIDI no simulador
 
-## Distribuição
+O simulador aceita entrada MIDI com velocity, sustain, pitch bend e modulação. Inicie o áudio, clique em **Conectar teclado MIDI** e escolha a entrada. Use um navegador com Web MIDI, como Chrome ou Edge no computador. [Como conectar e tocar](docs/SIMULATOR-MIDI.md).
 
-A build validada B2 permanece inalterada. O pacote contém fontes, ferramentas, documentação e registros de testes. A primeira instalação, o banco de fábrica e a numeração da release pública ainda precisam ser fechados. Leia [a proposta de publicação](publication/REVIEW.pt-BR.md).
+## Demonstração dos recursos de performance
 
-## Autoria e licença
+[Assista à breve demonstração do SMKSYNTH no YouTube](https://www.youtube.com/watch?v=Ax-RqjtUFjc).
 
-Direção do projeto e workflow de performance: **Marcus Padrini** (crédito proposto para revisão). Autores originais e colaboradores: [CREDITS.md](CREDITS.md). Código sob GPL-3.0-only, com componentes identificados separadamente em [LICENSING.md](LICENSING.md). O texto integral está em [LICENSE](LICENSE). Este pacote não contém samples de Mellotron nem material do SMKTRON. Projeto independente, sem vínculo oficial com a M-VAVE.
+## Desenvolvimento com IA
+
+O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e o fluxo de performance, orientou o trabalho, selecionou os sons, criou os cinco patterns e realizou os testes e a aprovação no instrumento. O ChatGPT, da OpenAI, contribuiu com propostas e soluções técnicas e gerou e revisou código das adaptações, ferramentas web, documentação e materiais gráficos sob sua orientação. As engines e os componentes de origem pertencem aos autores creditados abaixo. O projeto é independente e não tem vínculo ou endosso da OpenAI.
+
+![Tela real do sequenciador SMKSYNTH](docs/images/sequence.png)
+
+## O que está incluído
+
+| Recurso | SMKSYNTH 1.1.0 |
+|---|---|
+| Partes | Quatro, com seleção de ANALOG ou DRUM-X por parte |
+| Synth ANALOG | OberVave; oito vozes compartilhadas; SUPER nos dois osciladores |
+| Bateria | DRUM-X; oito instrumentos por kit |
+| Performance | Favoritos, sends por parte, split/layer e transpose de sequências pelas teclas |
+| Sequenciador | Quatro tracks; até 256 steps por track; gravação ao vivo ou passo a passo |
+| Patterns/cenas | 16 posições; sequência, sons, mixer e configurações de teclado por pattern |
+| Conteúdo inicial | Cinco patterns de Marcus Padrini e oito favoritos |
+| Presets | Banco da base mantido; nenhum preset de usuário extra instalado |
+| Salvamento | Manual; backup/restauração pelo navegador |
+
+Os sons editados das cenas e favoritos ficam nos próprios snapshots, sem depender de presets extras. Patterns 6–16 começam livres. O tempo inicial dos exemplos é 90 BPM.
+
+## Pads persistentes
+
+KNOB BANK escolhe o banco de pads. PLAY, REC, seleção de engine e mudança de página não tomam essa escolha automaticamente. SEQ acessa explicitamente os steps do sequenciador.
+
+| Banco | Uso |
+|---|---|
+| Performance / Favoritos | Pads superiores: partes A–D, delay/reverb e −/+ preset. Inferiores: oito favoritos. Toque recupera; segure para memorizar. |
+| Split / Layer | Duas configurações independentes; escolha partes, SINGLE/SPLIT/LAYER e a linha tocada. |
+| Patterns / Save | Toque carrega um dos 16 patterns; segure para salvar. Posição ocupada pede confirmação. |
+| Drum Pads | Entra no ciclo apenas com DRUM-X selecionado. Oito pads superiores tocam/gravam bateria com velocity; inferiores reservados. |
+
+Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. Trocar para ANALOG preserva esse banco, inativo. Selecionar uma voz de bateria, sozinho, **não** transforma os pads em bateria.
+
+## Instalação e atualização
+
+No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa SMKSYNTH 1.0.x ou SUPER SS1/SS2/SS3. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19634`.
+
+Para **Instalar** pela primeira vez, o SMK-37 Pro precisa estar no firmware oficial M-VAVE V016 (`SMK-37 Pro_016`). Essa opção inicializa o banco com cinco patterns e oito favoritos. Outros modelos são recusados. Use Chrome/Edge no computador, cabo USB de dados e alimentação estável. Firmware oficial M-VAVE não é redistribuído aqui.
+
+Transferência interrompida: retome pelo mesmo instalador, navegador e pacote. O instalador mantém links para retomar versões anteriores. [Guia completo de instalação e recuperação](docs/INSTALLATION.md).
+
+## Fonte, validação e estado do lançamento
+
+A versão oficial 1.1.0 promove a base MIDI M1.2 aprovada no instrumento: saída MIDI TRS/USB com canais por parte, rodas na parte selecionada, sustain físico e MIDI PANIC (GLOBE + PLAY), além da correção de notas presas ao mudar o modo de vozes. Um único [instalador Pro e Elite](https://4t59m4f784-creator.github.io/SMKSYNTH/install/) identifica o modelo e a operação automaticamente; atualizar preserva o banco salvo. O fluxo Elite foi validado por um usuário real. ENDLESS continua separado. [Notas completas](docs/RELEASE-1.1.0.md) · [Downloads 1.1.0](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.1.0).
+
+- [Validação e hashes](docs/VALIDATION.md)
+- [Build a partir das fontes](docs/BUILD.md)
+- [Mudanças](CHANGELOG.md)
+- [Contribuir](CONTRIBUTING.md)
+- [Guia de uso](docs/USER_GUIDE.md)
+
+O simulador executa o mesmo código C de síntese, sequenciamento e interface em WebAssembly. Tem memória independente e começa com os mesmos cinco patterns e oito favoritos da instalação.
+
+## Créditos e licença
+
+OberVave e Dinghy: **zvenson**. JIANT / DRUM-X: **Juan Ignacio Antonucci (Juan Jiant)** e colaboradores. Felucca: **Leo Kuroshita / Hügelton Instruments**. SLOOP: **isod89** e colaboradores. Port/ferramentas SMK-37: **M. Geisler / genkigenki** e colaboradores. Direção e validação do SMKSYNTH: **Marcus Padrini**. Soluções técnicas, código das adaptações, ferramentas e documentação produzidos com **ChatGPT / OpenAI**, sob sua orientação.
+
+Firmware e adaptações sob **GPL-3.0-only**. Consulte [LICENSE](LICENSE), [CREDITS](CREDITS.md) e [LICENSING](LICENSING.md) para atribuições e licenças de componentes. Não há samples de terceiros nesta distribuição. Projeto independente, sem vínculo ou endosso da M‑VAVE ou dos autores dos projetos de origem.
 
 FADER MODE JUMP/CATCH: GLOBAL. [Changelog](CHANGELOG.md).

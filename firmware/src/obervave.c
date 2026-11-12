@@ -22,6 +22,12 @@ static void app_idle(void);
 #include "obv_dsp.h"
 #include "obv_params.h"
 #include "obv_fx.h"
+#if BOARD_SMK37
+#include "smk_midi_routes.h"
+#endif
+#if !BOARD_SMK37
+static unsigned midi_input_active;
+#endif
 #include "obv_engine.h"
 #include "obv_seq.h"
 #include "obv_patches.h"
@@ -1188,7 +1194,7 @@ static void draw_page(void)
             k[i].present = 1;
             if (i == 0) { fmt_u(k[i].value, set.tempo); k[i].v = set.tempo - 40; k[i].max = 200; }
             else if (i == 1) { scat(k[i].value, CLICK_NAME[set.click % NCLICK]); k[i].v = set.click % NCLICK; k[i].max = NCLICK - 1; }
-            else if (i == 2) { if (set.midi_ch) fmt_u(k[i].value, set.midi_ch); else scat(k[i].value, "OMNI"); k[i].v = set.midi_ch; k[i].max = 16; }
+            else if (i == 2) { if (set.midi_ch) fmt_u(k[i].value, set.midi_ch); else scat(k[i].value, "OMNI"); k[i].v = set.midi_ch; k[i].max = 13; }
             else { scat(k[i].value, set.tune < 0 ? "-" : "+"); fmt_u(k[i].value + 1, (uint32_t)(set.tune < 0 ? -set.tune : set.tune)); scat(k[i].value, "c"); k[i].v = set.tune + 50; k[i].max = 100; k[i].bip = 1; }
         } else if (layer == L_EDIT || layer == L_FX || layer == L_GLO || layer == L_SAVE) {
             layer_knob(&k[i], i);
@@ -2187,7 +2193,9 @@ static void note_in(uint32_t on, uint32_t note, uint32_t vel)
 static uint8_t panel_tx_note[128],panel_tx_ch[128];
 static void panel_midi_send(unsigned on,unsigned raw,unsigned vel){
  if(on){panel_tx_note[raw]=(uint8_t)clampi((int)raw+(BOARD_SMK37?12*panel_octave():0),0,127);panel_tx_ch[raw]=(uint8_t)MIDI_OUT_CH;}
+#if !BOARD_SMK37
  midi_send((on?0x90u:0x80u)|panel_tx_ch[raw],panel_tx_note[raw],vel);
+#endif
 }
 static void panel_note_in(uint32_t on,uint32_t note,uint32_t vel){keyboard_physical=1;note_in(on,note,vel);keyboard_physical=0;}
 #if BOARD_SMK37
@@ -2252,6 +2260,14 @@ static void keys_in(uint32_t notes_only)
     }
 }
 
+static uint32_t midi_sustain;
+static void sustain_apply(void);
+#if BOARD_SMK37
+#include "smk_sustain.h"
+#else
+static void sustain_apply(void) { ctl_sustain = midi_sustain; }
+#endif
+
 static uint8_t midi_back[4];                    /* a message left for the main loop (app_idle met a program change) */
 static void midi_in(uint32_t notes_only)
 {
@@ -2259,12 +2275,14 @@ static void midi_in(uint32_t notes_only)
     for (;;) {
         uint32_t ch, kind;
         if (midi_back[3]) { st = midi_back[0]; d1 = midi_back[1]; d2 = midi_back[2]; midi_back[3] = 0; }
-        else if (!midi_get(&st, &d1, &d2)) break;
+        else if (!midi_get(&st, &d1, &d2)) { midi_input_active=0; break; }
         if (notes_only && (st & 0xF0u) == 0xC0u) {   /* a program change loads a sound: not in the middle of a draw */
+            midi_input_active=0;
             midi_back[0] = st; midi_back[1] = d1; midi_back[2] = d2; midi_back[3] = 1;
             break;
         }
         ch = (st & 15u) + 1u; kind = st & 0xF0u;
+        midi_input_active=1;
         if (set.sync_int && (st == 0xF8u || st == 0xFAu || st == 0xFBu || st == 0xFCu)) continue;   /* (SYNC INTERNAL) */
         if (st == 0xF8u) {                  /* clock: 24 per quarter. The tempo from 4 quarters (96 clocks) in rendered
                                              * frames, rounded to 48 as our own (quarter_len); taken only when it moves
@@ -2289,6 +2307,10 @@ static void midi_in(uint32_t notes_only)
         }
         if (st == 0xFCu) { ctl_seq_run = 0; dirty_tags = dirty_steps = 1; continue; }
         if (st >= 0xF0u) continue;
+        if(kind==0xB0u&&(!set.midi_ch||(ch>=set.midi_ch&&ch<set.midi_ch+NTRK))){
+            if(d1==64u){midi_sustain=d2>=64u;sustain_apply();continue;}
+            if(d1==120u||d1==123u){ctl_panic=1;continue;}
+        }
         if (set.midi_ch && ch > set.midi_ch && ch < set.midi_ch + NTRK) {   /* the next three channels: tracks B-D */
             uint32_t t = ch - set.midi_ch;
             if (kind == 0x90u && d2) note_event_p(t, 1, d1, d2);
@@ -2314,7 +2336,7 @@ static void midi_in(uint32_t notes_only)
         else if (kind == 0xC0u && d1 < NPROG) { trk_load(set.midi_ch ? 0u : seq_trk, d1); dirty_hdr = dirty_page = dirty_tags = dirty_steps = 1; }
         else if (kind == 0xB0u) {
             if (d1 == 7u) ctl_cc7 = d2;
-            else if (d1 == 64u) ctl_sustain = d2 >= 64u;
+            else if (d1 == 64u) { midi_sustain = d2 >= 64u; sustain_apply(); }
             else if (d1 == 120u || d1 == 123u) ctl_panic = 1;
             else if (cc_map[d1]) {
                 uint32_t p = cc_map[d1] - 1u;
@@ -2349,9 +2371,12 @@ static void app_idle(void)                      /* lcd.c while a strip goes out,
     keys_in(1);
 #if BOARD_SMK37
     smk_outer((uint32_t)(KEY0 + 12 * keyboard_base_octave()), 1, &dirty_steps);
+    smk_sustain_poll();
+    smk_midi_controls_poll();
     smk_wheels(); /* service physical controllers while LCD transfers/rendering yield */
 #endif
     midi_in(1);
+    midi_input_active=0;
     busy = 0;
 }
 
@@ -2539,7 +2564,7 @@ static void panel_encoders(void)
             } else if (page == PG_GLOBAL && !layer && !SMK_PAD_HELD) {   /* (a held layer has the knobs, on every page) */
                 if (k == 0) { set.tempo = (uint8_t)clampi(set.tempo + e, 40, 240); ctl_tempo = set.tempo; }
                 else if (k == 1) set.click = (uint8_t)((set.click & 0xFCu) | (uint32_t)clampi((int32_t)(set.click % NCLICK) + (e > 0 ? 1 : -1), 0, NCLICK - 1));
-                else if (k == 2) set.midi_ch = (uint8_t)clampi(set.midi_ch + e, 0, 16);
+                else if (k == 2) set.midi_ch = (uint8_t)clampi(set.midi_ch + e, 0, 13);
                 else { set.tune = (int8_t)clampi(set.tune + e, -50, 50); ctl_tune8 = set.tune * 256 / 100; }
                 set_dirty = 1; set_t = fm1_ms;
             } else if (is_seq_page(page) && !layer && step_held < 0) {   /* the full-screen sequencer's view */
@@ -2633,7 +2658,10 @@ static void app_main(void)
     if (set.prog >= NPROG) set.prog = 0;
     if (set.tempo < 40u || set.tempo > 240u) set.tempo = 120;
     if (set.oct < -2 || set.oct > 2) set.oct = 0;
-    if (set.midi_ch > 16u) set.midi_ch = 0;
+    if (set.midi_ch > 13u) set.midi_ch = 13;
+#if BOARD_SMK37
+    mout_base=set.midi_ch?set.midi_ch-1u:0u;
+#endif
     ctl_tempo = set.tempo;
     ctl_tune8 = set.tune * 256 / 100;
     {
@@ -2704,6 +2732,7 @@ static void app_main(void)
          * then only lets it go); PLAY, REC, OCT work inside a layer */
         b = fm1_input_edges(&rel);
 #if BOARD_SMK37
+        b = smk_panic_buttons(b, &rel);
         if(pb_confirm&&(b>>BTN_HOME&1u)){pb_cancel();b&=~(1u<<BTN_HOME);}
         b=save_button_poll(b,rel);
         b=pf_home_poll(b,rel);
@@ -2866,6 +2895,8 @@ static void app_main(void)
         smk_control_seen = smk_control_context();
         smk_faders(&dirty_page, &dirty_hdr, &dirty_tags);
         smk_wheels();
+        smk_sustain_poll();
+        smk_midi_controls_poll();
 #endif
         midi_in(0);
         if (ctl_ext_quarter && fm1_ms - clk_last > 1000u) { ctl_ext_quarter = 0; clk_n = 0; }   /* (the clock stopped: our own tempo) */

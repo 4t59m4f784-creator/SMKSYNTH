@@ -1,3 +1,17 @@
+# Public release 1.1.0 validation
+
+- Marcus approved all MIDI M1.2 base features on SMK-37 Pro: TRS/USB MIDI, part-specific pitch bend/mod wheel, sustain pedal, MIDI PANIC and stuck-note fix. An actual user validated the SMK-37 Elite installation workflow on hardware.
+- Final 1.1.0 packages were rebuilt from that tested base with identity 19634 on both models. The hardware approval above refers to the tested base and Elite workflow, rather than a fresh physical installation of these four final files.
+- Application: 167200 bytes; static RAM: 94480/98304 bytes; pool: 325984/344064 bytes; loader: 7703 bytes.
+- Unified installer: four distinct model/operation packages, SHA-256 and CRC checks, automatic selection, refusal of model/device substitution, unknown origins and foreign loaders. Resume is bound to the model, package and initial source. First installation seeds the factory bank; updating preserves the bank.
+- Host regression covers part note routing, CC1/pitch bend/CC64, all-channel Panic, note release after mode changes, sustain with other held keys, split/layer and sequencer, USB, backup, simulator and PT/EN. Elite flash tests include interruption/resume and bank preservation.
+- All four final packages are inspected for model, identities, loader, application and factory data. Publication checks public documentation and links.
+- ENDLESS remains separate. USB audio retains the known iPhone video-recording limitation. Host tests do not measure real CPU usage or replace hardware testing.
+
+Hashes: [RELEASE.json](../RELEASE.json). Download checksums: `releases/1.1.0/SHA256SUMS.txt`.
+
+## Historical 1.0.3 record
+
 # Public release 1.0.3 validation
 
 The public runtime promotes SUPER SS3 (`0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`), approved by Marcus on the SMK-37 Pro after chord tests.

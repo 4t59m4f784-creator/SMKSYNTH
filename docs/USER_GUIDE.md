@@ -21,3 +21,7 @@ Passo a passo, gravação ao vivo e arpejador consideram as oitavas físicas e d
 Patterns guardam sequência, quatro sons, mixer e configurações de teclado como cenas. Tempo é global; os exemplos começam a 90 BPM. Favoritos e sons de cena são snapshots independentes do banco de presets.
 
 Faça SAVE no painel e depois exporte o banco. Simulador e teclado têm memórias separadas; sessão de simulador não é backup físico.
+
+## MIDI e pedal na versão 1.1.0
+
+Consulte [MIDI OUT, sustain e MIDI PANIC no manual](MANUAL.md). TRS/DIN e USB transmitem as quatro partes em canais consecutivos, a partir do canal GLOBAL (OMNI transmite 1–4). Rodas acompanham a parte selecionada; pedal físico envia CC64 nas quatro partes. GLOBE + PLAY libera notas/sustain e para o transporte. [Instalador Pro e Elite](INSTALLATION.md).
