@@ -17,6 +17,20 @@ static void phrase(unsigned t,unsigned len){pat.trk[t].len=(uint16_t)len;for(uns
 int main(void){
  _Static_assert(sizeof(seqtrk_t)==8,"track record changed");_Static_assert(sizeof(pattern_t)==14476,"pattern changed");
  engine_init();pf_init();set.tempo=120;set.m_vol=100;set.m_dj=64;fx_sync();mix_apply();
+ /* SP2: visiting and adjusting a disabled page must not claim playback or edit the bank. */
+ reset();phrase(0,3);pattern_t untouched=pat;unsigned old_edited=pat_edited;
+ for(unsigned i=0;i<4;i++){
+  page=PG_SEQ;seq_view=SV_TRACKS;endless_poll();seq_view=SV_ENDLESS;endless_poll();
+  for(unsigned k=0;k<4;k++)endless_turn(k,1);
+  assert(!end_mode&&!end_record&&!ctl_seq_run&&pat_edited==old_edited);
+  assert(!memcmp(&pat,&untouched,sizeof pat));
+ }
+ /* PARA enables an existing phrase; stopping does not disable; PARA disables without erasing notes. */
+ endless_toggle();assert(end_mode&&pat.trk[0].len==3);key(1,60);key(0,60);assert(ctl_seq_run);
+ endless_stop();render(2);assert(end_mode&&!ctl_seq_run);key(1,60);key(0,60);assert(ctl_seq_run);
+ endless_toggle();render(2);assert(!end_mode&&!ctl_seq_run&&pat.trk[0].len==3);
+ for(unsigned i=0;i<3;i++){seq_view=SV_TRACKS;endless_poll();seq_view=SV_ENDLESS;endless_poll();assert(!end_mode);}
+ endless_record_toggle();assert(end_mode&&end_record==1&&pat.trk[0].len==3);endless_finish();
  for(unsigned t=0;t<4;t++){
   reset();seq_trk=t;assert(endless_enable());assert(end_mode&&pat.trk[t].len==16);
   for(unsigned p=0;p<4;p++)assert(endless_enabled(&pat.trk[p]));

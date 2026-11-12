@@ -1,7 +1,7 @@
 name: ENDLESS prototype checks
 on:
   push:
-    branches: ['experimental/endless', 'experimental/endless-e2', 'experimental/endless-e3', 'experimental/endless-e4', 'experimental/endless-e5', 'experimental/super-sp1']
+    branches: ['experimental/endless', 'experimental/endless-e2', 'experimental/endless-e3', 'experimental/endless-e4', 'experimental/endless-e5', 'experimental/super-sp1', 'experimental/super-sp2']
   pull_request:
     paths: ['firmware/src/obv_endless.h', 'tests/endless*', 'experimental/endless/**']
 permissions:
@@ -21,13 +21,13 @@ jobs:
           ASAN_OPTIONS=detect_leaks=0 UBSAN_OPTIONS=halt_on_error=1 build/endless
           sh tests/run_physical_controls_tests.sh
           node tests/endless_installer_test.mjs
-          python3 tests/smk_pkg_test.py experimental/endless/SMKSYNTH-1.0.3-sp1-SMK37-Pro.fwsc 'SMK-37 Pro_19628'
+          python3 tests/smk_pkg_test.py experimental/endless/SMKSYNTH-1.0.3-sp2-SMK37-Pro.fwsc 'SMK-37 Pro_19635'
       - name: Compile the same firmware loop for browser workflow tests
         run: |
           python3 -m pip install --target build/zig-python ziglang==0.14.1
           npm install --prefix build/wasm-tools binaryen@132.0.0
-          SIM_VERSION=1.0.3-sp1 SIM_OUT=build/endless-sim ZIG="$PWD/build/zig-python/ziglang/zig" WASM_OPT="$PWD/build/wasm-tools/node_modules/.bin/wasm-opt" sh tools/build_controls_sim.sh
-          node tests/endless_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp1.wasm
-          node tests/release_demo_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp1.wasm
-          node tests/display_refresh_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp1.wasm
-          node tests/super_sp1_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp1.wasm
+          SIM_VERSION=1.0.3-sp2 SIM_OUT=build/endless-sim ZIG="$PWD/build/zig-python/ziglang/zig" WASM_OPT="$PWD/build/wasm-tools/node_modules/.bin/wasm-opt" sh tools/build_controls_sim.sh
+          node tests/endless_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp2.wasm
+          node tests/release_demo_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp2.wasm
+          node tests/display_refresh_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp2.wasm
+          node tests/super_sp1_wasm_test.mjs build/endless-sim/SMKSYNTH-1.0.3-sp2.wasm

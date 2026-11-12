@@ -111,7 +111,7 @@ static void endless_arrow(unsigned right){
  }else if(k->len){seq_cursor_set(t,(seq_cur[t]+k->len+(right?1u:k->len-1u))%k->len);}
 }
 static void endless_turn(unsigned knob,int e){
- if(!endless_enable())return;
+ if(!end_mode){say("PARA ON / REC INPUT");return;}
  seqtrk_t*k=&pat.trk[seq_trk%NTRK];int sign=e>0?1:-1;
  if(!knob)k->div=(uint8_t)clampi((int)k->div+sign,0,NDIV-1);
  else if(knob==1)k->pad[1]=(uint8_t)clampi((int)k->pad[1]+e,1,126);
@@ -132,10 +132,9 @@ static void endless_knob(knob_view_t*k,unsigned i){
  else{unsigned hold=en?end_global_hold:1;scat(k->value,hold?"ON":"OFF");k->v=hold;k->max=1;}
 }
 static void endless_poll(void){
- static uint16_t epoch;static unsigned was_present;
+ static uint16_t epoch;
  if(epoch!=keyboard_pattern_epoch){epoch=keyboard_pattern_epoch;endless_recall();}
- unsigned present=page==PG_SEQ&&seq_view==SV_ENDLESS;
- if(present&&!was_present)endless_enable();was_present=present;
+ /* Page navigation only observes ENDLESS. PARA or REC explicitly enables it. */
  if(end_record&&(!endless_screen()||seq_trk+1u!=end_record||ctl_seq_run||layer||keyboard_active()||obv_drums_selected()))endless_finish();
  if(ctl_panic)endless_reset();
  if(end_held&&keyboard_active()){endless_stop();endless_reset();}

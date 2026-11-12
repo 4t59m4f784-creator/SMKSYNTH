@@ -1,10 +1,18 @@
-# SMKSYNTH SUPER SP1 — teste de performance
+# SP2 — ativação explícita do ENDLESS
+
+- A página não ativa o modo, nem na primeira visita nem após desligá-lo.
+- PARA alterna ON/OFF na página ENDLESS. REC continua ativando o modo para gravar. Knobs com o modo OFF não o ativam.
+- PLAY apenas para/retoma; sair da página mantém o modo ativo. Frases existentes são preservadas. A seleção já salva em cada pattern continua sendo restaurada ao carregar esse pattern.
+- Base SP1 intacta: SUPER no OSC1 e suas otimizações; ENDLESS E5 com C4 neutro. Sem novos recursos MIDI/sustain/Panic da oficial 1.1.0.
+- Atualização com preservação do banco; retorno à oficial 1.1.0 e comparações SP1/E5 disponíveis. Exporte seu banco antes.
+
+# SMKSYNTH SUPER SP2 — teste de performance
 
 Leia [SP1.md](SP1.md) para as mudanças de DSP, compatibilidade com SUPER no OSC2 e roteiro de validação física. Inclui o ENDLESS E5 descrito abaixo.
 
-# SMKSYNTH SUPER SP1 — teste de performance com ENDLESS E5
+# SMKSYNTH SUPER SP2 — teste de performance com ENDLESS E5
 
-Versão experimental `1.0.3-sp1`, identidade `SMK-37 Pro_19628`. Parte da pública 1.0.3 e inclui a correção UI1 de redesenho. Não promove uma nova versão pública.
+Versão experimental `1.0.3-sp2`, identidade `SMK-37 Pro_19635`. Parte da pública 1.0.3 e inclui a correção UI1 de redesenho. Não promove uma nova versão pública.
 
 ## Primeiro teste
 
@@ -13,7 +21,7 @@ Versão experimental `1.0.3-sp1`, identidade `SMK-37 Pro_19628`. Parte da públi
 3. Com o transporte parado, toque REC: ativa ENDLESS e abre entrada por passos. Uma track realmente vazia começa em zero; uma frase existente é preservada e REC acrescenta no final.
 4. Toque nota ou acorde e solte todas as teclas. Avança quando a última tecla é solta. Até quatro notas por passo; no máximo 256 passos.
 5. Durante a entrada: `>` sem teclas insere uma pausa; com nota/acorde segurado acrescenta um passo ligado. `<` desfaz o último passo, com as teclas soltas. REC encerra a entrada. Segurar REC por 1,2 s mantém o comando de limpar a track; em ENDLESS a extensão volta a zero. PARA + OCT permite o undo existente.
-6. Ao entrar na vista ENDLESS, o modo é ativado para todas as partes ANALOG. Escolha outra parte com K6 para gravar uma frase independente. Cada track conserva sua quantidade de passos, RATE e direção; todas usam o relógio mestre. Por exemplo, 3, 5 e 7 passos repetem independentemente.
+6. Acessar a vista não ativa o modo. PARA liga explicitamente o ENDLESS, e REC também o ativa para gravar nas partes ANALOG. Escolha outra parte com K6 para gravar uma frase independente. Cada track conserva sua quantidade de passos, RATE e direção; todas usam o relógio mestre. Por exemplo, 3, 5 e 7 passos repetem independentemente.
 7. PLAY inicia todas as tracks. Cada tecla, inclusive em legato, agenda o reinício de todas do começo na grade de semicolcheias Q16 e transpõe as partes ANALOG: C4 é zero. A última tecla pressionada define a transposição global de performance; a posição física da tecla é fixa e ignora a oitava da parte em foco; MIDI recebido permanece absoluto. Na gravação, a oitava da parte continua incorporada às notas. A transposição global KEY TR continua adicional; deixe-a zerada no primeiro teste. DRUM-X nunca transpõe.
 8. K1 RATE, K2 GATE e K3 DIR (FWD/REV/RND) continuam por parte. **K4 HOLD é global**: ON continua após soltar; OFF para o transporte inteiro e apaga SEQ PLAY ao soltar a última tecla. Todos os cursores retornam ao início. Com duas teclas seguradas, soltar somente uma não para a reprodução. Releases e caudas naturais dos sons permanecem.
 9. **K5 controla somente o TEMPO na tela ENDLESS**, de 40 a 240 BPM. O valor fica visível no alto à direita. Com clock MIDI externo, o valor efetivo tem prefixo E; o clock externo continua mestre, como na base. K5 mantém suas funções habituais nas demais telas.
@@ -32,7 +40,7 @@ Versão experimental `1.0.3-sp1`, identidade `SMK-37 Pro_19628`. Parte da públi
 
 ## Instalação e retorno
 
-Use somente o instalador experimental desta pasta/site. Aceita a pública 1.0.x e os testes SUPER SS1/SS2/SS3, UI1, E1 e E2. Primeira instalação a partir da V016 é recusada. Inclui retorno à pública 1.0.3 original; ambos preservam o banco. Durante transferência interrompida, retome na mesma página/navegador com o mesmo pacote. Se a interrupção foi durante E1, use primeiro [o instalador E1 preservado](legacy-e1/); ele mantém os hashes e a chave de retomada originais.
+Use somente o instalador experimental desta pasta/site. Aceita a pública 1.0.x e os testes SUPER SS1/SS2/SS3, UI1, E1 e E2. Primeira instalação a partir da V016 é recusada. Inclui retorno à oficial 1.1.0; ambos preservam o banco. Durante transferência interrompida, retome na mesma página/navegador com o mesmo pacote. Se a interrupção foi durante E1, use primeiro [o instalador E1 preservado](legacy-e1/); ele mantém os hashes e a chave de retomada originais.
 
 ## Créditos
 
@@ -45,7 +53,7 @@ Interação inspirada no [Endless do OP-1 / teenage engineering](https://teenage
 - HOLD ON mantém a frase antiga até a fronteira. HOLD OFF libera o transporte/PLAY ao soltar a última tecla, cancela pedidos pendentes e mantém apenas uma referência silenciosa de clock por uma semínima (500 ms a 120 BPM). A próxima tecla nesse intervalo é quantizada; após ele, inicia de imediato. Não há notas fantasmas quando a tecla é solta antes da fronteira.
 - A espera máxima é uma semicolcheia (aproximadamente 125 ms a 120 BPM). O período usa o BPM efetivo, inclusive o andamento externo já suportado pela base. Não promete correção retroativa de execução nem sincronização nova com posição de DAW.
 - STOP explícito, panic, pattern/undo e entrada REC limpam o pedido e a referência. PLAY explícito inicia imediatamente e ancora nova grade. Nenhum byte é acrescentado ao armazenamento.
-- [Comparar com E2 sem quantização](legacy-e2/): firmware e chave de retomada E2 preservados; instalador aceita também origens E3 e E4 para permitir o retorno direto. Voltar à versão atual pela página principal. A pública 1.0.3 permanece a mesma.
+- [Comparar com E2 sem quantização](legacy-e2/): firmware e chave de retomada E2 preservados; instalador aceita também origens E3 e E4 para permitir o retorno direto. Voltar à versão atual pela página principal. A oficial 1.1.0 permanece separada.
 
 ## Referência fixa do teclado — atualizada na E5
 
