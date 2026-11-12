@@ -15,9 +15,13 @@ class Links(HTMLParser):
     def __init__(self):
         super().__init__()
         self.links = []
+        self.meta = {}
 
     def handle_starttag(self, tag, attrs):
         self.links.extend(v for k, v in attrs if k in ('href', 'src') and v)
+        if tag=='meta':
+            a=dict(attrs)
+            self.meta[a.get('property',a.get('name'))]=a.get('content')
 
 
 def check(site):
@@ -45,6 +49,14 @@ def check(site):
         assert 'i18n.js' in html, f'Missing language support: {page}'
         parser = Links()
         parser.feed(html)
+        if folder in ('', 'install'):
+            origin='https://4t59m4f784-creator.github.io/SMKSYNTH/'
+            assert parser.meta['og:url']==origin+('install/' if folder else '')
+            assert parser.meta['og:image']==origin+'assets/smksynth-social-v1.png'
+            assert parser.meta['og:image:width']=='1200' and parser.meta['og:image:height']=='630'
+            assert parser.meta['twitter:card']=='summary_large_image'
+            card=(site/'assets/smksynth-social-v1.png').read_bytes()
+            assert card[:8]==b'\x89PNG\r\n\x1a\n' and int.from_bytes(card[16:20],'big')==1200 and int.from_bytes(card[20:24],'big')==630
         for link in parser.links:
             dependency(page, link)
             if 'docs/' in link and link.endswith('.md') and not link.endswith('.en.md'):
