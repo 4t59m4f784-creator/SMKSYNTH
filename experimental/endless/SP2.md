@@ -17,3 +17,7 @@ Base: SUPER SP1 (`68f2e40`). Identidade `SMK-37 Pro_19635`; versão `1.0.3-sp2`.
 Não altera DSP, supersaw, oito vozes, transposição C4, quantização, formato do banco ou modo de salvamento. Mantém o comportamento anterior de PARA ao desligar (controles ENDLESS são reinicializados; notas preservadas). Não incorpora as novidades MIDI da oficial 1.1.0.
 
 Validação automatizada: navegação por SEQ, reentrada após OFF, knobs, PARA ON/OFF, REC explícito, PLAY/retomada, frases intactas e recalls no loop real WASM. Regressão ENDLESS e comparação do áudio SP1. A confirmação física deste ajuste depende do teste no SMK-37 Pro.
+
+## Compatibilidade do instalador — correção
+
+Corrigida a ausência de PED1 e MIDI M1/M1.1/M1.2 (identidades Pro 19630–19633) na lista de origens. A passagem de M1.1 (`19632`) à SP2 foi verificada com banco preservado e interrupção/retomada. Nenhum firmware foi recompilado; pacotes, hashes, identidade de destino e chave pendente são os mesmos. A SP2 mantém a base SP1 e não incorpora os recursos MIDI da M1.1.

@@ -3,8 +3,8 @@ import fs from 'node:fs';import assert from 'node:assert/strict';import {webcryp
 import {PINS,PENDING,validate,modeFor,InstallService} from '../experimental/endless/service.js';import {PINS as stable} from '../web/install/service.js';
 const id=text=>({text,model:text.split('_')[0]});const buffers={};
 for(const [k,p]of Object.entries(PINS)){buffers[k]=new Uint8Array(fs.readFileSync('experimental/endless/'+p.url.slice(2)));await validate(buffers[k],k);const bad=buffers[k].slice();bad[1000]^=1;await assert.rejects(()=>validate(bad,k));}
-for(const src of ['19618','19619','19620','19621','19622','19623','19624','19625','19626','19627','19628','19634','19635'])assert.equal(modeFor('update',id('SMK-37 Pro_'+src)),'install');
-for(const src of ['19619','19620','19621','19622','19623','19624','19625','19626','19627','19628','19634','19635'])assert.equal(modeFor('release',id('SMK-37 Pro_'+src)),'install');
+for(const src of ['19618','19619','19620','19621','19622','19623','19624','19625','19626','19627','19628','19630','19631','19632','19633','19634','19635'])assert.equal(modeFor('update',id('SMK-37 Pro_'+src)),'install');
+for(const src of ['19619','19620','19621','19622','19623','19624','19625','19626','19627','19628','19630','19631','19632','19633','19634','19635'])assert.equal(modeFor('release',id('SMK-37 Pro_'+src)),'install');
 for(const k of Object.keys(PINS)){for(const src of ['SMK-37 Pro_016','SMK-37 Elite_19618','FM-1_19618'])assert.throws(()=>modeFor(k,id(src)));assert.equal(modeFor(k,id('ota-SMK-37 Pro_900'),{kind:k,sha:PINS[k].sha,source:'SMK-37 Pro_19623'}),'resume');assert.throws(()=>modeFor(k,id('ota-SMK-37 Pro_900'),{kind:k,sha:'bad',source:'SMK-37 Pro_19623'}));}
 assert.equal(PINS.release.product,'SMK-37 Pro_19634');assert(PENDING.includes('super.sp2'));
 let source='SMK-37 Pro_19622',fail=true;
@@ -38,3 +38,13 @@ assert.equal(e5.PINS.update.product,'SMK-37 Pro_19627');console.log('PASS: origi
 
 const sp1=await import('../experimental/endless/legacy-sp1/service.js');assert(sp1.PENDING.includes('super.sp1'));assert.notEqual(sp1.PENDING,PENDING);assert.equal(sp1.modeFor('update',id('SMK-37 Pro_19635')),'install');
 for(const [kind,pin] of Object.entries(sp1.PINS))await sp1.validate(new Uint8Array(fs.readFileSync('experimental/endless/legacy-sp1/'+pin.url.slice(2))),kind);
+
+// M1.1 -> SP2: connection, both interrupted retries and source-bound resume.
+for(const [kind,target]of [['update','SMK-37 Pro_19635'],['release','SMK-37 Pro_19634']]){
+ m.clear();source='SMK-37 Pro_19632';fail=true;
+ await assert.rejects(()=>svc.execute(kind,buffers));assert.equal(JSON.parse(m.get(PENDING)).source,'SMK-37 Pro_19632');
+ source='ota-SMK-37 Pro_900';await assert.rejects(()=>svc.execute(kind,buffers));assert.equal(JSON.parse(m.get(PENDING)).source,'SMK-37 Pro_19632');
+ fail=false;await svc.execute(kind,buffers);assert.equal(source,target);assert.equal(m.size,0);
+}
+for(const sourceId of ['19636','19632_extra','1963'])for(const kind of ['update','release'])assert.throws(()=>modeFor(kind,id('SMK-37 Pro_'+sourceId)));
+console.log('PASS: PED1/M1/M1.1/M1.2 accepted explicitly, actual M1.1 install/return interruption/resume retains original source, unknown identities still refused.');

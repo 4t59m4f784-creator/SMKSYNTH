@@ -14,14 +14,14 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 export function readPending(storage){try{const p=JSON.parse(storage.getItem(PENDING));return p&&PINS[p.kind]?.sha===p.sha?p:null}catch{return null}}
-const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627','SMK-37 Pro_19628','SMK-37 Pro_19634','SMK-37 Pro_19635'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627','SMK-37 Pro_19628','SMK-37 Pro_19634','SMK-37 Pro_19635'].includes(source);
+const originAllowed=(kind,source)=>kind==='release'?['SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627','SMK-37 Pro_19628','SMK-37 Pro_19630','SMK-37 Pro_19631','SMK-37 Pro_19632','SMK-37 Pro_19633','SMK-37 Pro_19634','SMK-37 Pro_19635'].includes(source):kind==='update'&&['SMK-37 Pro_19618','SMK-37 Pro_19619','SMK-37 Pro_19620','SMK-37 Pro_19621','SMK-37 Pro_19622','SMK-37 Pro_19623','SMK-37 Pro_19624','SMK-37 Pro_19625','SMK-37 Pro_19626','SMK-37 Pro_19627','SMK-37 Pro_19628','SMK-37 Pro_19630','SMK-37 Pro_19631','SMK-37 Pro_19632','SMK-37 Pro_19633','SMK-37 Pro_19634','SMK-37 Pro_19635'].includes(source);
 export function modeFor(kind,id,pending){
  if(!PINS[kind])throw Error('Operação inválida.');
  if(!id?.text)throw Error('Conecte e consulte o teclado.');
  if(!['SMK-37 Pro','ota-SMK-37 Pro'].includes(id.model))throw Error('Modelo recusado: somente SMK-37 Pro.');
  if(originAllowed(kind,id.text))return 'install';
  if(id.text==='ota-SMK-37 Pro_900'&&(pending?.kind===kind&&pending.sha===PINS[kind].sha&&originAllowed(kind,pending.source)))return 'resume';
- throw Error('Esta página aceita SMKSYNTH 1.0.3, SS1/SS2/SS3, UI1, E1, E2, E3, E4, E5, SP1, SP2 ou oficial 1.1.0 no SMK-37 Pro. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
+ throw Error('Esta página aceita SMKSYNTH 1.0.3, SS1/SS2/SS3, UI1, E1, E2, E3, E4, E5, SP1, SP2, PED1, MIDI M1/M1.1/M1.2 ou oficial 1.1.0 no SMK-37 Pro. Detectado: '+id.text+'. Nenhuma gravação iniciada.');
 }
 function guardFor(source){return (phase,id)=>{
  if(phase==='start'&&id.text!==source())throw Error('A identidade mudou antes da gravação: '+id.text);
