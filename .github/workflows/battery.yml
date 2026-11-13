@@ -1,0 +1,19 @@
+name: Battery indicator checks
+on:
+  push:
+    branches: ['feature/battery-from-smktron']
+  pull_request:
+    paths: ['firmware/src/obv_battery.h', 'tests/battery_test.c', 'docs/BATTERY-SMKTRON.md']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p build
+          cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/battery-test tests/battery_test.c
+          ASAN_OPTIONS=detect_leaks=0 build/battery-test
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/controls tests/physical_controls_test.c
+          build/controls
