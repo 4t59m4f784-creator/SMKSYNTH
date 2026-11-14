@@ -17,7 +17,7 @@ for model in ['pro','elite']:
   for k in range(struct.unpack_from('<H',head,8)[0]):
    e=I._dec(image[64+k*80:144+k*80]);off,size=struct.unpack_from('<II',e,8);files[struct.unpack_from('<H',e)[0]]=image[off:off+size]
   flash=files[0];area=bytearray(flash[0x4000:0x55000]);M.sfc(area,0,len(area),0,M.KEY)
-  for identity in [name+b'_19634',name+b'_000',b'ota-'+name+b'_016']:assert identity in area,identity
+  for identity in [name+b'_19649',name+b'_000',b'ota-'+name+b'_016']:assert identity in area,identity
   apps.append(area)
   ota=files[100];pos=64;loader=b''
   while pos<len(ota):

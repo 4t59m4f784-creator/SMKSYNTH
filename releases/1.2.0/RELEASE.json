@@ -1,0 +1,108 @@
+{
+  "version": "1.2.0",
+  "identity": "SMK-37 Pro_19649",
+  "required_origin": "SMK-37 Pro_016",
+  "installation": "first-install-or-preserving-update",
+  "runtime_base": "f9a2ab2162a4f19e13709f4f57d95aa30ad65c8b",
+  "factory_patterns": 5,
+  "favorites": 8,
+  "extra_user_presets": 0,
+  "tempo": 90,
+  "dp2_runtime_hardware_approved": true,
+  "first_install_hardware_approved": false,
+  "firmware_sha256": "5102f583e898aa573bff0ac98dd0939c3fe7114f021639f5724c952daaf39659",
+  "wasm_sha256": "76e54169a95a1d4f49be8eb799e62012bc55801bc08f31f7a850daca85df28e2",
+  "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
+  "app_bytes": 224880,
+  "static_ram_bytes": 95392,
+  "pool_bytes": 328368,
+  "loader_bytes": 7703,
+  "update_firmware_sha256": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c",
+  "usb_audio": true,
+  "fader_modes": [
+    "JUMP",
+    "CATCH"
+  ],
+  "usb_audio_validation": [
+    "Mac 44.1/48 kHz",
+    "iPhone AudioShare"
+  ],
+  "known_issues": [
+    "iPhone USB video recording clicks/dropouts"
+  ],
+  "usb_audio_base": "UA1",
+  "supersaw_hardware_approved": true,
+  "supersaw_origin": "https://github.com/isod89/clipper-fm1",
+  "identities": {
+    "pro": "SMK-37 Pro_19649",
+    "elite": "SMK-37 Elite_19649"
+  },
+  "supported_models": [
+    "SMK-37 Pro",
+    "SMK-37 Elite"
+  ],
+  "hardware_approved": true,
+  "elite_installer_hardware_approved": true,
+  "firmware": {
+    "pro": {
+      "release": {
+        "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
+        "product": "SMK-37 Pro_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Pro.fwsc",
+        "size": 651327,
+        "sha": "5102f583e898aa573bff0ac98dd0939c3fe7114f021639f5724c952daaf39659"
+      },
+      "update": {
+        "name": "SMKSYNTH 1.2.0 \u00b7 update",
+        "product": "SMK-37 Pro_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Pro.fwsc",
+        "size": 651819,
+        "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"
+      }
+    },
+    "elite": {
+      "release": {
+        "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
+        "product": "SMK-37 Elite_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Elite.fwsc",
+        "size": 651327,
+        "sha": "052496ea37f361aade975f9c6b08b62d891010e666fbe3a9845f939322acf598"
+      },
+      "update": {
+        "name": "SMKSYNTH 1.2.0 \u00b7 update",
+        "product": "SMK-37 Elite_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Elite.fwsc",
+        "size": 651819,
+        "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"
+      }
+    }
+  },
+  "midi_trs": true,
+  "midi_usb": true,
+  "midi_output_channels": "base + part index; OMNI output 1-4",
+  "midi_panic": "GLOBE + PLAY",
+  "physical_sustain": true,
+  "endless_included": true,
+  "hardware_validation": {
+    "pro": "MO1a and preceding functions approved by Marcus; 1.2.0 changes only stable identity/version",
+    "elite": "Unified Elite installation flow previously approved by a real user; 1.2 packages checked in simulated flash"
+  },
+  "required_origins": {
+    "pro": "SMK-37 Pro_016",
+    "elite": "SMK-37 Elite_016"
+  },
+  "midi_mode": true,
+  "midi_mode_bluetooth": false,
+  "midi_mode_profiles": 4,
+  "display_themes": [
+    "Obervave",
+    "Zoom"
+  ],
+  "default_theme": "Obervave",
+  "preset_rename": true,
+  "supersaw_oscillators": [
+    1
+  ],
+  "supersaw_voice_limit": 5,
+  "source_identity": "MO1a /19648"
+}

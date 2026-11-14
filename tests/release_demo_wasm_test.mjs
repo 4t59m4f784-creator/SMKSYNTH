@@ -1,6 +1,6 @@
 import fs from 'node:fs';import assert from 'node:assert/strict';
 const lab=new URL('../web/simulator/',import.meta.url);const {Engine}=await import('data:text/javascript;base64,'+fs.readFileSync(new URL('engine.js',lab)).toString('base64'));
-const wasm=fs.readFileSync(new URL('obervave-voice.wasm',lab)),seed=fs.readFileSync(new URL('factory-session.bin',lab));
+const wasm=process.argv[2]?fs.readFileSync(process.argv[2]):fs.readFileSync(new URL('obervave-voice.wasm',lab)),seed=fs.readFileSync(new URL('factory-session.bin',lab));
 let e=new Engine(wasm,seed.buffer.slice(seed.byteOffset,seed.byteOffset+seed.byteLength));e.advance(5000);
 const b=(n,ms=100)=>{e.input({t:'btn',b:n,down:true});e.advance(ms);e.input({t:'btn',b:n,down:false});e.advance(130);};
 const pad=p=>{e.input({t:'pad',p,v:100});e.advance(80);e.input({t:'pad',p,v:0});e.advance(160);};

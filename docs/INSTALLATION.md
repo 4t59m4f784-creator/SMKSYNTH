@@ -1,11 +1,11 @@
-# SMKSYNTH 1.1.0 - Instalação e recuperação
+# SMKSYNTH 1.2.0 - Instalação e recuperação
 
 O mesmo [instalador](../install/?lang=pt) atende SMK-37 Pro e SMK-37 Elite. Ele identifica o modelo e escolhe automaticamente um pacote específico. Use Chrome/Edge no computador em HTTPS, cabo USB de dados e alimentação estável; feche outros aplicativos MIDI.
 
 1. Conecte e consulte. O teclado só é acessado após clicar em Conectar.
 2. Partindo da V016 oficial do modelo conectado, a página oferece a instalação inicial. Ela inicializa/substitui o banco com cinco patterns e oito favoritos.
 3. Em versões SMKSYNTH compatíveis, a página oferece Atualizar, preservando programas, favoritos, patterns e configurações salvas. Salve as edições e exporte um [backup](../backup/?lang=pt) antes.
-4. Confira o modelo e a operação, confirme e mantenha a conexão até a identidade de destino `SMK-37 Pro_19634` ou `SMK-37 Elite_19634` ser confirmada.
+4. Confira o modelo e a operação, confirme e mantenha a conexão até a identidade de destino `SMK-37 Pro_19649` ou `SMK-37 Elite_19649` ser confirmada.
 5. Conecte o pedal de sustain antes de reiniciar e mantenha-o solto na inicialização.
 
 ## Transferências interrompidas
@@ -20,4 +20,4 @@ Exporte o banco antes de voltar ao firmware M-VAVE. Use M-UPGRADE do fabricante 
 
 ## Depois de instalar
 
-Veja no [manual](MANUAL.md) o roteamento USB/TRS, sustain físico e Panic por GLOBE + PLAY. A ENDLESS continua separada: a atualização preserva o banco salvo, mas não adiciona seus recursos. Para desfazer edições feitas em outra linha, restaure o backup anterior.
+Veja no [manual](MANUAL.md) o roteamento USB/TRS, sustain físico e Panic por GLOBE + PLAY. A 1.2.0 inclui ENDLESS e MIDI MODE. Atualizar preserva o banco salvo e os registros separados de tema/mapas compatíveis. Para desfazer edições feitas em outra linha, restaure o backup anterior.

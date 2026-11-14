@@ -155,6 +155,13 @@ static void draw_logo_small(int32_t x, int32_t y)   /* "SMKSYNTH" in FONT_S with
 #define C_TRACK_A RGB(96, 176, 255)
 #endif
 static const uint16_t C_TRKC[4] = {C_TRACK_A, RGB(255, 150, 40), RGB(110, 220, 150), RGB(255, 96, 150)};
+#if BOARD_SMK37
+/* The blue square matches the selected pattern pad; part colours stay separate. */
+static void ui_pattern_badge(int x,int y){
+ unsigned n=set.pat%NPAT+1u;char s[3]={(char)('0'+n/10u),(char)('0'+n%10u),0};
+ cv_rect(x,y,24,18,RGB(16,48,255));cv_text(x+(24-text_w(&FONT_S,s))/2,y+1,&FONT_S,s,C_CREAM);
+}
+#endif
 /* trk: the track the panel is on (its letter before the name, in its colour; the number in red for A) */
 static void ui_header(uint32_t prog, const uint8_t *name, uint32_t edited, const char *tags, uint32_t trk, uint32_t favourite)
 {
@@ -174,7 +181,12 @@ static void ui_header(uint32_t prog, const uint8_t *name, uint32_t edited, const
     n[PATCH_NAME + 1] = 0;
     cv_text(54, 4, &FONT_S, tl, c);
     cv_text(66, 4, &FONT_S, n, trk ? c : C_CREAM);
+#if BOARD_SMK37
+    char short_tags[19];unsigned tn=0;while(tn<18u&&tags[tn]){short_tags[tn]=tags[tn];tn++;}short_tags[tn]=0;
+    cv_text(54,22,&FONT_S,short_tags,C_DIMT);ui_pattern_badge(208,23);
+#else
     cv_text(54, 22, &FONT_S, tags, C_DIMT);
+#endif
     draw_logo_small(240 - 4 - text_w(&FONT_S, "SMKSYNTH"), 4);
     cv_rect(0, 42, 240, 1, C_RULE);
     cv_blit(0, 0);
@@ -458,7 +470,7 @@ static void ui_drum_grid(uint32_t t,uint32_t w0,uint32_t cursor,int32_t ph,uint3
     cv_blit(0,152);
 }
 
-static void ui_seq_knobs(const knob_view_t *k)
+static void ui_seq_knobs_tint(const knob_view_t *k,uint16_t value_color)
 {
     int32_t i;
     cv_begin(240, 52, C_PANEL);
@@ -467,7 +479,7 @@ static void ui_seq_knobs(const knob_view_t *k)
         int32_t cx = 30 + 60 * i, f;
         if (!k[i].present) continue;
         cv_text(cx - text_w(&FONT_S, k[i].label) / 2, 3, &FONT_S, k[i].label, C_DIMT);
-        cv_text(cx - text_w(&FONT_S, k[i].value) / 2, 19, &FONT_S, k[i].value, C_CREAM);
+        cv_text(cx - text_w(&FONT_S, k[i].value) / 2, 19, &FONT_S, k[i].value, value_color);
         cv_rect(cx - 22, 42, 44, 3, C_KNOB);
         if (k[i].max > 0) {
             f = 44 * clampi(k[i].v, 0, k[i].max) / k[i].max;
@@ -477,6 +489,8 @@ static void ui_seq_knobs(const knob_view_t *k)
     }
     cv_blit(0, 188);
 }
+
+static void ui_seq_knobs(const knob_view_t*k){ui_seq_knobs_tint(k,C_CREAM);}
 
 /* TRACKS (as SLOOP's): A-D one under the other, 36 px each from y 24, the chosen one lit in its colour. A row: the
  * letter in a tile, the sound (number and name), its state on the right (PLAY, STOP, NEXT: starts on the bar, ENDS:

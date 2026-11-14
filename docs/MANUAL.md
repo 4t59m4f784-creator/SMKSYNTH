@@ -1,12 +1,15 @@
-# SMKSYNTH 1.1.0 - Manual completo
+# SMKSYNTH 1.2.0 - Manual completo
 
-[PDF](pdf/SMKSYNTH-1.1.0-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.2.0-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Referência: firmware 1.1.0, SMK-37 Pro_19634 / SMK-37 Elite_19634.
+Referência: firmware 1.2.0, SMK-37 Pro_19649 / SMK-37 Elite_19649.
 
 ## Índice
 
 - 1. Visão geral e navegação
+- ENDLESS: gravar e tocar
+- MIDI MODE: controlador independente
+- Tema, osciloscópio e salvamento
 - 2. Botões: referência
 - 3. Performance, faders e rodas
 - 4. Favoritos e presets
@@ -36,7 +39,7 @@ Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os 
 
 ## 1. Visão geral e navegação
 
-Firmware 1.1.0 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
+Firmware 1.2.0 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
 
 ![knobs](diagrams/knobs-pt.svg)
 
@@ -54,20 +57,61 @@ Banco de pads e página da tela são estados distintos. PLAY, REC e seleção de
 
 Toque = pressione e solte. Segure = mantenha pressionado pelo tempo indicado. Os diagramas de pads usam duas fileiras de oito, da esquerda para a direita: 1-8 em cima, 9-16 embaixo. Os demais desenhos são mapas funcionais, sem escala.
 
+## ENDLESS: gravar e tocar
+
+ENDLESS faz parte da versão oficial 1.2. Funciona em SINGLE, com as quatro partes e comprimentos independentes. Split/Layer precisa estar desligado. DRUM-X mantém seu sequenciador de bateria. Abrir a página não ativa ENDLESS.
+
+1. Selecione a parte com K6 e percorra as vistas SEQ até ENDLESS. Toque PARA para ativar; PARA novamente desativa sem apagar as notas. REC também ativa e começa a entrada de notas.
+2. Com o transporte parado, toque REC e grave notas ou acordes: ao soltar todas as teclas, o próximo toque acrescenta um step. São até 256 steps por parte.
+3. Durante a entrada, seta direita acrescenta pausa sem teclas ou prolonga as notas seguradas; seta esquerda remove o último step após soltar as teclas. Toque REC novamente para encerrar a entrada.
+4. Com ENDLESS ativo, uma tecla dispara/transpõe a sessão das partes: C4 mantém a afinação original, sem depender da oitava de edição da parte. PLAY inicia ou para o transporte. K4 HOLD mantém a execução após soltar as teclas; desligado, a última tecla solta para a sessão.
+5. K1 RATE, K2 GATE, K3 DIR (FWD/REV/RND), K4 HOLD. Salve no banco de patterns para guardar sequências, sons e ajustes.
+6. Segurar REC por mais de 1,2 s apaga a sequência e automações da parte selecionada. Parar, trocar de tela ou desligar ENDLESS não apaga o que foi gravado.
+
+ENDLESS transmite as notas por MIDI USB e TRS/DIN usando o canal de cada parte, como o sequenciador normal. Não envia MIDI Clock/Start/Stop.
+
+## MIDI MODE: controlador independente
+
+No MIDI MODE o sintetizador fica silencioso e os controles enviam MIDI por USB e TRS/DIN. Não inclui Bluetooth. A entrada e a saída encerram as notas e limpam modulação temporária para preservar o timbre ao retornar ao synth.
+
+1. No synth, percorra GLOBE até MIDI MODE. Antes de ativar, a tela mostra somente o comando de entrada; gire K1 para a direita.
+2. No MIDI MODE, GLOBE abre os ajustes: K1 à esquerda retorna ao synth; K2 escolhe MAP 1-4; K3 define o canal principal 1-16; K4 escolhe encoders ABS ou REL. O canal deste modo é independente do canal-base das partes do synth.
+3. KNOB BANK e FADER BANK alternam os bancos A/B. Pressione os dois juntos para trocar o banco dos pads. OCT-/+ transpõem o teclado.
+4. Toque PARA para editar. Mova o controle desejado ou use K5/OCT para selecioná-lo. K1 escolhe o tipo permitido (OFF, CC, CC TOGGLE, NOTE ou PITCH BEND), K2 o número CC/nota, K3 o canal (MAIN ou 1-16) e K4 a cor dos pads. Nem todos os tipos se aplicam a todos os controles.
+5. BT salva os quatro mapas, incluindo canais, cores e comportamento. Solte teclas, pads e pedal antes de salvar. PARA volta à visão de performance. Encoders ABS aceleram conforme a velocidade; REL usa mensagens relativas.
+6. A tela mantém três áreas independentes: último controle com valor e barras, pads com atividade e teclado virtual de 37 teclas com acordes. GLOBE + PLAY aciona MIDI PANIC.
+
+O simulador demonstra a interface e preserva sua memória no navegador; não substitui um teste das portas físicas USB/TRS. O backup .smksynth guarda o banco do synth; mapas MIDI e tema ficam em memória separada e não são incluídos nesse arquivo.
+
+## Tema, osciloscópio e salvamento
+
+GLOBE > THEME: K1 escolhe OBERVAVE (padrão) ou ZOOM. A preferência é gravada automaticamente após 1,5 s, com transporte parado e áudio em silêncio. Não é necessário salvar um preset. A gravação do tema não salva edições pendentes de mapas MIDI.
+
+Zoom usa nomes e valores maiores. A cor da parte identifica a linha do cabeçalho, o box da parte (letra branca) e o número do preset. Textos, valores e grade preservam a paleta do instrumento. O número do pattern continua visível na performance.
+
+Performance com valores é a tela padrão. PATCH curto abre a tela de logo, osciloscópio da saída geral e vozes/peças de bateria; outro toque entra no ciclo do Mixer. PATCH longo volta aos valores. O osciloscópio mantém suas cores e não mostra pattern. Edições aparecem por cerca de um segundo em um aviso Zoom e depois somem.
+
+| Fluxo | Telas e comandos |
+| --- | --- |
+| Save rápido | BT curto salva o som na posição atual, mantendo o nome. |
+| Salvar como / renomear | BT longo abre edição. K1 move cursor; K2 escolhe caractere (até 10); K7 escolhe posição 01-99. A tela mostra o programa já presente no destino. |
+| Revisar substituição | BT abre a revisão do nome e destino, com o programa que será substituído. Solte e pressione BT novamente para gravar. |
+| Voltar / cancelar | PATCH na revisão volta à edição; PATCH na edição cancela sem escrever. |
+
 ## 2. Botões: referência
 
 ![buttons](diagrams/buttons-pt.svg)
 
 | Botão | Função |
 | --- | --- |
-| PATCH | Toque: Performance; na Performance abre Mixer; no Mixer percorre as sete linhas. Segure 0,7 s: volta à Performance. |
+| PATCH | Toque: Performance; na Performance abre o osciloscópio; outro toque abre Mixer; no Mixer percorre as sete linhas. Segure 0,7 s: volta à Performance. |
 | PARA | Toque: páginas de síntese; em STEPS limpa o step e avança (DRUM: limpa o hit da lane). Segure: edição/erase. |
 | CHORD | ANALOG: FILTER ENV / AMP ENV. DRUM-X: DRUM SOUND. |
 | NOTE REPEAT | ANALOG: LFO / LFO DEST / LFO +. DRUM-X redireciona para DRUM SOUND. |
 | ARP | Abre ARP. Novo toque nessa página alterna HOLD da parte. |
 | SCALE | Segure em STEPS ANALOG: STEP+. Na página GLOBAL, toque alterna SYNC AUTO / INTERNAL. |
-| GLOBE | Toque: GLOBAL > POLYPHONY > OUTPUT > PART SETUP. Segure: teclas para start/stop, mute, solo e tap tempo. |
-| BT / SAVE | Toque: salva o preset da parte no programa atual. Segure 0,7 s: SAVE PRESET AS; K7 escolhe destino, BT confirma. |
+| GLOBE | Toque: GLOBAL > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE. Segure: teclas para start/stop, mute, solo e tap tempo. |
+| BT / SAVE | Toque: salva o preset da parte no programa atual. Segure 0,7 s: SAVE PRESET AS; K1 move o cursor, K2 muda o caractere e K7 escolhe destino. BT revisa; um segundo BT confirma. |
 | FX | Toque: CHORUS > DELAY > REVERB > DRIVE. Segure: K1/K2/K3 retornos chorus/delay/reverb; K4 tempo do delay. |
 | SEQ | Toque: vistas do sequenciador e posse explícita dos pads de steps. Segure: teclas brancas viram steps. |
 | PLAY | Inicia do step 1 ou para. Parar também encerra REC. |
@@ -109,7 +153,7 @@ Cada favorito guarda o snapshot do som, número de programa, marca de edição, 
 | Operação | Comando | Resultado |
 | --- | --- | --- |
 | Salvar preset | BT / SAVE | Sobrescreve o programa atual da parte |
-| Salvar preset como | Segure BT; K7; BT | Escolhe e sobrescreve um dos 99 programas |
+| Salvar preset como | Segure BT; K1/K2/K7; BT; BT | Nomeia e escolhe um dos 99 programas; revisão antes de sobrescrever |
 | Cancelar Save As | PATCH | Fecha sem confirmar a escrita |
 
 Há 64 presets de fábrica e posições 65-99 INIT na base. Um save do usuário pode ocupar qualquer posição como sobreposição. Preset não contém toda a sequência nem as quatro partes. Aguarde PRESET SAVED / SETTINGS SAVED antes de desligar; se estiver tocando, a escrita aguarda parada e silêncio.
@@ -263,14 +307,14 @@ PARA percorre OSC 1, OSC 2, OSC MOD, FILTER, FILTER + e SUPER. CHORD alterna FIL
 | OSC 2 | WAVE | PW | LEVEL | SEMI |
 | OSC MOD | SYNC | X-MOD | ENV>O2 | FINE |
 | FILTER | RESO | ENV AMT | KEY TRK | TYPE |
-| SUPER | DET1 | MIX1 | DET2 | MIX2 |
+| SUPER | DETUNE | MIX | -- | -- |
 | FILTER + | DRIVE | VEL>FLT | VEL>AMP | MORPH |
 | FILTER ENV | ATTACK | DECAY | SUSTAIN | RELEASE |
 | AMP ENV | ATTACK | DECAY | SUSTAIN | RELEASE |
 
 | Grupo | Uso |
 | --- | --- |
-| OSC 1/2 | WAVE: OFF, SAW, PULSE, SAW+PLS ou SUPER; PW controla largura de pulso ou DETUNE em SUPER. LEVEL mistura cada oscilador; NOISE acrescenta ruído. SEMI afina OSC2 em -24 a +24 semitons; FINE é ajuste fino. |
+| OSC 1/2 | WAVE: OFF, SAW, PULSE, SAW+PLS; SUPER é exclusivo do OSC 1; PW controla largura de pulso ou DETUNE em SUPER. LEVEL mistura cada oscilador; NOISE acrescenta ruído. SEMI afina OSC2 em -24 a +24 semitons; FINE é ajuste fino. |
 | OSC MOD | SYNC sincroniza osciladores; X-MOD controla modulação cruzada; ENV>O2 aplica envelope à afinação do OSC2 (bipolar). |
 | FILTER | CUTOFF está na Performance/fader A1; RESO realça a frequência de corte. ENV AMT é bipolar. KEY TRK segue a altura. TYPE: LP12, HP12, BP12, NOTCH, LP24, SEM; MORPH modifica SEM. |
 | ENVELOPES | ATTACK: entrada; DECAY: queda até SUSTAIN; RELEASE: saída após soltar. FILTER ENV atua no filtro; AMP ENV na amplitude. VEL>FLT/VEL>AMP definem a resposta à velocity. |
@@ -314,7 +358,7 @@ FX percorre as quatro páginas de efeito. Os efeitos são compartilhados: MIX de
 
 DELAY TIME usa divisões sincronizadas: 1/16, 1/8T, 1/8, 1/8 pontuada, 1/4, 1/4 pontuada e 1/2. FEEDBK controla repetições; TONE escurece/clareia. REVERB: SIZE tamanho, DAMP amortecimento, PRE-DLY atraso inicial. CHORUS: RATE velocidade, DEPTH intensidade.
 
-Da Performance, toque PATCH para abrir Mixer. Toques seguintes percorrem LEVEL > PAN > SEND CHORUS > SEND DELAY > SEND REVERB > SEND DRIVE > MASTER. K1-K4 ajustam A-D nas seis primeiras linhas. Em MASTER, VOL/DJ FLT/DRIVE/COMP são controles globais do mixer. K5 seleciona pattern; segure PATCH para sair.
+Da Performance, toque PATCH para abrir o osciloscópio; toque novamente para abrir Mixer. Toques seguintes percorrem LEVEL > PAN > SEND CHORUS > SEND DELAY > SEND REVERB > SEND DRIVE > MASTER. K1-K4 ajustam A-D nas seis primeiras linhas. Em MASTER, VOL/DJ FLT/DRIVE/COMP são controles globais do mixer. K5 seleciona pattern; segure PATCH para sair.
 
 Mute e solo por parte: GLOBE segurado mais as teclas correspondentes. Os estados são indicados no Mixer. F4 Bank B e K8 são o volume físico de saída; não são quatro volumes individuais.
 
@@ -353,7 +397,7 @@ Salvamento manual: uma edição na tela não é uma escrita em flash. Pare o tra
 1. Para primeira instalação, parta do firmware oficial M-VAVE V016 do seu modelo Pro ou Elite. Use o M-UPGRADE oficial para retornar a essa versão.
 2. Exporte seu .smksynth antes de retornar ao oficial. A primeira instalação inicializa/substitui o banco.
 3. Use Chrome/Edge no computador, HTTPS, cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
-4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19634 / SMK-37 Elite_19634.
+4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19649 / SMK-37 Elite_19649.
 5. Se interromper, retome no mesmo navegador/site com o mesmo pacote. Não troque de instalador no meio.
 
 Backup: pare PLAY/REC, solte controles/notas e conecte a ferramenta. Exporte o banco atual nesta sessão antes de restaurar. Escolha o arquivo, revise e digite RESTAURAR (também na interface inglesa). Restauração substitui o banco inteiro; não mescla. Ao concluir, reinicie e confira seus sons.
@@ -381,23 +425,23 @@ Projeto independente. Síntese ANALOG: OberVave/zvenson; DRUM-X: JIANT; SUPER: o
 
 ## SUPER / Supersaw
 
-Selecione WAVE = SUPER em OSC 1 e/ou OSC 2. Cada oscilador mistura sete serras: uma central e seis desafinadas. PW passa a mostrar DETUNE. LEVEL continua ajustando o volume do oscilador.
+Selecione WAVE = SUPER somente em OSC 1. Para preservar a estabilidade, OSC 2 não oferece SUPER. OSC 1 mistura sete serras: uma central e seis desafinadas. PW passa a mostrar DETUNE. LEVEL continua ajustando o volume do oscilador.
 
 PARA percorre OSC 1 > OSC 2 > OSC MOD > FILTER > FILTER + > SUPER. Na página SUPER, os quatro knobs controlam:
 
 | K1 | K2 | K3 | K4 |
 | --- | --- | --- | --- |
-| DET1 | MIX1 | DET2 | MIX2 |
+| DETUNE | MIX | -- | -- |
 
-DET1/DET2 (0-127): abertura da desafinação de cada oscilador. MIX1/MIX2 (0-127): presença das seis serras laterais em relação à central; MIX 0 mantém somente a serra central. O padrão é MIX 64.
+DETUNE (0-127): abertura da desafinação do OSC 1. MIX (0-127): presença das seis serras laterais em relação à central; MIX 0 mantém somente a serra central. O padrão é MIX 64.
 
-Comece com um OSC SUPER, DETUNE moderado e MIX 64. Acrescente OSC2 e efeitos conforme o timbre. SEMI/FINE do OSC2, pitch bend, glide, vibrato, envelopes e filtros continuam disponíveis. São oito vozes ANALOG compartilhadas; as sete serras não acrescentam polifonia. UNISON empilha vozes completas e aumenta o consumo.
+Comece com um OSC SUPER, DETUNE moderado e MIX 64. Acrescente OSC2 e efeitos conforme o timbre. SEMI/FINE do OSC2, pitch bend, glide, vibrato, envelopes e filtros continuam disponíveis. Há oito vozes ANALOG compartilhadas; quando SUPER está em uso, a alocação fica limitada a cinco vozes e prioriza a substituição de notas em release. As sete serras não acrescentam polifonia. UNISON empilha vozes completas e aumenta o consumo.
 
 Quando qualquer OSC usa SUPER, SYNC e X-MOD são ignorados. PWM não modula a desafinação SUPER. DETUNE usa os mesmos CCs e a automação de PW; MIX não tem CC ou automação dedicados.
 
 Os ajustes são salvos em presets, favoritos, cenas e backups. Sons antigos abrem sem conversão, com MIX 64. Antes de retornar a um firmware anterior à SUPER, restaure um backup feito naquela versão: ela não entende WAVE 4 nem todos os novos favoritos.
 
-P mostra o pico de processamento em microssegundos; O conta blocos que excederam o prazo. Ambos reiniciam no boot. A implementação SS3 foi aprovada no instrumento por Marcus; o consumo depende da polifonia, do unison e dos efeitos.
+P mostra o pico de processamento em microssegundos; O conta blocos que excederam o prazo. Ambos reiniciam no boot. A base desta versão foi aprovada no instrumento por Marcus; o consumo depende da polifonia, do unison e dos efeitos.
 
 Origem: Clipper, de 3dSam, sobre Felucca, com curva e offsets de desafinação derivados da análise de Adam Szabo citada pelo Clipper. Fonte: https://github.com/isod89/clipper-fm1 . O SMKSYNTH adapta essa base com MIX independente e otimizações próprias; não é uma reprodução exata do Roland JP-8000/JP-8080. GPL-3.0-only; atribuições em CREDITS.md e LICENSING.md.
 
@@ -433,7 +477,7 @@ Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program 
 
 Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
 
-A 1.1.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
+A 1.2.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Apêndice MIDI / 1
 
@@ -527,7 +571,7 @@ Constantes: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. Para cada 
 
 ## Atualização e áudio USB
 
-Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas, MIDI M1-M1.2 e testes compatíveis são aceitos e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A identidade pública continua SMK-37 Pro_19634 / SMK-37 Elite_19634.
+Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até MO1a são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19649 / SMK-37 Elite_19649.
 
 Áudio USB estéreo de 16 bits, 44,1/48 kHz: testado no Mac e no iPhone com AudioShare. Problema conhecido: vídeos gravados no iPhone com áudio USB podem conter cliques ou cortes.
 

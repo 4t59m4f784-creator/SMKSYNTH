@@ -31,6 +31,7 @@ static void sustain_apply(void) { ctl_sustain = midi_sustain || smk_pedal.down; 
  * four part channels and channels still owning their previous notes. */
 static void smk_midi_controls_poll(void)
 {
+    if(mm_panic_left)return; /* controller safety owns the wire until drained */
     unsigned base=set.midi_ch?set.midi_ch-1u:0u;
     if(base>12u)base=12u;
     if(base!=mout_base){mout_base=base;if(smk_pedal.down){unsigned mask=smk_sustain_channels();smk_pedal_channels|=mask;smk_cc_schedule(mask,127);}}
@@ -72,7 +73,7 @@ static void smk_sustain_poll(void)
         return; /* panic: must release before sustain can hold notes again */
     }
     if (high == smk_pedal.down) return;
-    smk_pedal.down = high; sustain_apply();
+    smk_pedal.down = high; if(mm_on){mm_pedal_event(high);return;} sustain_apply();
     unsigned mask=smk_sustain_channels();
     if(high){smk_pedal_channels|=mask;smk_cc_schedule(mask,127);}
     else {smk_cc_schedule(mask|smk_pedal_channels,0);smk_pedal_channels=0;}
@@ -80,6 +81,7 @@ static void smk_sustain_poll(void)
 
 static void smk_panel_panic(void)
 {
+    endless_stop(); endless_reset(); /* cancel scheduled launches and captured trigger keys too */
     fm1_irq_off();
     ctl_seq_run = ctl_seq_restart = ctl_count = 0;
     rec = REC_OFF; rec_down = rec_wait = 0;

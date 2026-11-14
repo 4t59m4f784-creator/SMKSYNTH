@@ -1,23 +1,23 @@
 {
-  "version": "1.1.0",
-  "identity": "SMK-37 Pro_19634",
+  "version": "1.2.0",
+  "identity": "SMK-37 Pro_19649",
   "required_origin": "SMK-37 Pro_016",
   "installation": "first-install-or-preserving-update",
-  "runtime_base": "15d08eeacb25adde675c94384d50e0a01358b177",
+  "runtime_base": "f9a2ab2162a4f19e13709f4f57d95aa30ad65c8b",
   "factory_patterns": 5,
   "favorites": 8,
   "extra_user_presets": 0,
   "tempo": 90,
   "dp2_runtime_hardware_approved": true,
   "first_install_hardware_approved": false,
-  "firmware_sha256": "e0e2c4a9eb2412f4dcbd802e39fabb54c83725d62ac35213b39d99f33fb2daf7",
-  "wasm_sha256": "23453bd191a8dd6cdb18a0bbf35c00e32499d728150a08da2d3e490b162ef009",
+  "firmware_sha256": "5102f583e898aa573bff0ac98dd0939c3fe7114f021639f5724c952daaf39659",
+  "wasm_sha256": "76e54169a95a1d4f49be8eb799e62012bc55801bc08f31f7a850daca85df28e2",
   "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
-  "app_bytes": 167200,
-  "static_ram_bytes": 94480,
-  "pool_bytes": 325984,
+  "app_bytes": 224880,
+  "static_ram_bytes": 95392,
+  "pool_bytes": 328368,
   "loader_bytes": 7703,
-  "update_firmware_sha256": "4e4c777f0ff9b1b7e5a8292bf6b13aadda6937c14825291b65019c94a0d12909",
+  "update_firmware_sha256": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c",
   "usb_audio": true,
   "fader_modes": [
     "JUMP",
@@ -34,8 +34,8 @@
   "supersaw_hardware_approved": true,
   "supersaw_origin": "https://github.com/isod89/clipper-fm1",
   "identities": {
-    "pro": "SMK-37 Pro_19634",
-    "elite": "SMK-37 Elite_19634"
+    "pro": "SMK-37 Pro_19649",
+    "elite": "SMK-37 Elite_19649"
   },
   "supported_models": [
     "SMK-37 Pro",
@@ -46,34 +46,34 @@
   "firmware": {
     "pro": {
       "release": {
-        "name": "SMKSYNTH 1.1.0 · first-install",
-        "product": "SMK-37 Pro_19634",
-        "url": "./firmware/SMKSYNTH-1.1.0-first-install-SMK37-Pro.fwsc",
+        "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
+        "product": "SMK-37 Pro_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Pro.fwsc",
         "size": 651327,
-        "sha": "e0e2c4a9eb2412f4dcbd802e39fabb54c83725d62ac35213b39d99f33fb2daf7"
+        "sha": "5102f583e898aa573bff0ac98dd0939c3fe7114f021639f5724c952daaf39659"
       },
       "update": {
-        "name": "SMKSYNTH 1.1.0 · update",
-        "product": "SMK-37 Pro_19634",
-        "url": "./firmware/SMKSYNTH-1.1.0-update-SMK37-Pro.fwsc",
+        "name": "SMKSYNTH 1.2.0 \u00b7 update",
+        "product": "SMK-37 Pro_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Pro.fwsc",
         "size": 651819,
-        "sha": "4e4c777f0ff9b1b7e5a8292bf6b13aadda6937c14825291b65019c94a0d12909"
+        "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"
       }
     },
     "elite": {
       "release": {
-        "name": "SMKSYNTH 1.1.0 · first-install",
-        "product": "SMK-37 Elite_19634",
-        "url": "./firmware/SMKSYNTH-1.1.0-first-install-SMK37-Elite.fwsc",
+        "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
+        "product": "SMK-37 Elite_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Elite.fwsc",
         "size": 651327,
-        "sha": "b1fd98d3b5833e4c2fb29475cde7a3db42fc3f853959e8f58fb979c264d1ab34"
+        "sha": "052496ea37f361aade975f9c6b08b62d891010e666fbe3a9845f939322acf598"
       },
       "update": {
-        "name": "SMKSYNTH 1.1.0 · update",
-        "product": "SMK-37 Elite_19634",
-        "url": "./firmware/SMKSYNTH-1.1.0-update-SMK37-Elite.fwsc",
+        "name": "SMKSYNTH 1.2.0 \u00b7 update",
+        "product": "SMK-37 Elite_19649",
+        "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Elite.fwsc",
         "size": 651819,
-        "sha": "f98ea632bbbfcad3701fecfd89e8d3ebbfa1d7d31989260c3ffaeb63c10c23a1"
+        "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"
       }
     }
   },
@@ -82,13 +82,27 @@
   "midi_output_channels": "base + part index; OMNI output 1-4",
   "midi_panic": "GLOBE + PLAY",
   "physical_sustain": true,
-  "endless_included": false,
+  "endless_included": true,
   "hardware_validation": {
-    "pro": "MIDI M1.2 functions approved by Marcus",
-    "elite": "Elite installation flow approved by a real user"
+    "pro": "MO1a and preceding functions approved by Marcus; 1.2.0 changes only stable identity/version",
+    "elite": "Unified Elite installation flow previously approved by a real user; 1.2 packages checked in simulated flash"
   },
   "required_origins": {
     "pro": "SMK-37 Pro_016",
     "elite": "SMK-37 Elite_016"
-  }
+  },
+  "midi_mode": true,
+  "midi_mode_bluetooth": false,
+  "midi_mode_profiles": 4,
+  "display_themes": [
+    "Obervave",
+    "Zoom"
+  ],
+  "default_theme": "Obervave",
+  "preset_rename": true,
+  "supersaw_oscillators": [
+    1
+  ],
+  "supersaw_voice_limit": 5,
+  "source_identity": "MO1a /19648"
 }

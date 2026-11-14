@@ -15,7 +15,9 @@
 
 #define FELUCCA_OTA_DRYRUN 0
 #if BOARD_SMK37
+#ifndef FELUCCA_ID
 #define FELUCCA_ID "ota-SMK-37 Pro_900"
+#endif
 #define T_APP_HI 0x9D000u                   /* end of the app area the loader writes */
 #define T_REC 0xBFF00u                      /* the update record (ota.c OTA_RES) */
 #define T_ERASE_HI 0xC0000u                 /* nothing erased at or above (BTIF, USRTRIM, ...) */

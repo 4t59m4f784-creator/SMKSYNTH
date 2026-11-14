@@ -58,11 +58,11 @@ int main(void) {
         ctl_seq_run=0;pat_go(n);edit(11);snd_capture(n);
         ctl_seq_run=1;seq_was=0;pat_go(same?n:1-n);
         unsigned target=same?n:1-n;
-        assert(pat_queue==target+1);assert(!memcmp(snd_q,saved[target].p,sizeof snd_q));
+        assert(pat_queue==target+1);assert(!ctl_pat_keep);pat_old.magic=0x13579BDFu;assert(!memcmp(snd_q,saved[target].p,sizeof snd_q));
         assert(!memcmp(&pat_q,&steps[target],sizeof pat_q));
         /* Step automation legitimately changes the patch at the first tick. */
         pat_q.lane[0][0].param=AUTO_NONE;
-        seq_tick();assert(!ctl_pat_swap);assert(ui_snd_swapped);
+        seq_tick();assert(pat_old.magic==0x13579BDFu);assert(!ctl_pat_swap);assert(ui_snd_swapped);
         pat.lane[0][0]=steps[target].lane[0][0];
         set.pat=target;snd_meta(target);pat_queue=0;pat_edited=0;
         ui_snd_swapped=0;verify(target);

@@ -1,6 +1,6 @@
 # Build reproduzível
 
-Firmware: SMKSYNTH 1.1.0 / `SMK-37 Pro_19634`. Base musical/interface: SUPER SS3, commit `0b4ccdd4892dd6d6d5a1a4f206aa939aca46a853`. O código de síntese, sequenciador, interface e formatos dessa base foi preservado.
+Firmware: SMKSYNTH 1.2.0 / `SMK-37 Pro_19649`. Base musical/interface: MO1a, commit `f9a2ab2162a4f19e13709f4f57d95aa30ad65c8b`. O código de síntese, sequenciador, interface e formatos dessa base foi preservado.
 
 ## Requisitos
 
@@ -22,11 +22,11 @@ Não é necessário ter o backup original para recompilar. `tools/prepare_factor
 ```sh
 export JIELI_TOOLCHAIN=/caminho/jieli-linux-toolchains
 python3 tools/build.py --voice-hardware --board smk37 --model pro \
-  --release 1.1.0 --identity 19634 --first-install \
+  --release 1.2.0 --identity 19649 --first-install \
   --factory-bank factory/bank-SMK16P1.bin --sdk /caminho/SDK
 ```
 
-Saída: `build/obervave-1.1.0-smk37.fwsc`; nome de distribuição `SMKSYNTH-1.1.0-SMK37-Pro.fwsc`.
+Saída: `build/obervave-1.2.0-smk37.fwsc`; nome de distribuição `SMKSYNTH-1.2.0-SMK37-Pro.fwsc`.
 
 O perfil `--first-install` usa o loader completo padrão da plataforma para preparar a área `0x4000..0x9CFFF`, incluindo o seed SMK16P1. O app mantém o perfil de armazenamento SMK16P1. Esse pacote é somente para a instalação inicial a partir de M‑VAVE V016, conferida pelo cliente. Não é o loader de atualizações SUPER SS3 que preservava um banco existente.
 
@@ -36,7 +36,7 @@ O journal de restauração começa apagado em `0x55000..0x56FFF`; o seed ocupa `
 
 ```sh
 sh tools/build_controls_sim.sh
-cp build/controls/SMKSYNTH-1.1.0.wasm web/simulator/obervave-voice.wasm
+cp build/controls/SMKSYNTH-1.2.0.wasm web/simulator/obervave-voice.wasm
 node tests/release_demo_wasm_test.mjs
 node tests/release_101_installer_test.mjs
 ```
@@ -46,3 +46,9 @@ O simulador usa `factory/simulator-session.bin`, uma representação dos mesmos 
 ## Preserving update / Atualização com preservação
 
 Use the same build command without `--first-install --factory-bank factory/bank-SMK16P1.bin` to build the bank-preserving update. The first-install and update packages are separate; do not interchange them. `obv_supersaw.c` is compiled at `-O2`; the main application and USB paths retain `-Os`. SUPER attribution: [Clipper](https://github.com/isod89/clipper-fm1); see LICENSING.md.
+
+## 1.2.0
+
+`python3 tools/build.py --board smk37 --model pro --release 1.2.0 --identity 19649 --voice-hardware --sdk /path/to/sdk`
+
+Elite: `--model elite`. First install: add `--first-install --factory-bank factory/bank-SMK16P1.bin`. Update omits both. Simulator: `SIM_VERSION=1.2.0 sh tools/build_controls_sim.sh`. Stable and MO1a use the same runtime paths; OBV_EXPERIMENTAL only shows the experimental boot label.

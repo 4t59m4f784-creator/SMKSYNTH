@@ -19,7 +19,7 @@ jobs:
       - name: Verify release and website
         run: |
           python3 tests/release_factory_test.py
-          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.1.0-first-install-SMK37-Pro.fwsc
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.2.0-first-install-SMK37-Pro.fwsc
           node tests/release_110_installer_test.mjs
           python3 tests/release_110_packages_test.py
           sh tests/run_physical_controls_tests.sh
@@ -29,6 +29,10 @@ jobs:
           /tmp/midi-only
           node tests/release_demo_wasm_test.mjs
           node tests/release_i18n_test.mjs
+          mkdir -p build/mo1 build/zm1 build/zm3
+          node tests/midi_overview_wasm_test.mjs web/simulator/obervave-voice.wasm
+          node tests/zoom_wasm_test.mjs web/simulator/obervave-voice.wasm
+          node tests/preset_name_wasm_test.mjs web/simulator/obervave-voice.wasm
           mkdir -p build
           cc -O2 -o build/backup_server tests/backup_server.c
           node tests/backup_compatibility_test.mjs --protocol
@@ -36,7 +40,7 @@ jobs:
           python3 tools/package_release.py build/audit-site
           python3 tools/check_public_web.py build/audit-site
           node tests/simulator_midi_test.mjs
-          cd releases/1.1.0 && sha256sum -c SHA256SUMS.txt
+          cd releases/1.2.0 && sha256sum -c SHA256SUMS.txt
   release:
     needs: verify
     runs-on: ubuntu-latest
@@ -49,13 +53,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 tools/package_release.py build/release-site
-          if ! gh release view v1.1.0 >/dev/null 2>&1; then
-            gh release create v1.1.0 releases/1.1.0/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.1.0' --notes-file docs/RELEASE-1.1.0.md
+          if ! gh release view v1.2.0 >/dev/null 2>&1; then
+            gh release create v1.2.0 releases/1.2.0/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.2.0' --notes-file docs/RELEASE-1.2.0.md
           else
-            echo 'Release v1.1.0 already exists; immutable downloads left unchanged.'
+            echo 'Release v1.2.0 already exists; immutable downloads left unchanged.'
           fi
-          gh release upload v1.1.0 docs/pdf/*.pdf --clobber
-          gh release edit v1.1.0 --notes-file docs/RELEASE-1.1.0.md
+          gh release upload v1.2.0 docs/pdf/SMKSYNTH-1.2.0-*.pdf --clobber
+          gh release edit v1.2.0 --notes-file docs/RELEASE-1.2.0.md
   pages:
     needs: verify
     runs-on: ubuntu-latest

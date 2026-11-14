@@ -1,12 +1,15 @@
-# SMKSYNTH 1.1.0 - Guia rápido
+# SMKSYNTH 1.2.0 - Guia rápido
 
-[PDF](pdf/SMKSYNTH-1.1.0-Quick-Start-PT.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.2.0-Quick-Start-PT.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Referência: firmware 1.1.0, SMK-37 Pro_19634 / SMK-37 Elite_19634.
+Referência: firmware 1.2.0, SMK-37 Pro_19649 / SMK-37 Elite_19649.
 
 ## Índice
 
 - Quick start / 1. Primeiros passos
+- ENDLESS: gravar e tocar
+- MIDI MODE: controlador independente
+- Tema, osciloscópio e salvamento
 - Quick start / 2. Favoritos e Split/Layer
 - Quick start / 3. Patterns e bateria
 - Quick start / 4. Gravar, salvar e recuperar
@@ -19,7 +22,7 @@ Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os 
 
 ## Quick start / 1. Primeiros passos
 
-SMKSYNTH 1.1.0 - M-VAVE SMK-37 Pro / Elite. Use este guia depois de instalar. Para primeira instalação, use somente o firmware oficial V016; a instalação substitui o banco. Salve e exporte seu trabalho antes de retornar ao firmware oficial.
+SMKSYNTH 1.2.0 - M-VAVE SMK-37 Pro / Elite. Use este guia depois de instalar. Para primeira instalação, use somente o firmware oficial V016; a instalação substitui o banco. Salve e exporte seu trabalho antes de retornar ao firmware oficial.
 
 1. Ajuste K8/master para um volume adequado e aperte PLAY.
 2. K6 seleciona A-D; K7 troca o preset da parte.
@@ -34,6 +37,47 @@ SMKSYNTH 1.1.0 - M-VAVE SMK-37 Pro / Elite. Use este guia depois de instalar. Pa
 K1-K4 seguem a tela. K5: tempo na Performance; LEVEL/OCT em Split/Layer; página em STEPS; pattern nas outras vistas SEQ/Mixer. FADER BANK troca apenas os faders. GLOBAL > FADER MODE: JUMP assume imediatamente; CATCH espera cruzar o valor salvo. F4 Bank B = K8/master.
 
 Os cinco exemplos começam a 90 BPM. Há oito favoritos e nenhum preset pessoal extra. PLAY/REC e escolha de engine preservam o banco de pads; SEQ solicita explicitamente os steps.
+
+## ENDLESS: gravar e tocar
+
+ENDLESS faz parte da versão oficial 1.2. Funciona em SINGLE, com as quatro partes e comprimentos independentes. Split/Layer precisa estar desligado. DRUM-X mantém seu sequenciador de bateria. Abrir a página não ativa ENDLESS.
+
+1. Selecione a parte com K6 e percorra as vistas SEQ até ENDLESS. Toque PARA para ativar; PARA novamente desativa sem apagar as notas. REC também ativa e começa a entrada de notas.
+2. Com o transporte parado, toque REC e grave notas ou acordes: ao soltar todas as teclas, o próximo toque acrescenta um step. São até 256 steps por parte.
+3. Durante a entrada, seta direita acrescenta pausa sem teclas ou prolonga as notas seguradas; seta esquerda remove o último step após soltar as teclas. Toque REC novamente para encerrar a entrada.
+4. Com ENDLESS ativo, uma tecla dispara/transpõe a sessão das partes: C4 mantém a afinação original, sem depender da oitava de edição da parte. PLAY inicia ou para o transporte. K4 HOLD mantém a execução após soltar as teclas; desligado, a última tecla solta para a sessão.
+5. K1 RATE, K2 GATE, K3 DIR (FWD/REV/RND), K4 HOLD. Salve no banco de patterns para guardar sequências, sons e ajustes.
+6. Segurar REC por mais de 1,2 s apaga a sequência e automações da parte selecionada. Parar, trocar de tela ou desligar ENDLESS não apaga o que foi gravado.
+
+ENDLESS transmite as notas por MIDI USB e TRS/DIN usando o canal de cada parte, como o sequenciador normal. Não envia MIDI Clock/Start/Stop.
+
+## MIDI MODE: controlador independente
+
+No MIDI MODE o sintetizador fica silencioso e os controles enviam MIDI por USB e TRS/DIN. Não inclui Bluetooth. A entrada e a saída encerram as notas e limpam modulação temporária para preservar o timbre ao retornar ao synth.
+
+1. No synth, percorra GLOBE até MIDI MODE. Antes de ativar, a tela mostra somente o comando de entrada; gire K1 para a direita.
+2. No MIDI MODE, GLOBE abre os ajustes: K1 à esquerda retorna ao synth; K2 escolhe MAP 1-4; K3 define o canal principal 1-16; K4 escolhe encoders ABS ou REL. O canal deste modo é independente do canal-base das partes do synth.
+3. KNOB BANK e FADER BANK alternam os bancos A/B. Pressione os dois juntos para trocar o banco dos pads. OCT-/+ transpõem o teclado.
+4. Toque PARA para editar. Mova o controle desejado ou use K5/OCT para selecioná-lo. K1 escolhe o tipo permitido (OFF, CC, CC TOGGLE, NOTE ou PITCH BEND), K2 o número CC/nota, K3 o canal (MAIN ou 1-16) e K4 a cor dos pads. Nem todos os tipos se aplicam a todos os controles.
+5. BT salva os quatro mapas, incluindo canais, cores e comportamento. Solte teclas, pads e pedal antes de salvar. PARA volta à visão de performance. Encoders ABS aceleram conforme a velocidade; REL usa mensagens relativas.
+6. A tela mantém três áreas independentes: último controle com valor e barras, pads com atividade e teclado virtual de 37 teclas com acordes. GLOBE + PLAY aciona MIDI PANIC.
+
+O simulador demonstra a interface e preserva sua memória no navegador; não substitui um teste das portas físicas USB/TRS. O backup .smksynth guarda o banco do synth; mapas MIDI e tema ficam em memória separada e não são incluídos nesse arquivo.
+
+## Tema, osciloscópio e salvamento
+
+GLOBE > THEME: K1 escolhe OBERVAVE (padrão) ou ZOOM. A preferência é gravada automaticamente após 1,5 s, com transporte parado e áudio em silêncio. Não é necessário salvar um preset. A gravação do tema não salva edições pendentes de mapas MIDI.
+
+Zoom usa nomes e valores maiores. A cor da parte identifica a linha do cabeçalho, o box da parte (letra branca) e o número do preset. Textos, valores e grade preservam a paleta do instrumento. O número do pattern continua visível na performance.
+
+Performance com valores é a tela padrão. PATCH curto abre a tela de logo, osciloscópio da saída geral e vozes/peças de bateria; outro toque entra no ciclo do Mixer. PATCH longo volta aos valores. O osciloscópio mantém suas cores e não mostra pattern. Edições aparecem por cerca de um segundo em um aviso Zoom e depois somem.
+
+| Fluxo | Telas e comandos |
+| --- | --- |
+| Save rápido | BT curto salva o som na posição atual, mantendo o nome. |
+| Salvar como / renomear | BT longo abre edição. K1 move cursor; K2 escolhe caractere (até 10); K7 escolhe posição 01-99. A tela mostra o programa já presente no destino. |
+| Revisar substituição | BT abre a revisão do nome e destino, com o programa que será substituído. Solte e pressione BT novamente para gravar. |
+| Voltar / cancelar | PATCH na revisão volta à edição; PATCH na edição cancela sem escrever. |
 
 ## Quick start / 2. Favoritos e Split/Layer
 
@@ -80,13 +124,13 @@ Em ANALOG, um banco Drum Pads já selecionado fica inativo. Volte a DRUM-X ou us
 
 | Botão | Uso imediato |
 | --- | --- |
-| PATCH | Toque: Performance; na Performance abre Mixer; no Mixer percorre as sete linhas. Segure 0,7 s: volta à Performance. |
+| PATCH | Toque: Performance; na Performance abre o osciloscópio; outro toque abre Mixer; no Mixer percorre as sete linhas. Segure 0,7 s: volta à Performance. |
 | PARA | Toque: páginas de síntese; em STEPS limpa o step e avança (DRUM: limpa o hit da lane). Segure: edição/erase. |
 | CHORD | ANALOG: FILTER ENV / AMP ENV. DRUM-X: DRUM SOUND. |
 | NOTE REPEAT | ANALOG: LFO / LFO DEST / LFO +. DRUM-X redireciona para DRUM SOUND. |
 | ARP | Abre ARP. Novo toque nessa página alterna HOLD da parte. |
 | SCALE | Segure em STEPS ANALOG: STEP+. Na página GLOBAL, toque alterna SYNC AUTO / INTERNAL. |
-| GLOBE | Toque: GLOBAL > POLYPHONY > OUTPUT > PART SETUP. Segure: teclas para start/stop, mute, solo e tap tempo. |
+| GLOBE | Toque: GLOBAL > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE. Segure: teclas para start/stop, mute, solo e tap tempo. |
 | FX | Toque: CHORUS > DELAY > REVERB > DRIVE. Segure: K1/K2/K3 retornos chorus/delay/reverb; K4 tempo do delay. |
 | SEQ | Toque: vistas do sequenciador e posse explícita dos pads de steps. Segure: teclas brancas viram steps. |
 | REC | Toque: arma parado; em execução liga/desliga gravação. Segure mais de 1,2 s: apaga a track selecionada. |
@@ -132,7 +176,7 @@ Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program 
 
 Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
 
-A 1.1.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
+A 1.2.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Links
 

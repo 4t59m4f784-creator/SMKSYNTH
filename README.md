@@ -1,5 +1,10 @@
 # SMKSYNTH
 
+**1.2.0 oficial: ENDLESS + MIDI MODE.** Sequências com MIDI por parte, controlador USB/TRS com mapas editáveis no instrumento, tema Zoom e renomeação de presets. **Supersaw somente no OSC 1 para preservar a estabilidade.**
+
+[Novidades da 1.2](docs/RELEASE-1.2.0.md)
+
+
 **SMK‑37 Pro e SMK‑37 Elite como instrumentos de performance.**
 
 [Site e instalação](https://4t59m4f784-creator.github.io/SMKSYNTH/) · [Simulador](https://4t59m4f784-creator.github.io/SMKSYNTH/simulator/) · [Backup e restauração](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/) · [Instalação](docs/INSTALLATION.md) · [English](docs/README.en.md)
@@ -8,10 +13,10 @@
 
 | Documento | Português | English |
 |---|---|---|
-| Quick start | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Quick-Start-EN.pdf) |
-| Manual completo | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.1.0-Manual-EN.pdf) |
+| Quick start | [Ler](docs/QUICKSTART.md) · [PDF](docs/pdf/SMKSYNTH-1.2.0-Quick-Start-PT.pdf) | [Read](docs/QUICKSTART.en.md) · [PDF](docs/pdf/SMKSYNTH-1.2.0-Quick-Start-EN.pdf) |
+| Manual completo | [Ler](docs/MANUAL.md) · [PDF](docs/pdf/SMKSYNTH-1.2.0-Manual-PT.pdf) | [Read](docs/MANUAL.en.md) · [PDF](docs/pdf/SMKSYNTH-1.2.0-Manual-EN.pdf) |
 
-Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.1.0.
+Mapas de pads, botões, knobs e faders; gravação, cenas, efeitos, MIDI, salvamento e backup. Diagramas conferidos no código da versão 1.2.0.
 
 Do ponto de vista sonoro, o SMKSYNTH é o casamento do excelente sintetizador [OberVave](https://github.com/zvenson/obervave) com a engine DRUM-X do também excelente [JIANT](https://github.com/juanjiant-bit/JIANT).
 
@@ -23,7 +28,7 @@ Alterne entre partes, grave e acesse timbres favoritos com um toque, grave sequ�
 
 ## SUPER / Supersaw
 
-Sete serras por oscilador, DETUNE e MIX independentes, nos dois OSCs. Selecione WAVE = SUPER; PW vira DETUNE. A página SUPER, acessada por PARA, reúne DET1 / MIX1 / DET2 / MIX2. Presets, favoritos, cenas e backups guardam os ajustes. SYNC e X-MOD são ignorados com SUPER; UNISON consome vozes completas. [Controles e limites no manual](docs/MANUAL.md#super--supersaw).
+Sete serras no OSC 1, com DETUNE e MIX. Supersaw disponível somente no OSC 1 para preservar a estabilidade; OSC 2 mantém as formas convencionais. Alocação de até cinco vozes quando SUPER está em uso, incluindo release, com substituição das caudas. A página SUPER reúne DETUNE / MIX. Presets, favoritos, cenas e backups guardam os ajustes. [Controles no manual](docs/MANUAL.md#super--supersaw).
 
 A supersaw se originou no **[Clipper, de 3dSam](https://github.com/isod89/clipper-fm1)**, sobre Felucca, que referencia a análise de Adam Szabo. Adaptamos a curva e os offsets de desafinação, com MIX independente e otimizações próprias. Créditos e avisos originais preservados; não é uma reprodução exata do Roland JP-8000/JP-8080.
 
@@ -49,10 +54,10 @@ O SMKSYNTH foi desenvolvido com uso de IA. Marcus Padrini definiu os objetivos e
 
 ## O que está incluído
 
-| Recurso | SMKSYNTH 1.1.0 |
+| Recurso | SMKSYNTH 1.2.0 |
 |---|---|
 | Partes | Quatro, com seleção de ANALOG ou DRUM-X por parte |
-| Synth ANALOG | OberVave; oito vozes compartilhadas; SUPER nos dois osciladores |
+| Synth ANALOG | OberVave; oito vozes compartilhadas; SUPER somente no OSC 1; até cinco vozes com SUPER |
 | Bateria | DRUM-X; oito instrumentos por kit |
 | Performance | Favoritos, sends por parte, split/layer e transpose de sequências pelas teclas |
 | Sequenciador | Quatro tracks; até 256 steps por track; gravação ao vivo ou passo a passo |
@@ -78,7 +83,7 @@ Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. T
 
 ## Instalação e atualização
 
-No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa SMKSYNTH 1.0.x ou SUPER SS1/SS2/SS3. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19634`.
+No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa uma versão pública anterior ou experimental compatível até MO1a. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19649`.
 
 Para **Instalar** pela primeira vez, o SMK-37 Pro precisa estar no firmware oficial M-VAVE V016 (`SMK-37 Pro_016`). Essa opção inicializa o banco com cinco patterns e oito favoritos. Outros modelos são recusados. Use Chrome/Edge no computador, cabo USB de dados e alimentação estável. Firmware oficial M-VAVE não é redistribuído aqui.
 
@@ -86,7 +91,6 @@ Transferência interrompida: retome pelo mesmo instalador, navegador e pacote. O
 
 ## Fonte, validação e estado do lançamento
 
-A versão oficial 1.1.0 promove a base MIDI M1.2 aprovada no instrumento: saída MIDI TRS/USB com canais por parte, rodas na parte selecionada, sustain físico e MIDI PANIC (GLOBE + PLAY), além da correção de notas presas ao mudar o modo de vozes. Um único [instalador Pro e Elite](https://4t59m4f784-creator.github.io/SMKSYNTH/install/) identifica o modelo e a operação automaticamente; atualizar preserva o banco salvo. O fluxo Elite foi validado por um usuário real. ENDLESS continua separado. [Notas completas](docs/RELEASE-1.1.0.md) · [Downloads 1.1.0](https://github.com/4t59m4f784-creator/SMKSYNTH/releases/tag/v1.1.0).
 
 - [Validação e hashes](docs/VALIDATION.md)
 - [Build a partir das fontes](docs/BUILD.md)

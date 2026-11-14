@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {canRestore,supportedFirmware} from './compatibility.js?v=release-110';
+import {canRestore,supportedFirmware} from './compatibility.js?v=release-120';
 import {BackupClient,unpack} from './legacy-client.js';
 import {crc32,SIZE} from './bank.js';
 const prefix=[125,83,77,75,66,1];

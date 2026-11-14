@@ -1,14 +1,14 @@
-# Public release 1.1.0 validation
+# Public 1.2.0 validation
 
-- Marcus approved all MIDI M1.2 base features on SMK-37 Pro: TRS/USB MIDI, part-specific pitch bend/mod wheel, sustain pedal, MIDI PANIC and stuck-note fix. An actual user validated the SMK-37 Elite installation workflow on hardware.
-- Final 1.1.0 packages were rebuilt from that tested base with identity 19634 on both models. The hardware approval above refers to the tested base and Elite workflow, rather than a fresh physical installation of these four final files.
-- Application: 167200 bytes; static RAM: 94480/98304 bytes; pool: 325984/344064 bytes; loader: 7703 bytes.
-- Unified installer: four distinct model/operation packages, SHA-256 and CRC checks, automatic selection, refusal of model/device substitution, unknown origins and foreign loaders. Resume is bound to the model, package and initial source. First installation seeds the factory bank; updating preserves the bank.
-- Host regression covers part note routing, CC1/pitch bend/CC64, all-channel Panic, note release after mode changes, sustain with other held keys, split/layer and sequencer, USB, backup, simulator and PT/EN. Elite flash tests include interruption/resume and bank preservation.
-- All four final packages are inspected for model, identities, loader, application and factory data. Publication checks public documentation and links.
-- ENDLESS remains separate. USB audio retains the known iPhone video-recording limitation. Host tests do not measure real CPU usage or replace hardware testing.
+- Marcus approved MO1a /19648 on Pro hardware, including ENDLESS, MIDI MODE, Zoom, preset naming and colours. A real user previously validated the Elite installation flow. Promotion changes version/identity without changing approved behaviour.
+- Stable identities: SMK-37 Pro_19649 and SMK-37 Elite_19649. Pro application 224880 bytes; RAM 95392/98304; pool 328368/344064; loader 7703 bytes. These are build limits, not real-time audio-load measurements.
+- All four final packages have SHA-256, CRC, model, application/loader identity and seed checks. First installation contains the factory bank; Update retains bank bytes. Simulated 1.1.0 → 1.2.0 updates passed 56 interruption/resume points per model, including protected areas and journal handling.
+- Native regressions cover per-part MIDI, ENDLESS, sustain/Panic, controller transitions, output backpressure, long SUPER tails with five-voice allocation, colours, presets, sequencing, pads, Split/Layer and physical controls.
+- Public WASM executes the real firmware loop for ENDLESS (3/5/7 lengths, fixed C4, HOLD, drums and saves), independent MIDI keys/pads/controls, synth return, persistent theme and separate preset confirmation. The demo retains five patterns, eight favourites, 90 BPM and no extra personal presets.
+- Website, installer and simulator retain PT/EN; links, four pins, corresponding source and four versioned PDFs are checked. The hero captures the actual firmware splash renderer.
+- Each of the four final 1.2.0 packages has not had a new physical installation. Host/simulated-flash tests do not replace hardware CPU/audio testing. Known iPhone USB-video clicks/dropouts remain.
 
-Hashes: [RELEASE.json](../RELEASE.json). Download checksums: `releases/1.1.0/SHA256SUMS.txt`.
+Hashes: [RELEASE.json](../RELEASE.json). Downloads: `releases/1.2.0/SHA256SUMS.txt`.
 
 ## Historical 1.0.3 record
 

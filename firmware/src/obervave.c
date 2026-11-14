@@ -14,12 +14,17 @@
  *   this file       the panel, MIDI, the screen, the storage
  *
  * Integers only (no FPU, no 64-bit division); tests/host.c runs this on a computer. */
+static volatile unsigned smk_controller_active;
+#define SMK_CONTROLLER_ACTIVE smk_controller_active
 static void app_idle(void);
 #define LCD_IDLE() app_idle()                   /* (lcd.c: while the DMA runs) */
 #include "platform.c"
 /* SMK-37: storage writes only after an explicit user save/copy. */
 #define OBV_MANUAL_STORAGE BOARD_SMK37
 #include "obv_dsp.h"
+#if BOARD_SMK37
+#include "smk_midi_mode.h"
+#endif
 #include "obv_params.h"
 #include "obv_fx.h"
 #if BOARD_SMK37
@@ -39,6 +44,9 @@ static void app_audio(int32_t *out, uint32_t n)
 #endif
 #if OBV_VOICE_HW && !defined(OBV_HOST)
     if(b2_latched){memset(out,0,n*2u*sizeof *out);return;}
+#endif
+#if BOARD_SMK37
+    if(mm_on){memset(out,0,n*2u*sizeof *out);return;}
 #endif
     engine_audio(out, n);
 #ifndef OBV_HOST
@@ -141,10 +149,16 @@ static uint8_t audition[SEQ_CHORD], audition_part;   /* the held step's notes so
 static const char *toast;
 static int is_seq_page(uint32_t pg) { return pg == PG_SEQ || pg == PG_DSEQ; }
 /* the full-screen sequencer's views (SEQ tapped steps through the first three; SAVE tapped there: PATTERNS) */
-enum { SV_TRACKS, SV_STEPS, SV_MORE, SV_TRACK, SV_SLOTS, SV_TRANSPOSE, NSV };   /* TRACKS first: A-D one under the other (SLOOP) */
-static const char *const SV_NAME[NSV] = {"TRACKS", "STEPS", "STEP+", "TRACK", "PATTERNS", "TRANSPOSE"};
+enum { SV_TRACKS, SV_STEPS, SV_MORE, SV_TRACK, SV_SLOTS, SV_TRANSPOSE, SV_ENDLESS, NSV };   /* TRACKS first: A-D one under the other (SLOOP) */
+static const char *const SV_NAME[NSV] = {"TRACKS", "STEPS", "STEP+", "TRACK", "PATTERNS", "TRANSPOSE", "ENDLESS"};
 #define SV_ENTRY(v) ((v) == SV_STEPS || (v) == SV_MORE)   /* the views where the keys write into the cursor's step */
 /* STEP+ is no view of its own: SELECT held down in STEPS shows its knobs (RATCHET, CHANCE, ON/OFF), as VIBE's SHIFT */
+static uint32_t end_record, end_pos, end_count, end_ui_seen;
+static uint8_t end_owner[128]; /* low bits: captured part+1, bit7: live monitor */
+static void endless_reset(void);
+static void endless_finish(void);
+static void endless_recall(void);
+static int endless_screen(void);
 static uint32_t more_held;
 #define SV_EFF (seq_view == SV_STEPS && more_held ? (uint32_t)SV_MORE : seq_view)
 static uint32_t seq_view, slot_sel, pat_used, pat_next, arm_k, arm_t, entry_n, pat_edit_t, pend_slot, pat_save_say;
@@ -557,8 +571,9 @@ static void load_pattern(uint32_t n)            /* stopped: pattern n with its s
 #endif
     uint32_t t;
     n %= NPAT;
+    endless_reset();
     ctl_panic = 1;                              /* (what the old one held lets go) */
-    pat_fetch(n, &pat);seq_trk=pattern_focus(&pat);keyboard_pattern_epoch++;keyboard_pattern_gains(&pat);
+    pat_fetch(n, &pat);seq_trk=pattern_focus(&pat);keyboard_pattern_epoch++;endless_recall();keyboard_pattern_gains(&pat);
     set.pat = (uint8_t)n;
     if (psnd[n].magic == PSN2_MAGIC) {
         patch_t nx[NTRK];
@@ -788,7 +803,7 @@ static void obv_context_refresh(void)
         if((page>=PG_OSC1&&page<=PG_FILTER2)||page==PG_SUPER||page==PG_VOWELS||page==PG_VTONE)page=PG_DKIT;
         if(page==PG_FENV||page==PG_AENV||page==PG_LFO||page==PG_LFODEST||page==PG_LFO2)page=PG_DSOUND;
     }
-    else {if(page==PG_DSEQ){page=PG_SEQ;if(seq_view!=SV_TRANSPOSE)seq_view=SV_TRACKS;}else if(page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND)page=PG_OSC1;}
+    else {if(page==PG_DSEQ){page=PG_SEQ;if(end_mode)seq_view=SV_ENDLESS;else if(seq_view!=SV_TRANSPOSE)seq_view=SV_TRACKS;}else if(page==PG_VOWELS||page==PG_VTONE||page==PG_DKIT||page==PG_DSOUND)page=PG_OSC1;}
 }
 static int32_t obv_page_param(uint32_t pg,uint32_t k)
 {
@@ -807,8 +822,7 @@ static const char *obv_voice_label(uint32_t p)
         if(p==DP_LENGTH)return "DECAY";if(p==DP_FOLD)return "FOLD";
         if(p==P_O2_SEMI)return "TUNE";return PDEF[p].name;
     }
-    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER) ||
-       (p==P_O2_PW && ed_patch(0)->v[P_O2_WAVE]==W_SUPER))return "DETUNE";
+    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER))return "DETUNE";
     return PDEF[p].name;
 }
 static uint32_t super_edit_page(void)
@@ -905,6 +919,9 @@ static void randomize(void)
 
 /* ---- the screen (obv_ui.h draws; this decides what and when) */
 #include "obv_ui.h"
+#if BOARD_SMK37
+#include "smk_midi_layout.h"
+#endif
 
 static void fmt_u(char *s, uint32_t v)          /* decimal, no leading zeros */
 {
@@ -935,8 +952,8 @@ static void param_value(char *s, uint32_t p, uint32_t v)   /* <= 7 characters */
         if(p==DP_TONE||p==DP_LENGTH){fmt_s(s,(int32_t)v-64);return;}
     }
 
-    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER) ||
-       (p==P_O2_PW && ed_patch(0)->v[P_O2_WAVE]==W_SUPER)){fmt_u(s,v);return;}
+    if((p==P_O1_PW && ed_patch(0)->v[P_O1_WAVE]==W_SUPER)){fmt_u(s,v);return;}
+    if(p==P_O2_WAVE&&v==W_SUPER)v=W_SAW;
     switch (PDEF[p].kind) {
     case K_BIP: if (v < 64u) { scat(s, "-"); fmt_u(t, 64u - v); } else { scat(s, v > 64u ? "+" : ""); fmt_u(t, v - 64u); } scat(s, t); break;
     case K_ONOFF: scat(s, v ? "ON" : "OFF"); break;
@@ -970,6 +987,10 @@ static uint32_t cut_shown_t;                    /* the header shows the cutoff f
 static uint32_t perf_header_slot(void);
 static uint32_t perf_pattern_bank(void);
 static uint32_t perf_drum_bank(void);
+#if BOARD_SMK37
+#include "smk_zoom.h"
+#endif
+
 static void draw_header(void)
 {
     char tags[40];
@@ -1125,6 +1146,11 @@ static void draw_keyboard_scope(void){
 
 static void draw_page(void)
 {
+#if BOARD_SMK37
+    if(page==PG_THEME&&!layer){zm_theme_draw();return;}
+    if(page==PG_MIDI&&!layer){mui_entry_draw();return;}
+    if(page==PG_CONTROLS&&!layer){mui_controls_draw(smk_fader_jump());return;}
+#endif
     obv_context_refresh();
     knob_view_t k[4];
     uint32_t i;
@@ -1135,8 +1161,9 @@ static void draw_page(void)
         k[i].bip = 0;
         k[i].value[0] = 0;
         if(page==PG_SUPER && !layer){
-            static const char *const labels[4]={"DET1","MIX1","DET2","MIX2"};
-            const patch_t *p=ed_patch(0);unsigned o=i/2;
+            static const char *const labels[2]={"DETUNE","MIX"};
+            if(i>=2u)continue;
+            const patch_t *p=ed_patch(0);unsigned o=0;
             k[i].present=1;k[i].label=labels[i];k[i].max=127;
             k[i].v=(i&1u)?patch_super_mix(p,o):p->v[o?P_O2_PW:P_O1_PW];
             fmt_u(k[i].value,k[i].v);
@@ -1188,6 +1215,15 @@ static void draw_page(void)
             if (!i) { k[i].label = "MODE"; k[i].present = 1;
                 scat(k[i].value, smk_fader_jump() ? "JUMP" : "CATCH"); k[i].v = smk_fader_jump() ? 0 : 1; k[i].max = 1; }
 #endif
+        } else if (page == PG_MIDI && !layer) {
+#if BOARD_SMK37
+            static const char *const ML[4]={"MODE","MAP","CHANNEL","KNOBS"};
+            k[i].label=ML[i];k[i].present=!i;
+            if(!i){scat(k[i].value,"SYNTH");k[i].v=0;k[i].max=1;}
+            else if(i==1){fmt_u(k[i].value,mm_data.selected+1u);k[i].v=mm_data.selected;k[i].max=3;}
+            else if(i==2){fmt_u(k[i].value,mm_main_ch());k[i].v=mm_main_ch()-1u;k[i].max=15;}
+            else {scat(k[i].value,mm_relative()?"REL":"ABS");k[i].v=mm_relative();k[i].max=1;}
+#endif
         } else if (page == PG_GLOBAL && !layer && !SMK_PAD_HELD) {
             static const char *const GL[4] = {"TEMPO", "CLICK", "MIDI CH", "TUNE"};
             k[i].label = GL[i];
@@ -1203,6 +1239,7 @@ static void draw_page(void)
         } else if (p >= 0) {
             k[i].label = obv_voice_label((uint32_t)p);
             k[i].v = ed_patch((uint32_t)p)->v[p];
+            if(p==P_O2_WAVE&&k[i].v==W_SUPER)k[i].v=W_SAW;
             k[i].max = obv_param_max(ed_patch((uint32_t)p),(uint32_t)p);
             if(k[i].v>k[i].max)k[i].v=k[i].max;
             k[i].bip = PDEF[p].kind == K_BIP || PDEF[p].kind == K_SEMI || PDEF[p].kind == K_MORPH;
@@ -1241,6 +1278,9 @@ static void draw_page(void)
             else
 #endif
             scat(cpu, set.sync_int ? " INT" : ctl_ext_quarter ? " CLK" : " AUTO");
+            #if BOARD_SMK37
+            if(zm_grid_active()||zm_scope_active())zm_grid(t,k);else
+#endif
             ui_page(t, k, page==PG_KEYBOARD&&!layer?0:save_armed ? "SAVE?" : seq_shown() && pat_edited ? "EDITED" : (page == PG_GLOBAL || page == PG_SUPER) && !layer ? cpu : 0);
         }
     }
@@ -1278,7 +1318,7 @@ static void draw_hints(void)
     if(perf_drum_bank()&&!layer&&!toasting&&!rec){uint32_t dk=obv_drums_selected()?901u:902u;if(hints_key!=dk){hints_key=dk;ui_hints(obv_drums_selected()?"PADS 1-8: PLAY / REC":"SELECT A DRUM-X PART",obv_drums_selected()?"PADS 9-16 UNUSED":"KNOB BANK: EXIT",obv_drums_selected()?RGB(166,66,255):C_AMBER);}return;}
     if(page==PG_KEYBOARD&&!layer&&!toasting&&!rec){if(hints_key!=900u){hints_key=900u;ui_hints("P8 / P16 SELECT PLAY ROW", "K5 LEVEL/OCT  TWO PADS LAYER", C_TRKC[0]);}return;}
     if(!layer&&!toasting&&!rec&&(page==PG_SUPER||page==PG_OSC1||page==PG_OSC2||page==PG_OSCMOD)&&
-       (ed_patch(0)->v[P_O1_WAVE]==W_SUPER||ed_patch(0)->v[P_O2_WAVE]==W_SUPER)){
+       (ed_patch(0)->v[P_O1_WAVE]==W_SUPER)){
         if(hints_key!=903u){hints_key=903u;ui_hints("SUPER: SYNC / XMOD BYPASS","PWM DOES NOT MODULATE DETUNE",C_AMBER);}return;
     }
     if (held > 500u) {                          /* REC held: a bar fills up to the clear */
@@ -1569,6 +1609,8 @@ static void entry_note(uint32_t on, uint32_t note, uint32_t vel)
 
 static void entry_reset(void) { entry_n = 0; memset(entry_on_note, 0, sizeof entry_on_note); }
 
+#include "obv_endless.h"
+
 /* which slots hold a pattern, its tracks' lengths, and every pattern's sounds (at boot; undo_pat as the buffer) */
 static void slot_lens_read(void)
 {
@@ -1640,7 +1682,7 @@ static void pat_go(uint32_t n)
     if (pend_slot == n + 1u) {                  /* back to the one left with its edits (not saved yet): those */
         pat_q = pat_old; pend_slot = 0; q_edited = 1;
     } else { pat_fetch(n, &pat_q); q_edited = 0; }
-    ctl_pat_keep = !pend_slot;                  /* (the one left comes back in pat_old, with its edits; pat_old waiting
+    ctl_pat_keep = !OBV_MANUAL_STORAGE && !pend_slot;                  /* (the one left comes back in pat_old, with its edits; pat_old waiting
                                                  * for the stop is never overwritten) */
     snd_target(n, snd_q); ctl_snd_swap = 1;
     mx_prepare(n); ctl_mx_swap = 1;
@@ -1752,6 +1794,7 @@ static void seq_view_turn(uint32_t knob, int32_t e)
     seqtrk_t *tk = &pat.trk[t];
     int32_t sg = e > 0 ? 1 : -1;
     step_t *st;
+    if(seq_view==SV_ENDLESS){endless_turn(knob,e);return;}
     if(seq_view==SV_TRANSPOSE){
         if(knob==0)transpose_keys_set(e>0);
         else if(knob==1)ctl_seq_transpose=clampi(ctl_seq_transpose+e,-48,79);
@@ -1823,6 +1866,7 @@ static void seq_view_turn(uint32_t knob, int32_t e)
 
 static void seq_view_knob(knob_view_t *k, uint32_t i)
 {
+    if(seq_view==SV_ENDLESS){endless_knob(k,i);return;}
     static const char *const L[NSV][4] = {{"CUTOFF", "LEVEL", "LENGTH", "QUANT"}, {"STEP", "NOTE", "GATE", "VELO"},
                                           {"STEP", "RATCHET", "CHANCE", "ON/OFF"}, {"LENGTH", "DIV", "SWING", "TRANSP"},
                                           {"SLOT", "", "GO", "SAVE"}};
@@ -1843,6 +1887,7 @@ static void seq_view_knob(knob_view_t *k, uint32_t i)
     k->label = L[SV_EFF][i];
     k->present = k->label[0] != 0;
     k->bip = 0; k->v = 0; k->max = 0;
+    if(seq_view==SV_ENDLESS){endless_knob(k,i);return;}
     if (seq_view == SV_SLOTS) {
         if (i == 0) { fmt_u(v, slot_sel + 1u); k->v = (int32_t)slot_sel; k->max = NPAT - 1; }
         else if (i == 2u) scat(v, slot_sel == set.pat ? "HERE" : "TURN");
@@ -2137,6 +2182,9 @@ static void draw_seq_knobs(void)
         else seq_view_knob(&k[i], i);
     }
     ui_trk = seq_trk;
+#if BOARD_SMK37
+    if(zm_zoom&&seq_view==SV_TRANSPOSE&&!layer){zm_grid("TRANSPOSE",k);return;}
+#endif
     ui_seq_knobs(k);
 }
 
@@ -2154,6 +2202,7 @@ static void note_in(uint32_t on, uint32_t note, uint32_t vel)
 {
     uint32_t t;
     note &= 127u;
+    if(endless_note(on,note,vel))return;
     unsigned had_pen=panel_live_note[note]==1u;
     if(!on && transpose_captured[note]){transpose_captured[note]=0;return;}
     if(on && transpose_keys && !layer){
@@ -2337,7 +2386,7 @@ static void midi_in(uint32_t notes_only)
         else if (kind == 0xB0u) {
             if (d1 == 7u) ctl_cc7 = d2;
             else if (d1 == 64u) { midi_sustain = d2 >= 64u; sustain_apply(); }
-            else if (d1 == 120u || d1 == 123u) ctl_panic = 1;
+            else if (d1 == 120u || d1 == 123u) { endless_reset(); ctl_panic = 1; }
             else if (cc_map[d1]) {
                 uint32_t p = cc_map[d1] - 1u;
                 set_param(p, (int32_t)((d2*obv_param_max(ed_patch(p),p)+63u)/127u));
@@ -2358,7 +2407,11 @@ static void b1_discard_inputs(void){
  while(smk_pad_take()>=0){}while(smk_extkey_take()>=0){}
  while(midi_get(&st,&a,&b)){}midi_back[3]=0;smk_ext_back=-1;
 }
-static int b1_can_begin(void){return flash_ok&&b1_ready&&!fm1_in.buttons&&!layer&&step_held<0&&!ctl_seq_run&&!rec&&engine_quiet()&&!notes_down&&!fm1_in.keys&&!ctl_sustain&&!manual_store_request&&!ps_dirty&&!pat_dirty&&!copy_to&&!pat_save_say&&!pf_manual_write&&!pf_pending&&!preset_ui&&!pb_confirm;}
+static int b1_can_begin(void){return !mm_on&&!mm_wait_release&&flash_ok&&b1_ready&&!fm1_in.buttons&&!layer&&step_held<0&&!ctl_seq_run&&!rec&&engine_quiet()&&!notes_down&&!fm1_in.keys&&!ctl_sustain&&!manual_store_request&&!ps_dirty&&!pat_dirty&&!copy_to&&!pat_save_say&&!pf_manual_write&&!pf_pending&&!preset_ui&&!pb_confirm;}
+#endif
+#if BOARD_SMK37
+#include "smk_midi_mode_ui.h"
+#include "smk_zoom_runtime.h"
 #endif
 static void app_idle(void)                      /* lcd.c while a strip goes out, ui_page between the knobs: the notes */
 {
@@ -2368,6 +2421,9 @@ static void app_idle(void)                      /* lcd.c while a strip goes out,
     if(b1_active)return;
 #endif
     busy = 1;
+#if BOARD_SMK37
+    if(mm_on||mm_wait_release){mm_service();mm_discard_midi();busy=0;return;}
+#endif
     keys_in(1);
 #if BOARD_SMK37
     smk_outer((uint32_t)(KEY0 + 12 * keyboard_base_octave()), 1, &dirty_steps);
@@ -2472,7 +2528,7 @@ static void panel_encoders(void)
 #endif
     obv_context_refresh();
 #if BOARD_SMK37
-    if(preset_ui||pb_confirm){for(unsigned i=0;i<8;i++){int e=fm1_enc_take(i);if(preset_ui==1&&i==ENC_PRESETS&&e){save_to=(uint32_t)((int32_t)save_to+e+(int32_t)NPROG*4)%NPROG;save_ui_dirty=1;}}return;}
+    if(preset_ui||pb_confirm){for(unsigned i=0;i<8;i++){int e=fm1_enc_take(i);if(preset_ui==1&&e)preset_turn(i,e);}return;}
 #endif
         /* encoders */
         if ((e = fm1_enc_take(ENC_PRESETS)) != 0 && save_armed) {           /* SAVE armed: PRESETS picks the slot to save into ("save as") */
@@ -2490,7 +2546,11 @@ static void panel_encoders(void)
                                                  * the MIXER the next pattern (on the bar), else the tempo */
             static char msg[16];
             uint32_t t = seq_trk % NTRK, len = pat.trk[t].len;
-            if(page==PG_KEYBOARD&&!layer){kb_edit_oct^=1u;dirty_page=1;say(kb_edit_oct?"KEYBOARD OCTAVES":"KEYBOARD LEVELS");}
+            if(endless_screen()){
+                set.tempo=(uint8_t)clampi((int)set.tempo+e,40,240);ctl_tempo=set.tempo;set_dirty=1;set_t=fm1_ms;
+                dirty_page=1;
+            }
+            else if(page==PG_KEYBOARD&&!layer){kb_edit_oct^=1u;dirty_page=1;say(kb_edit_oct?"KEYBOARD OCTAVES":"KEYBOARD LEVELS");}
             else if (is_seq_page(page) && SV_ENTRY(seq_view) && !layer) {
                 if (len) {
                     int32_t c = (int32_t)(seq_cur[t] % len) + (e > 0 ? 16 : -16);
@@ -2524,7 +2584,8 @@ static void panel_encoders(void)
 #endif
             if (e > 1 || e < -1) e *= 3;        /* a fast turn goes further */
             if(page==PG_SUPER && !layer){
-                unsigned o=k/2;patch_t *p=ed_patch(0);
+                if(k>=2u)continue;
+                unsigned o=0;patch_t *p=ed_patch(0);
                 if(k&1u){patch_super_mix_set(p,o,(uint32_t)clampi((int32_t)patch_super_mix(p,o)+e*2,0,127));trk_edited[seq_trk%NTRK]=1;}
                 else {unsigned id=o?P_O2_PW:P_O1_PW;set_param(id,(int32_t)p->v[id]+e*2);auto_rec(id);}
                 dirty_hdr=1;
@@ -2557,9 +2618,17 @@ static void panel_encoders(void)
                 if (k == 0) set.dv_type = (uint8_t)clampi((int32_t)(set.dv_type % NDV) + (e > 0 ? 1 : -1), 0, NDV - 1);
                 else { uint8_t *v = k == 1 ? &set.dv_amt : k == 2 ? &set.dv_tone : &set.dv_mix; *v = (uint8_t)clampi((int32_t)*v + e * 2, 0, 127); }
                 mix_apply(); set_dirty = 1; set_t = fm1_ms;
+            } else if (page == PG_THEME && !layer) {
+#if BOARD_SMK37
+                if(!k){zm_theme_set(e>0);dirty_hdr=dirty_tags=dirty_steps=1;}
+#endif
             } else if (page == PG_CONTROLS && !layer) {
 #if BOARD_SMK37
                 if (!k) { smk_fader_mode_set(e < 0); set_dirty = 1; set_t = fm1_ms; }
+#endif
+            } else if (page == PG_MIDI && !layer) {
+#if BOARD_SMK37
+                mm_setting_turn(k,e);
 #endif
             } else if (page == PG_GLOBAL && !layer && !SMK_PAD_HELD) {   /* (a held layer has the knobs, on every page) */
                 if (k == 0) { set.tempo = (uint8_t)clampi(set.tempo + e, 40, 240); ctl_tempo = set.tempo; }
@@ -2591,6 +2660,9 @@ static void panel_encoders(void)
                 if (p == P_MODE || p == P_FTYPE || p == P_ARP_MODE || p >= P_CHO_RATE) dirty_tags = 1;
                 dirty_hdr = 1;
             }
+#if BOARD_SMK37
+            zm_focus_capture(k,p);
+#endif
             dirty_page = 1;
         }
 
@@ -2605,6 +2677,9 @@ static void app_main(void)
     smk_pad_events = 1;                         /* the pads are OberVave's step pads (obv_smk.h), not notes */
 #endif
     engine_init();
+#if BOARD_SMK37
+    mm_boot();zm_boot();
+#endif
     cc_map_init();
     {
         uint32_t n;
@@ -2692,6 +2767,12 @@ static void app_main(void)
     for (;;) {
         uint32_t rel, b, lit = 0, base = (uint32_t)(KEY0 + 12 * keyboard_base_octave()), np = page;
         platform_poll();
+#if BOARD_SMK37
+        mm_service();
+        if(mm_on){mm_poll();continue;}
+        if(mm_wait_release){uint32_t rel;fm1_input_edges(&rel);while(smk_pad_take()>=0){}while(smk_extkey_take()>=0){}for(unsigned e=0;e<8;e++)fm1_enc_take(e);mm_discard_midi();if(mm_return_poll())continue;leds_prev=glow_prev=0xFFFFFFFFu;leds_q=hints_key=0xFFFFFFFFu;}
+#endif
+        endless_poll();
 #if OBV_VOICE_HW && !defined(OBV_HOST)
         b1_ready=1;
         static unsigned b1_shown;
@@ -2765,17 +2846,18 @@ static void app_main(void)
                     if (layer != LL[k] || layer_lock) continue;
                     if (!layer_used && fm1_ms - layer_t < 600u) {   /* a tap: the button's pages */
                         if (LL[k] == L_SEQ) {   /* SEQ: the full-screen sequencer; there, its next view (as SLOOP) */
-                            static const char *const HINT[NSV] = {NM_ALGO ": TRACK A-D", "KEYS WRITE  " NM_SELBTN " HELD: MORE", "MORE PER STEP", "THE TRACK: LENGTH ..", "THE 8 PATTERNS", "K1 KEYS  K2 VALUE  K3 ZERO"};
+                            static const char *const HINT[NSV] = {NM_ALGO ": TRACK A-D", "KEYS WRITE  " NM_SELBTN " HELD: MORE", "MORE PER STEP", "THE TRACK: LENGTH ..", "THE 8 PATTERNS", "K1 KEYS  K2 VALUE  K3 ZERO", "REC APPEND / PARA ENABLE"};
                             if (page==PG_DSEQ) {seq_view=seq_view==SV_STEPS?SV_MORE:seq_view==SV_MORE?SV_TRACK:seq_view==SV_TRACK?SV_TRACKS:seq_view==SV_TRACKS?SV_SLOTS:seq_view==SV_SLOTS?SV_TRANSPOSE:SV_STEPS;}
                             else if (is_seq_page(page)) { seq_view = (seq_view + 1u) % NSV; if (seq_view == SV_MORE) seq_view = SV_TRACK; }   /* (STEP+ = SELECT held in STEPS) */
-                            else { seq_back = page; np = PG_SEQ; seq_view = SV_TRACKS; }
+                            else { seq_back = page; np = PG_SEQ; seq_view = end_mode?SV_ENDLESS:SV_TRACKS; }
                             if (seq_view == SV_SLOTS) slot_sel = pat_queue ? pat_queue - 1u : set.pat;
                             say(HINT[seq_view]);
                             entry_reset();
-                        } else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
+                        } else if (LL[k] == L_EDIT && page==PG_SEQ && seq_view==SV_ENDLESS) endless_toggle();
+                        else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
                         else if (LL[k] == L_EDIT) np = obv_drums_selected() ? (page==PG_DKIT?PG_DSOUND:PG_DKIT) : super_edit_page();
                         else if (LL[k] == L_FX) np = cycle_page(PG_CHORUS, 4);
-                        else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : PG_GLOBAL;
+                        else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : (BOARD_SMK37 && page == PG_CONTROLS) ? PG_THEME : (BOARD_SMK37 && page == PG_THEME) ? PG_MIDI : PG_GLOBAL;
 
                     }
                     layer = L_NONE;
@@ -2787,12 +2869,15 @@ static void app_main(void)
         }
 #if BOARD_SMK37
         pf_bank_poll(b, rel);
+        if(endless_screen()&&(b&((1u<<BTN_LEFT)|(1u<<BTN_RIGHT)))){
+            endless_arrow((b>>BTN_RIGHT)&1u);b&=~((1u<<BTN_LEFT)|(1u<<BTN_RIGHT));dirty_steps=dirty_page=1;
+        }
         smk_buttons(b, &dirty_steps);           /* FADER BANK, < > */
 #endif
         ctl_click = set.click % NCLICK == CLICK_ON || (rec == REC_ON && set.click % NCLICK != CLICK_OFF);
         if (b & (3u << BTN_OCT_DOWN)) {
             if (layer == L_EDIT) {              /* EDIT + OCT- / OCT+: undo / redo (one level: a swap) */
-                if (undo_ok) { pattern_t tmp = pat; pat = undo_pat; undo_pat = tmp; pat_edited = 1; say(b & (1u << BTN_OCT_DOWN) ? "UNDO" : "REDO"); }
+                if (undo_ok) { pattern_t tmp = pat; pat = undo_pat; undo_pat = tmp; endless_recall(); pat_edited = 1; say(b & (1u << BTN_OCT_DOWN) ? "UNDO" : "REDO"); }
                 else say("NOTHING TO UNDO");
                 layer_used = 1;
             } else if (steps_on()) {            /* the SEQ layer: OCT- / OCT+ page */
@@ -2814,7 +2899,13 @@ static void app_main(void)
         if (b & (1u << BTN_HOME)) {             /* HOME: PERFORM; while a layer is held: lock it open; locked: let it go */
             if (layer && !layer_lock) { layer_lock = 1; layer_used = 1; say("LOCKED: ITS BUTTON ENDS IT"); }
             else if (layer_lock) { layer = L_NONE; layer_lock = 0; dirty_page = dirty_steps = dirty_tags = 1; leds_q = 0xFFFFFFFFu; }
-            else if (page == PG_PERFORM) { np = PG_MIXER; mix_row = 0; }   /* again: the MIXER (VIBE's F1) */
+            else if (page == PG_PERFORM) {
+#if BOARD_SMK37
+                if(!zm_scope){zm_scope=1;zm_focus_on=0;dirty_hdr=dirty_page=dirty_steps=1;scope_state=1;}else{zm_scope=0;zm_focus_on=0;np=PG_MIXER;mix_row=0;}
+#else
+                np=PG_MIXER;mix_row=0;
+#endif
+            }   /* again: the MIXER (VIBE's F1) */
             else if (page == PG_MIXER) {        /* there: its next row */
                 static const char *const MR[7] = {"LEVEL", "PAN", "SEND CHORUS", "SEND DELAY", "SEND REVERB", "SEND DRIVE", "MASTER"};
                 mix_row = (mix_row + 1u) % 7u; say(MR[mix_row]); dirty_page = dirty_steps = 1;
@@ -2835,8 +2926,9 @@ static void app_main(void)
             if (page == PG_ARP) { hold ^= 1u << (seq_trk % NTRK); ctl_hold = hold; dirty_tags = 1; }   /* on its page: the panel's sound's HOLD */
             else np = PG_ARP;
         }
+        if ((b & (1u << BTN_PLAY)) && end_record) endless_finish();
         if (b & (1u << BTN_PLAY)) {             /* start from step 1 / stop (a take ends with it) */
-            if (ctl_seq_run) { ctl_seq_run = 0; rec = REC_OFF; rec_wait = 0; }   /* (the stop ends REC, armed too: the pads start / stop again) */
+            if (ctl_seq_run) { if(end_mode)endless_stop();else{ctl_seq_run = 0; rec = REC_OFF; rec_wait = 0;} }   /* (the stop ends REC, armed too: the pads start / stop again) */
             else {
                 if (rec == REC_READY) { rec = REC_ON; undo_save(); ctl_count = set.click % NCLICK == CLICK_COUNT; }
                 ctl_seq_restart = 1; ctl_seq_run = 1;
@@ -2846,12 +2938,14 @@ static void app_main(void)
         if (b & (1u << BTN_REC)) { rec_down = 1; rec_down_t = fm1_ms; }   /* REC acts when let go; held 1.2 s it clears the track */
         if (rec_down && fm1_ms - rec_down_t > 1200u) {
             trk_clear();
+            if(endless_screen()&&endless_enabled(&pat.trk[seq_trk])){endless_finish();pat.trk[seq_trk].len=0;seq_cursor_set(seq_trk,0);}
             rec_down = 0;
             leds_q = 0xFFFFFFFFu;
         }
         if (rel & (1u << BTN_REC) && rec_down) {
             if (fm1_ms - rec_down_t < 500u) {   /* a press: playing, record now / stop recording; stopped, arm */
-                if (rec) rec = REC_OFF;
+                if(endless_screen())endless_record_toggle();
+                else if (rec) rec = REC_OFF;
                 else if (ctl_seq_run) { rec = REC_ON; undo_save(); }
                 else rec = REC_READY;
                 memset(rec_open_part, 0, sizeof rec_open_part);
@@ -2873,6 +2967,10 @@ static void app_main(void)
 #endif
         if (req_page) { np = req_page - 1u; req_page = 0; if (np == page) dirty_page = dirty_steps = dirty_tags = 1; }
         if (np != page) {
+#if BOARD_SMK37
+            zm_scope=zm_focus_on=0;
+            if(mui_full_page(np)||mui_full_page(page)){lcd_fill(0,0,240,240,C_PANEL);dirty_hdr=dirty_tags=1;scope_state=1;}
+#endif
             if (layer_lock) { layer = L_NONE; layer_lock = 0; }
             if (is_seq_page(np) != is_seq_page(page)) {   /* into / out of the full-screen sequencer: all new */
                 lcd_fill(0, 0, 240, 240, C_PANEL);
@@ -2892,6 +2990,7 @@ static void app_main(void)
         panel_encoders();
 
 #if BOARD_SMK37
+        if(mm_on)continue;
         smk_control_seen = smk_control_context();
         smk_faders(&dirty_page, &dirty_hdr, &dirty_tags);
         smk_wheels();
@@ -2948,7 +3047,7 @@ static void app_main(void)
         if (ui_seq_beat != beat_seen) { beat_seen = ui_seq_beat; beat_t = fm1_ms; }
         {
             uint32_t play_on = ctl_seq_run && fm1_ms - beat_t < 90u;   /* PLAY flashes on the beat */
-            uint32_t rec_on = rec == REC_ON || (rec == REC_READY && (fm1_ms / 250u) & 1u);
+            uint32_t rec_on = end_record || rec == REC_ON || (rec == REC_READY && (fm1_ms / 250u) & 1u);
             uint32_t pg = steps_on();
             uint32_t on = pg ? seq_pg[seq_trk] > 0u : panel_octave() < 0, up2 = pg ? seq_pg[seq_trk] + 1u < seq_pages(seq_trk) : panel_octave() > 0;
             lit |= (play_on << 27) | ((uint32_t)(ed_patch(P_ARP_MODE)->v[P_ARP_MODE] != 0) << 28) | (on << 29) | (up2 << 30) | (rec_on << 31);
@@ -2969,7 +3068,7 @@ static void app_main(void)
         fm1_led_key(BTN_ENV, page == PG_FENV || page == PG_AENV);
         fm1_led_key(BTN_LFO, page >= PG_LFO && page <= PG_LFO2);
         fm1_led_key(BTN_FX, page >= PG_CHORUS && page <= PG_DRIVE);
-        fm1_led_key(BTN_GLO, (page >= PG_VOICE && page <= PG_GLOBAL) || page == PG_CONTROLS);
+        fm1_led_key(BTN_GLO, (page >= PG_VOICE && page <= PG_GLOBAL) || page == PG_CONTROLS || page == PG_MIDI || page == PG_THEME);
         fm1_led_key(BTN_SAVE, preset_ui==1||preset_ui==2||preset_down);
 #if BOARD_SMK37
         smk_leds();                             /* the step pads, FADER BANK, < > */
@@ -2991,6 +3090,16 @@ static void app_main(void)
         /* the screen: only what changed */
         idle_ok = 1;
         if(save_ui_active()){save_ui_draw();}else{
+#if BOARD_SMK37
+        if(zm_display_poll()){}else
+        if(!layer&&mui_full_page(page)){
+            if((dirty_page||dirty_hdr||dirty_tags||dirty_steps)&&fm1_ms-t_page>=40u){dirty_page=dirty_hdr=dirty_tags=dirty_steps=0;t_page=fm1_ms;draw_page();}
+        }else
+#endif
+        if(endless_screen()){
+            if(fm1_ms-t_page>=30u){t_page=fm1_ms;endless_draw(!end_ui_seen);end_ui_seen=1;dirty_page=dirty_steps=dirty_hdr=dirty_tags=0;}
+        } else {
+        end_ui_seen=0;
         if (is_seq_page(page)) {                /* the full-screen sequencer: its own strips */
             static uint32_t top_key, t_seq, info_key;
             static char info_prev[40];
@@ -3031,7 +3140,13 @@ static void app_main(void)
             }
         } else {
         if (dirty_hdr && fm1_ms - t_hdr >= 30u) { dirty_hdr = 0; t_hdr = fm1_ms; draw_header(); }
-        if (dirty_page && fm1_ms - t_page >= 30u) { dirty_page = 0; t_page = fm1_ms; draw_page(); }
+        if (dirty_page && fm1_ms - t_page >= 30u) {
+            dirty_page = 0;
+            /* Outside sequencer/record/mixer, the page consumes this invalidation.
+             * Clear before drawing: app_idle may queue a new event during a blit. */
+            if (!seq_shown() && !rec && page != PG_MIXER) dirty_steps = 0;
+            t_page = fm1_ms; draw_page();
+        }
         if (dirty_tags) { dirty_tags = 0; draw_tags(); }
         if (page == PG_MIXER) {                 /* the mixer: its strip instead of the scope and the voice lights */
             static uint32_t mix_key = 0xFFFFFFFFu;
@@ -3086,10 +3201,11 @@ static void app_main(void)
         }
         }
         }
+        }
         } /* modal display ownership */
         idle_ok = 0;
 #if BOARD_SMK37
-        pf_save_poll();
+        pf_save_poll();zm_theme_poll();
 #endif
         if ((set_dirty || ps_dirty) && (!OBV_MANUAL_STORAGE||manual_store_request) && !ctl_seq_run && engine_quiet() && fm1_ms - set_t > 2000u) {   /* when silent: an erase stalls the sound */
             uint32_t i, bad=0;

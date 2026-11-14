@@ -24,6 +24,8 @@ typedef struct { uint32_t stage; int32_t level; } env_t;   /* level Q24 */
 
 typedef struct {
     osc_t o1, o2;
+    int32_t guard_l,guard_r;
+    uint32_t guard_in;
     uint32_t noise;
     env_t fe, ae;
     svf_state_t f1, f2;
@@ -209,9 +211,27 @@ static void voice_pan(voice_t *v, int32_t pan)   /* -64..64 */
     v->gr = PAN_Q12[pos];
 }
 
+/* EM2: hard ceiling counts rendered SUPER cards, including release/DUAL/UNISON. */
+#define SUPER_LIMIT 5u
+#define STEAL_FADE 64u
+static int32_t guard_tail[NPART][2];
+static unsigned guard_left[NPART];
+static unsigned super_part(unsigned p){return obv_patch_engine(pt[p].p)==OBV_ANALOG && pt[p].p->v[P_O1_WAVE]==W_SUPER;}
+static unsigned super_voice(unsigned v){return (vc[v].gate||vc[v].ae.stage!=E_IDLE)&&super_part(vc[v].part);}
+static unsigned super_count(void){unsigned n=0;for(unsigned v=0;v<NV;v++)n+=super_voice(v);return n;}
+static unsigned super_victim(void){unsigned pick=NV;for(unsigned v=0;v<NV;v++)if(super_voice(v)){
+ if(pick==NV || (!vc[v].gate&&vc[pick].gate) || (vc[v].gate==vc[pick].gate && ((!vc[v].gate&&vc[v].ae.level<vc[pick].ae.level) || ((vc[v].gate||vc[v].ae.level==vc[pick].ae.level)&&vc[v].seq<vc[pick].seq))))pick=v;
+ }return pick;}
+static void super_retire(unsigned n){voice_t*v=&vc[n];unsigned p=v->part%NPART;
+ guard_tail[p][0]=(int32_t)(((int64_t)guard_tail[p][0]*guard_left[p])/STEAL_FADE)+v->guard_l;
+ guard_tail[p][1]=(int32_t)(((int64_t)guard_tail[p][1]*guard_left[p])/STEAL_FADE)+v->guard_r;
+ guard_left[p]=STEAL_FADE;v->guard_l=v->guard_r=0;v->guard_in=STEAL_FADE;
+ v->gate=0;v->ae.stage=v->fe.stage=E_IDLE;v->ae.level=v->fe.level=0;v->amp0=v->amp1=0;v->grp=0;
+}
 static void voice_start(voice_t *v, uint32_t part, uint32_t note, uint32_t vel, int32_t det8, int32_t pan)
 {
     const uint8_t *pv = pt[part].p->v;
+    if(super_part(part)&&super_count()>=SUPER_LIMIT&&super_voice((unsigned)(v-vc)))super_retire((unsigned)(v-vc));
     v->seq_owned = seq_note_source;v->key_combined=seq_note_source?0:keyboard_source;
     v->part = (uint8_t)part;
     v->note = (uint8_t)note;
@@ -242,6 +262,7 @@ static int part_grouped(uint32_t part)
  * cut by a chord); only if nothing else is left */
 static uint32_t voice_alloc(uint32_t part)
 {
+    if(super_part(part)&&super_count()>=SUPER_LIMIT){unsigned v=super_victim();super_retire(v);return v;}
     uint32_t i, v, pick = 0xFFFFFFFFu, best = 0xFFFFFFFFu;
 #define KEPT(v) (vc[v].grp && vc[v].gate && vc[v].part != part)
     for (i = 0; i < NV; i++) {
@@ -324,6 +345,7 @@ static void voice_trigger(uint32_t part, uint32_t note, uint32_t vel)
         vc[b].grp = 0;
     } else {
         n = uni_count(part);
+        if(super_part(part)&&n>SUPER_LIMIT)n=SUPER_LIMIT;
         if (grp_n[part] == n) {                 /* a key still down in the group (all its cards still its own): legato */
             uint32_t own = 1;
             for (i = 0; i < n; i++) {
@@ -626,7 +648,7 @@ static void engine_events(void)
     if (ctl_panic) {
         uint32_t hard = ctl_panic > 1u;
         ctl_panic = 0;
-        if (hard) { nq_r = nq_w; memset(vc, 0, sizeof vc); }
+        if (hard) { nq_r = nq_w; memset(vc, 0, sizeof vc); memset(guard_left,0,sizeof guard_left); memset(guard_tail,0,sizeof guard_tail); }
         for (p = 0; p < NPART; p++) {
             obv_pending_n[p]=0;
             parts_off(p);
@@ -766,7 +788,7 @@ static void block_globals(part_t *g)            /* a sound's derived numbers, on
     g->pw1_base = ((uint32_t)pv[P_O1_PW] << 25) + (1u << 24);
     g->pw2_base = ((uint32_t)pv[P_O2_PW] << 25) + (1u << 24);
     g->w1 = pv[P_O1_WAVE];
-    g->w2 = pv[P_O2_WAVE];
+    g->w2 = pv[P_O2_WAVE]==W_SUPER?W_SAW:pv[P_O2_WAVE]; /* old OSC2 SUPER is read as SAW; stored bytes stay intact */
     g->ftype = pv[P_FTYPE];
     g->morph_q = pv[P_FMORPH];                  /* SEM: 0 LP, 64 notch, 127 HP */
     g->sync_on = pv[P_SYNC];
@@ -852,7 +874,8 @@ static void voice_block(voice_t *v, uint32_t card)
 }
 
 #include "obv_supersaw.h"
-static super_state_t super_state[NV][2];
+static super_state_t super_state[NV];
+static super_plain_state_t super_plain_state[NV];
 
 /* ---- the samples of one voice: oscillators -> mix -> drive -> filter -> amp -> pan */
 static void voice_render(voice_t *v, int32_t *out)
@@ -865,15 +888,15 @@ static void voice_render(voice_t *v, int32_t *out)
     int32_t hw1 = (ww1 & OSC_SAW ? -65536 : 0) + (ww1 & OSC_PLS ? -65536 : 0);
     int32_t hw2 = (ww2 & OSC_SAW ? -65536 : 0) + (ww2 & OSC_PLS ? -65536 : 0);
     int32_t super_buf[2][CTL];
-    super_state_t *ss = super_state[v - vc];
-    uint32_t has_super = ww1 == W_SUPER || ww2 == W_SUPER;
+    super_state_t *ss = &super_state[v - vc];
+    super_plain_state_t *ps = &super_plain_state[v - vc];
+    uint32_t has_super = ww1 == W_SUPER;
     uint32_t buffered1 = ww1 == W_SUPER || (has_super && ww1 == W_SAW);
-    uint32_t buffered2 = ww2 == W_SUPER || (has_super && ww2 == W_SAW);
+    uint32_t buffered2 = has_super && ww2 == W_SAW;
     if (has_super) { sy = 0; xq = 0; } /* SS1: deliberately bypassed */
-    if (ww1 == W_SUPER) super_render_call(&ss[0], &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
-    else {ss[0].active = 0;if(buffered1)super_plain_call(&ss[0],&v->o1,inc1,l1?super_buf[0]:0,CTL);}
-    if (ww2 == W_SUPER) super_render_call(&ss[1], &v->o2, inc2, g->p->v[P_O2_PW], patch_super_mix(g->p,1), l2 ? super_buf[1] : 0, CTL);
-    else {ss[1].active = 0;if(buffered2)super_plain_call(&ss[1],&v->o2,inc2,l2?super_buf[1]:0,CTL);}
+    if (ww1 == W_SUPER) super_render_call(ss, &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
+    else {ss->active = 0;if(buffered1)super_plain_call(ps,&v->o1,inc1,l1?super_buf[0]:0,CTL);}
+    if(buffered2)super_plain_call(ps,&v->o2,inc2,l2?super_buf[1]:0,CTL);
     for (i = 0; i < CTL; i++) {
         int32_t s1, s2, mix, lp, bp, hp, y, amp, rt = -1;
         uint32_t ie = inc1;
@@ -905,8 +928,9 @@ static void voice_render(voice_t *v, int32_t *out)
         y = clampi(y, -65000, 65000);
         amp = amp0 + ((da * (int32_t)i) >> 4);
         y = (y * amp) >> 16;
-        out[2u * i] += (y * gl) >> 12;
-        out[2u * i + 1u] += (y * gr) >> 12;
+        if(v->guard_in){y=(int32_t)((int64_t)y*(STEAL_FADE-v->guard_in)/STEAL_FADE);v->guard_in--;}
+        v->guard_l=(y*gl)>>12;v->guard_r=(y*gr)>>12;
+        out[2u*i]+=v->guard_l;out[2u*i+1]+=v->guard_r;
     }
     (void)o2n;
 }
@@ -936,6 +960,11 @@ static void engine_audio(int32_t *out, uint32_t n)
         if (ctl_arp_restart) { ctl_arp_restart = 0; for (p = 0; p < NPART; p++) { arp[p].pos = 0; arp[p].cnt = 0xFFFFFFFFu; } }
         for (p = 0; p < NPART; p++) arp_tick(p);
         seq_tick();                             /* (may swap the pattern in) */
+        while(super_count()>SUPER_LIMIT)super_retire(super_victim());
+        for(unsigned gp=0;gp<NPART;gp++)if(guard_left[gp]){used|=1u<<gp;
+         for(unsigned gi=0;gi<CTL&&guard_left[gp];gi++,guard_left[gp]--)for(unsigned c=0;c<2;c++)
+          bus[gp][2u*(b+gi)+c]+=(int32_t)((int64_t)guard_tail[gp][c]*guard_left[gp]/STEAL_FADE);
+        }
         for (p = 0; p < NPART; p++) { lfo_tick(&pt[p]); block_globals(&pt[p]); }
         for (v = 0; v < NV; v++) {
             if (vc[v].ae.stage == E_IDLE && !vc[v].gate) {

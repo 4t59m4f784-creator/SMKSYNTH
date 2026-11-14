@@ -1,12 +1,15 @@
-# SMKSYNTH 1.1.0 - Quick start guide
+# SMKSYNTH 1.2.0 - Quick start guide
 
-[PDF](pdf/SMKSYNTH-1.1.0-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.2.0-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Reference: firmware 1.1.0, SMK-37 Pro_19634 / SMK-37 Elite_19634.
+Reference: firmware 1.2.0, SMK-37 Pro_19649 / SMK-37 Elite_19649.
 
 ## Contents
 
 - Quick start / 1. First steps
+- ENDLESS: record and perform
+- MIDI MODE: independent controller
+- Theme, oscilloscope and saving
 - Quick start / 2. Favourites and Split/Layer
 - Quick start / 3. Patterns and drums
 - Quick start / 4. Record, save and restore
@@ -19,7 +22,7 @@ Developed using AI: Marcus Padrini defined and directed the experience, created 
 
 ## Quick start / 1. First steps
 
-SMKSYNTH 1.1.0 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
+SMKSYNTH 1.2.0 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
 
 1. Set K8/master to a suitable level and press PLAY.
 2. K6 selects A-D; K7 changes the part preset.
@@ -34,6 +37,47 @@ SMKSYNTH 1.1.0 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. F
 K1-K4 follow the screen. K5: tempo on Performance; LEVEL/OCT in Split/Layer; page in STEPS; pattern in other SEQ/Mixer views. FADER BANK only changes faders. GLOBAL > FADER MODE: JUMP engages immediately; CATCH waits to cross the stored value. Bank B F4 = K8/master.
 
 Five examples start at 90 BPM. Eight favourites, no extra personal presets. PLAY/REC and engine choice preserve the pad bank; SEQ explicitly requests steps.
+
+## ENDLESS: record and perform
+
+ENDLESS is included in official version 1.2. It works in SINGLE, with four parts and independent lengths. Turn Split/Layer off. DRUM-X keeps its drum sequencer. Opening the page does not enable ENDLESS.
+
+1. Select a part with K6 and cycle SEQ views to ENDLESS. Tap PARA to enable; tap PARA again to disable without deleting notes. REC also enables it and starts note entry.
+2. With transport stopped, tap REC and enter notes or chords: after releasing all keys, the next press appends a step. Up to 256 steps per part.
+3. During entry, right arrow adds a rest with no keys held or extends held notes; left arrow removes the last step after keys are released. Tap REC again to finish entry.
+4. With ENDLESS enabled, a key triggers/transposes the parts together: C4 keeps original pitch, independently of the part editing octave. PLAY starts or stops transport. K4 HOLD keeps playback going after keys are released; with HOLD off, releasing the last key stops the session.
+5. K1 RATE, K2 GATE, K3 DIR (FWD/REV/RND), K4 HOLD. Save in the pattern bank to retain sequences, sounds and settings.
+6. Holding REC for over 1.2 s clears the selected part sequence and automation. Stopping, leaving the page or disabling ENDLESS does not delete recorded notes.
+
+ENDLESS sends notes through USB and TRS/DIN using each part channel, like the regular sequencer. It does not send MIDI Clock/Start/Stop.
+
+## MIDI MODE: independent controller
+
+In MIDI MODE the synthesizer is silent and controls send MIDI through USB and TRS/DIN. Bluetooth is not included. Entering and leaving release notes and clear temporary modulation to preserve the patch on return to the synth.
+
+1. In the synth, cycle GLOBE to MIDI MODE. Before activation the page shows only the entry control; turn K1 right.
+2. In MIDI MODE, GLOBE opens settings: K1 left returns to the synth; K2 selects MAP 1-4; K3 sets main channel 1-16; K4 selects ABS or REL encoders. This channel is independent of the synth part base channel.
+3. KNOB BANK and FADER BANK switch banks A/B. Press both together to switch pad bank. OCT-/+ transpose the keyboard.
+4. Tap PARA to edit. Move the desired control or use K5/OCT to select it. K1 selects an allowed type (OFF, CC, CC TOGGLE, NOTE or PITCH BEND), K2 the CC/note number, K3 channel (MAIN or 1-16), and K4 pad colour. Available types depend on the control.
+5. BT saves all four maps, including channels, colours and behaviour. Release keys, pads and pedal before saving. PARA returns to the performance overview. ABS encoders accelerate with turning speed; REL uses relative messages.
+6. The display keeps three independent areas: last controller value and bars, pads with activity, and a 37-key virtual keyboard showing chords. GLOBE + PLAY triggers MIDI PANIC.
+
+The simulator demonstrates the interface and retains browser memory; it does not replace physical USB/TRS port testing. A .smksynth backup stores the synth bank; MIDI maps and theme use separate memory and are not included in that file.
+
+## Theme, oscilloscope and saving
+
+GLOBE > THEME: K1 selects OBERVAVE (default) or ZOOM. The preference saves automatically after 1.5 s with transport stopped and audio quiet. No preset save is needed. Theme saving does not commit pending MIDI map edits.
+
+Zoom uses larger labels and values. Part colour identifies the header line, part badge (white letter), and preset number. Text, values and grid retain the instrument palette. The pattern number stays visible in performance.
+
+Performance values are the default view. A short PATCH opens the logo, overall-output oscilloscope and voices/drum pieces; another tap enters the Mixer cycle. A long PATCH returns to values. The oscilloscope keeps fixed colours and has no pattern indicator. Edits appear in a Zoom notice for about one second, then disappear.
+
+| Flow | Screens and commands |
+| --- | --- |
+| Quick save | Short BT saves the sound to its current slot, retaining the name. |
+| Save as / rename | Long BT opens editing. K1 moves cursor; K2 chooses character (up to 10); K7 selects slot 01-99. The screen shows the program already in the destination. |
+| Review replacement | BT opens the name/destination review, showing the program to be replaced. Release and press BT again to write. |
+| Back / cancel | PATCH from review returns to editing; PATCH from editing cancels without writing. |
 
 ## Quick start / 2. Favourites and Split/Layer
 
@@ -80,13 +124,13 @@ With ANALOG selected, an already selected Drum Pads bank becomes inactive. Retur
 
 | Button | Immediate use |
 | --- | --- |
-| PATCH | Tap: Performance; on Performance opens Mixer; in Mixer cycles seven rows. Hold 0.7 s: return to Performance. |
+| PATCH | Tap: Performance; on Performance opens the oscilloscope; the next tap opens Mixer; in Mixer cycles seven rows. Hold 0.7 s: return to Performance. |
 | PARA | Tap: synthesis pages; in STEPS clears and advances a step (DRUM: clears the lane hit). Hold: edit/erase layer. |
 | CHORD | ANALOG: FILTER ENV / AMP ENV. DRUM-X: DRUM SOUND. |
 | NOTE REPEAT | ANALOG: LFO / LFO DEST / LFO +. DRUM-X redirects to DRUM SOUND. |
 | ARP | Open ARP. Another tap on that page toggles the part’s HOLD. |
 | SCALE | Hold in ANALOG STEPS: STEP+. On GLOBAL, tap toggles SYNC AUTO / INTERNAL. |
-| GLOBE | Tap: GLOBAL > POLYPHONY > OUTPUT > PART SETUP. Hold: keys for start/stop, mute, solo and tap tempo. |
+| GLOBE | Tap: GLOBAL > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE. Hold: keys for start/stop, mute, solo and tap tempo. |
 | FX | Tap: CHORUS > DELAY > REVERB > DRIVE. Hold: K1/K2/K3 chorus/delay/reverb returns; K4 delay time. |
 | SEQ | Tap: sequencer views and explicit step-pad ownership. Hold: white keys become steps. |
 | REC | Tap: arm while stopped; toggle recording while running. Hold over 1.2 s: clear selected track. |
@@ -132,7 +176,7 @@ MIDI Clock/Start/Stop output and automatic Program Change on internal preset sel
 
 Press GLOBE and PLAY together in either order. This stops PLAY/REC, clears HOLD/sustain and pending notes, and cuts internal voices. USB and TRS send CC64=0, CC123=0 and CC120=0 on all 16 channels. Release the pedal before using sustain again. Effect tails may finish normally.
 
-1.1.0 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
+1.2.0 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
 
 ## Links
 

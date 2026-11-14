@@ -140,7 +140,7 @@ EXPORT void sim_key(uint32_t k, uint32_t down) {
     else host_qput(1,(int32_t)(k<<8|(down?key_velocity:0u)));
 }
 EXPORT void sim_velocity(uint32_t v) {key_velocity=v<1u?1u:v>127u?127u:v;}
-EXPORT void sim_pad(uint32_t p,uint32_t velocity) { if(p<16u)host_qput(0,(int32_t)(p<<8|(velocity&127u))); }
+EXPORT void sim_pad(uint32_t p,uint32_t velocity) { if(p<16u){fm1_in.pad_st[p]=velocity?128:0;host_qput(0,(int32_t)(p<<8|(velocity&127u)));} }
 EXPORT void sim_fader(uint32_t f,uint32_t v) { if(f<4u)fm1_in.fader[f]=(uint8_t)(v&127u); }
 EXPORT void sim_wheel(uint32_t w,uint32_t v) { if(w<2u)fm1_in.wheel[w]=(uint16_t)v; }
 EXPORT uint32_t sim_pad_rgb(uint32_t p) { return p<16u?padled_rgb[p]:0u; }
@@ -175,7 +175,7 @@ EXPORT void sim_button(uint32_t b, uint32_t down)   /* BTN_* (platform.c): 0 OCT
 }
 EXPORT void sim_enc(uint32_t e, int32_t steps)  /* ENC_*: 0-3 SCREEN 1-4, 4 SELECT, 5 TRACK, 6 PRESET, 7 MASTER; + = clockwise */
 {
-    if(e==ENC_MASTER){smk_master=clampi(smk_master+steps*24,0,1023);master_q12=(smk_master*smk_master)>>8;}
+    if(e==ENC_MASTER&&!mm_on){smk_master=clampi(smk_master+steps*24,0,1023);master_q12=(smk_master*smk_master)>>8;}
     else if (e < (uint32_t)HOST_NENC) { host_enc[e] += steps; host_enc_pos[e] += steps; }
 }
 EXPORT void sim_midi(uint32_t st, uint32_t d1, uint32_t d2)   /* a MIDI message into the app's USB-MIDI in */
@@ -208,17 +208,19 @@ EXPORT uint32_t sim_prog(void) { return trk_prog[0]; }   /* (track A's program) 
  * page may keep them (localStorage) and put them back before sim_init: blob 0 = settings, 1..8 = patterns 1..8, byte
  * 0 = 1 if used, all HOST_BLOB_SZ long */
 EXPORT uint32_t sim_blob_size(void) { return HOST_BLOB_SZ; }
-static uint8_t perf_blob[2][HOST_BLOB_SZ];
-EXPORT uint32_t sim_blob_count(void) {return NBLOB+3u;}
-EXPORT uint8_t *sim_blob(uint32_t i) {return i==0u?host_store:i<=NBLOB?host_slot[i-1u]:i<NBLOB+3u?perf_blob[i-(NBLOB+1u)]:0;}
+static uint8_t perf_blob[2][HOST_BLOB_SZ],mm_blob[2][HOST_BLOB_SZ];
+EXPORT uint32_t sim_blob_count(void) {return NBLOB+5u;}
+EXPORT uint8_t *sim_blob(uint32_t i) {return i==0u?host_store:i<=NBLOB?host_slot[i-1u]:i<NBLOB+3u?perf_blob[i-(NBLOB+1u)]:i<NBLOB+5u?mm_blob[i-(NBLOB+3u)]:0;}
 EXPORT void sim_restore(void) {
+    for(uint32_t i=0;i<2u;i++){uint32_t n;memcpy(&n,mm_blob[i],4);if(n<=4096u){host_mm_len[i]=n;memcpy(host_mm[i],mm_blob[i]+4,n);}}
     for(uint32_t i=0;i<2u;i++){uint32_t n;memcpy(&n,perf_blob[i],4);if(n<=4096u){host_perf_len[i]=n;memcpy(host_perf[i],perf_blob[i]+4,n);}}
 }
 EXPORT uint32_t sim_store_hash(void)            /* changes when a save happens */
 {
     uint32_t h = 2166136261u, i, b;
     for(b=0;b<2u;b++){memcpy(perf_blob[b],&host_perf_len[b],4);memcpy(perf_blob[b]+4,host_perf[b],4096);}
-    for (b = 0; b < NBLOB+3u; b++) {
+    for(b=0;b<2u;b++){memcpy(mm_blob[b],&host_mm_len[b],4);memcpy(mm_blob[b]+4,host_mm[b],4096);}
+    for (b = 0; b < NBLOB+5u; b++) {
         const uint8_t *p = sim_blob(b);
         for (i = 0; i < HOST_BLOB_SZ; i++) h = (h ^ p[i]) * 16777619u;
     }
@@ -278,6 +280,9 @@ EXPORT uint32_t sim_step_note(uint32_t p,uint32_t n,uint32_t i){return pat.st[p%
 EXPORT uint32_t sim_keyboard_row(void){return pat.keyboard_selected;}
 EXPORT uint32_t sim_keyboard_edit_row(void){return kb_edit_row;}
 
+EXPORT uint32_t sim_preset_name(uint32_t i){return preset_snapshot.v[NPARAM+i%PATCH_NAME];}
+EXPORT uint32_t sim_program_name(uint32_t n,uint32_t i){patch_t p;prog_get(n%NPROG,&p);return p.v[NPARAM+i%PATCH_NAME];}
+EXPORT uint32_t sim_preset_cursor(void){return preset_cursor;}
 EXPORT uint32_t sim_preset_save_state(void){return preset_ui;}
 EXPORT uint32_t sim_preset_save_slot(void){return save_to+1u;}
 EXPORT uint32_t sim_preset_save_part(void){return preset_part;}
@@ -291,3 +296,50 @@ EXPORT int32_t sim_part_octave(uint32_t t){return patch_keyboard_octave(&live_p[
 
 EXPORT uint32_t sim_fader_jump(void){return !!smk_fader_jump();}
 EXPORT uint32_t sim_fader_caught(uint32_t i){return i<4u?smk_fader_owner[i].picked:0u;}
+
+/* ENDLESS prototype observability; no firmware/runtime state is stored here. */
+EXPORT uint32_t sim_endless_record(void){return end_record;}
+EXPORT uint32_t sim_endless_enabled(uint32_t t){return endless_enabled(&pat.trk[t%NTRK]);}
+EXPORT uint32_t sim_seq_length(uint32_t t){return pat.trk[t%NTRK].len;}
+EXPORT uint32_t sim_step_gate(uint32_t t,uint32_t n){return pat.st[t%NTRK][n%SEQ_STEPS].gate;}
+EXPORT int32_t sim_endless_transpose(uint32_t t){return obv_patch_engine(&live_p[t%NTRK])==OBV_DRUMS?0:end_global_transpose;}
+EXPORT uint32_t sim_endless_input_step(void){return end_pos;}
+EXPORT uint32_t sim_transport(void){return ctl_seq_run;}
+
+EXPORT uint32_t sim_endless_mode(void){return end_mode;}
+EXPORT uint32_t sim_endless_pending(void){return end_pending;}
+EXPORT uint32_t sim_endless_clock_phase(void){return end_clock_phase;}
+EXPORT uint32_t sim_endless_hold(void){return end_global_hold;}
+EXPORT uint32_t sim_endless_held_keys(void){return end_held;}
+EXPORT uint32_t sim_seq_div(uint32_t t){return pat.trk[t%NTRK].div;}
+
+EXPORT uint32_t sim_midi_mode(void){return mm_on;}
+EXPORT uint32_t sim_midi_map(void){return mm_data.selected;}
+EXPORT uint32_t sim_midi_edit(void){return mm_edit;}
+EXPORT uint32_t sim_midi_settings(void){return mm_settings;}
+EXPORT uint32_t sim_midi_selected(void){return mm_sel;}
+EXPORT uint32_t sim_midi_color(uint32_t p){return mm_profile()->color[p%32];}
+EXPORT void sim_midi_blocked(uint32_t b){host_midi_blocked=!!b;}
+EXPORT uint32_t sim_midi_ui_control(void){return mm_ui_control;}
+EXPORT uint32_t sim_midi_ui_value(void){return mm_ui_control_v;}
+EXPORT uint32_t sim_midi_ui_pad(void){return mm_ui_pad;}
+EXPORT uint32_t sim_midi_ui_pad_value(void){return mm_ui_pad_v;}
+EXPORT uint32_t sim_midi_ui_note(uint32_t k){return k<37?mm_ui_note(k):0;}
+EXPORT uint32_t sim_midi_last(void){return mm_last;}
+EXPORT uint32_t sim_midi_last_value(void){return mm_last_v;}
+EXPORT uint32_t sim_midi_return_wait(void){return mm_wait_release;}
+EXPORT uint32_t sim_midi_panic(void){return mm_panic_left;}
+
+EXPORT uint32_t sim_midi_entry(uint32_t i,uint32_t f){mm_entry_t *e=&mm_profile()->map[i%MM_N];return f==0?e->type:f==1?e->num:e->ch;}
+EXPORT uint32_t sim_midi_tx_count(void){return host_midi_count;}
+EXPORT uint32_t sim_midi_tx(uint32_t i,uint32_t f){return host_midi_sent[i%256][f%3];}
+
+EXPORT uint32_t sim_midi_ui_stage(void){return SMK_MIDI_UI_STAGE;}
+EXPORT int32_t sim_synth_vibrato(void){return ctl_vib;}
+EXPORT int32_t sim_synth_bend(void){return ctl_bend+ctl_wheel_bend;}
+
+EXPORT uint32_t sim_zoom_theme(void){return zm_zoom;}
+EXPORT uint32_t sim_scope_view(void){return zm_scope_active();}
+EXPORT uint32_t sim_theme_pending(void){return zm_theme_pending;}
+EXPORT uint32_t sim_zoom_focus(void){return zm_focus_visible();}
+EXPORT uint32_t sim_mix_row(void){return mix_row;}

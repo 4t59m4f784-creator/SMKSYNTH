@@ -27,7 +27,7 @@ static int obv_patch_sanitize(patch_t*p){
  const char*name="INIT ANA";for(unsigned i=0;i<PATCH_NAME&&name[i];i++)p->v[NPARAM+i]=(uint8_t)name[i];
  obv_patch_set_engine(p,OBV_ANALOG);return 1;
 }
-static uint32_t obv_param_max(const patch_t*p,uint32_t id){(void)p;return PDEF[id].max;}
+static uint32_t obv_param_max(const patch_t*p,uint32_t id){return id==P_O2_WAVE&&obv_patch_engine(p)==OBV_ANALOG?W_BOTH:PDEF[id].max;}
 
 /* KBO1: one reserved byte, before the engine tag; absent legacy tag = octave0. */
 #define PATCH_KBO_AT (OBV_ENGINE_TAG_AT-1u)

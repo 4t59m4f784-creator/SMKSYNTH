@@ -16,7 +16,9 @@ def package(destination,reuse_release=False):
     if p.suffix in ['.zip','.fwsc','.pcm','.smksynth','.wav','.mp4','.pyc','.gz']:continue
     if p.suffix in ['.wasm','.bin'] and not str(rel).startswith(('factory/','web/simulator/')):continue
     if name in ['.github/workflows/physical-controls.yml','tools/check_controls_candidate.py','tools/package_controls_candidate.py']:continue
-    z.write(p,f'SMKSYNTH-{version}-source/'+name)
+    entry=zipfile.ZipInfo(f'SMKSYNTH-{version}-source/'+name,date_time=(2026,11,14,0,0,0))
+    entry.create_system=3;entry.external_attr=(0o100755 if p.stat().st_mode&0o111 else 0o100644)<<16
+    z.writestr(entry,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
   shutil.copy2(ROOT/'RELEASE.json',out/'RELEASE.json')
   assets=sorted(p for p in out.iterdir() if p.is_file() and p.name!='SHA256SUMS.txt')
   (out/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.name+'\n' for p in assets))

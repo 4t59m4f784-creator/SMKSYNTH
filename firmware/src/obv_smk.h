@@ -81,6 +81,10 @@ static int32_t smk_ext_back = -1;
 static void smk_seq_pad_event(int32_t e,uint32_t *dirty)
 {
         uint32_t p = ((uint32_t)e >> 8) & 15u, vel = (uint32_t)e & 0xFFu, k = SMK_WK[p], q;
+        if(endless_screen()){
+            if(vel&&!end_record){unsigned n=seq_pg[seq_trk]*16u+p;if(n<pat.trk[seq_trk].len)seq_cursor_set(seq_trk,n);}
+            *dirty=1;return; /* ENDLESS pads inspect; they never toggle/delete steps. */
+        }
         if (vel) {
             if (rec) {                              /* REC on: the pad plays the pen chord, recorded as the keys are */
                 for (q = 0; q < SEQ_CHORD; q++) {
@@ -298,16 +302,22 @@ static void smk_faders(uint32_t *dirty_page, uint32_t *dirty_hdr, uint32_t *dirt
         scat(l1,(!smk_bank&&obv_drums_selected())?obv_voice_label(p):FN[smk_bank][i]);
         if(smk_bank&&i<3){char tr[3]={' ',TRK_L[t],0};scat(l1,tr);}
         scat(l1,waiting?" CATCH ":" ");scat(l1,val);
-        smk_bar(l2,v,127u);smk_overlay(l1,l2);
+        smk_bar(l2,v,127u);if(waiting){char focus[24]="CATCH ";zm_copy(focus+6,FN[smk_bank][i],sizeof focus-6);zm_focus_named(focus,val);}else zm_focus_named(FN[smk_bank][i],val);smk_overlay(l1,l2);
     }
 }
 
 /* ---- the wheels (also between frames: bends follow the wheel, not the screen) */
+static uint32_t smk_wheels_force;
+static void smk_synth_controller_reset(void){
+    ctl_bend=ctl_wheel_bend=ctl_vib=0;
+    for(unsigned p=0;p<NPART;p++)pt[p].bend_sm=0;
+    smk_wheels_force=1;
+}
 static void smk_wheels(void)
 {
+    if(mm_on)return;
     ctl_wheel_part = seq_trk % NTRK;
     enum { DEAD = 12, MOD_LO = 485, MOD_HI = 615 };
-    static smk_pw_t pw;
     static int32_t mlo, mhi, last_b = 0x7FFFFFFF, last_m = -1;
     int32_t m = fm1_in.wheel[1], mw, b;
     if (fm1_in.frames < 300u)                   /* (the readings settle) */
@@ -320,7 +330,7 @@ static void smk_wheels(void)
     if (m > mhi) mhi = m;
     mw = mhi - m <= DEAD ? 0 : (mhi - m - DEAD) * 127 / (mhi - mlo - DEAD > 1 ? mhi - mlo - DEAD : 1);   /* up = lower raw */
     mw = clampi(mw, 0, 127);
-    b = smk_pw_bend(&pw, fm1_in.wheel[0], fm1_ms) * 8192 / (SMK_PW_ST * 4096);   /* -> the MIDI bend's -8192..8191 */
+    b = smk_pw_bend(&smk_pitch_calibration, fm1_in.wheel[0], fm1_ms) * 8192 / (SMK_PW_ST * 4096);   /* -> the MIDI bend's -8192..8191 */
     b = clampi(b, -8192, 8191);
     static int32_t out_ch=-1,out_b=0x7FFFFFFF,out_m=-1;
     static uint32_t out_epoch;
@@ -334,10 +344,11 @@ static void smk_wheels(void)
         if(mw!=out_m){mout_emit(0xB0u|ch,1,(unsigned)mw);out_m=mw;}
     }
     fm1_irq_on();
-    if (b != last_b) { last_b = b; ctl_wheel_bend = b; }   /* (only on a change: a MIDI bend in still works at rest) */
-    if (mw != last_m) {
+    if (smk_wheels_force || b != last_b) { last_b = b; ctl_wheel_bend = b; }   /* (only on a change: a MIDI bend in still works at rest) */
+    if (smk_wheels_force || mw != last_m) {
         last_m = mw; ctl_vib = mw;
     }
+    smk_wheels_force=0;
 }
 
 /* ---- the pads' and the extra buttons' lights */

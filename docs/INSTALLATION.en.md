@@ -1,11 +1,11 @@
-# SMKSYNTH 1.1.0 - Installation and recovery
+# SMKSYNTH 1.2.0 - Installation and recovery
 
 The same [installer](../install/?lang=en) supports SMK-37 Pro and SMK-37 Elite. It identifies the model and selects a specific package automatically. Use desktop Chrome/Edge over HTTPS, a USB data cable and stable power; close other MIDI apps.
 
 1. Connect and identify. The keyboard is not accessed until you click Connect.
 2. From official V016 of the connected model, the page offers first installation. This initializes/replaces the bank with five patterns and eight favourites.
 3. From supported SMKSYNTH builds, the page offers Update, preserving saved programs, favourites, patterns and settings. Save changes and export a [backup](../backup/?lang=en) before updating.
-4. Check the detected model and operation, confirm and keep the connection until target identity `SMK-37 Pro_19634` or `SMK-37 Elite_19634` is confirmed.
+4. Check the detected model and operation, confirm and keep the connection until target identity `SMK-37 Pro_19649` or `SMK-37 Elite_19649` is confirmed.
 5. Connect the sustain pedal before restarting and keep it released during startup.
 
 ## Interrupted transfers

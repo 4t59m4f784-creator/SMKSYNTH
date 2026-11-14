@@ -143,21 +143,7 @@ static volatile uint32_t fm1_ms;                /* milliseconds since power-on (
 #endif
 #include "fm1_flash.h"
 static uint8_t flash_ok;
-static int st_read(uint32_t off, void *dst, uint32_t n)
-{
-    uint8_t *d = dst;
-    while (n) {
-        uint32_t k = n > 256u ? 256u : n, f = irq_save();
-        int rc = FL_FAR(fl_read_ram)(off, d, k);
-        irq_restore(f);
-        if (rc)
-            return rc;
-        off += k;
-        d += k;
-        n -= k;
-    }
-    return 0;
-}
+#include "obv_store_read.h"
 
 static uint8_t recovery_active;
 #if BOARD_SMK37
@@ -252,6 +238,14 @@ static int sector_save(uint32_t at, const void *p, uint32_t n)   /* p in RAM, n 
 static int settings_load(void *p, uint32_t n) { return sector_load(SETTINGS_AT, p, n); }
 static int settings_save(const void *p, uint32_t n) { return sector_save(SETTINGS_AT, p, n); }
 #if BOARD_SMK37
+#if OBV_VOICE_HW
+/* Independent controller profiles; never erase programs, patterns or restore journal. */
+static int mm_store_load(unsigned i,void *p,unsigned n){return i<2u?sector_load(MIDI_MAP_AT+i*4096u,p,n):-1;}
+static int mm_store_save(unsigned i,const void *p,unsigned n){return i<2u?sector_save(MIDI_MAP_AT+i*4096u,p,n):-1;}
+#else
+static int mm_store_load(unsigned i,void *p,unsigned n){(void)i;(void)p;(void)n;return -1;}
+static int mm_store_save(unsigned i,const void *p,unsigned n){(void)i;(void)p;(void)n;return -1;}
+#endif
 static int perf_store_load(uint32_t i,void *p,uint32_t n) {return i<2u?sector_load(PFAV_AT+i*0x1000u,p,n):-1;}
 static int perf_store_save(uint32_t i,const void *p,uint32_t n) {return i<2u?sector_save(PFAV_AT+i*0x1000u,p,n):-1;}
 #endif

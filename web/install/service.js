@@ -4,9 +4,9 @@ import {productOf,logicalImage,filesOk} from './package.js';
 import {PINS} from './pins.js';
 import {t} from './language.js';
 export {PINS};
-export const PENDING='smksynth.1.1.0.pro-elite.pending.v1';
-const PRO=['19615','19616','19617','19618','19619','19620','19621','19622','19623','19624','19625','19626','19627','19628','19630','19631','19632','19633','19634'];
-const ELITE=['19618','19629','19634'];
+export const PENDING='smksynth.1.2.0.pro-elite.pending.v1';
+const PRO=["19615", "19616", "19617", "19618", "19619", "19620", "19621", "19622", "19623", "19624", "19625", "19626", "19627", "19628", "19630", "19631", "19632", "19633", "19634", "19635", "19636", "19637", "19638", "19639", "19640", "19641", "19642", "19643", "19644", "19645", "19646", "19647", "19648", "19649"];
+const ELITE=["19618", "19629", "19634", "19635", "19636", "19637", "19638", "19639", "19640", "19641", "19642", "19643", "19644", "19645", "19646", "19647", "19648", "19649"];
 export function modelOf(id){
  for(const model of Object.keys(PINS)){const name=PINS[model].model;if([name,'ota-'+name].includes(id?.model)&&new RegExp('^(ota-)?'+name+'_[0-9]{3,5}$').test(id?.text||''))return model;}
  throw Error(t('Modelo não compatível. Conecte SMK-37 Pro ou SMK-37 Elite.','Unsupported model. Connect an SMK-37 Pro or SMK-37 Elite.'));

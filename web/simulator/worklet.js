@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {Engine} from './engine.js?v=midi-1';
+import {Engine} from './engine.js?v=release-120';
 class OberVave extends AudioWorkletProcessor {
  constructor(options){super();this.lastFrame=0;this.lastStore=0;this.wasm=options.processorOptions.wasm;try{this.engine=new Engine(options.processorOptions.wasm,options.processorOptions.store);this.port.postMessage({t:'ready',audio:true});}catch(e){this.port.postMessage({t:'error',message:e.message});}this.port.onmessage=({data:m})=>{if(!this.engine)return;if(m.t==='reboot'){const store=this.engine.store(true);this.engine=new Engine(this.wasm,store);this.port.postMessage({t:'ready',audio:true});}else if(m.t==='flush')this.flush(m.tag);else this.engine.input(m);};}
  flush(tag){const data=this.engine.store(true);this.port.postMessage({t:'store',data,tag},[data]);}

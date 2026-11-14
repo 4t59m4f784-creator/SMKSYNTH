@@ -2,35 +2,35 @@
   "pro": {
     "model": "SMK-37 Pro",
     "release": {
-      "name": "SMKSYNTH 1.1.0 · first-install",
-      "product": "SMK-37 Pro_19634",
-      "url": "./firmware/SMKSYNTH-1.1.0-first-install-SMK37-Pro.fwsc",
+      "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
+      "product": "SMK-37 Pro_19649",
+      "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Pro.fwsc",
       "size": 651327,
-      "sha": "e0e2c4a9eb2412f4dcbd802e39fabb54c83725d62ac35213b39d99f33fb2daf7"
+      "sha": "5102f583e898aa573bff0ac98dd0939c3fe7114f021639f5724c952daaf39659"
     },
     "update": {
-      "name": "SMKSYNTH 1.1.0 · update",
-      "product": "SMK-37 Pro_19634",
-      "url": "./firmware/SMKSYNTH-1.1.0-update-SMK37-Pro.fwsc",
+      "name": "SMKSYNTH 1.2.0 \u00b7 update",
+      "product": "SMK-37 Pro_19649",
+      "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Pro.fwsc",
       "size": 651819,
-      "sha": "4e4c777f0ff9b1b7e5a8292bf6b13aadda6937c14825291b65019c94a0d12909"
+      "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"
     }
   },
   "elite": {
     "model": "SMK-37 Elite",
     "release": {
-      "name": "SMKSYNTH 1.1.0 · first-install",
-      "product": "SMK-37 Elite_19634",
-      "url": "./firmware/SMKSYNTH-1.1.0-first-install-SMK37-Elite.fwsc",
+      "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
+      "product": "SMK-37 Elite_19649",
+      "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Elite.fwsc",
       "size": 651327,
-      "sha": "b1fd98d3b5833e4c2fb29475cde7a3db42fc3f853959e8f58fb979c264d1ab34"
+      "sha": "052496ea37f361aade975f9c6b08b62d891010e666fbe3a9845f939322acf598"
     },
     "update": {
-      "name": "SMKSYNTH 1.1.0 · update",
-      "product": "SMK-37 Elite_19634",
-      "url": "./firmware/SMKSYNTH-1.1.0-update-SMK37-Elite.fwsc",
+      "name": "SMKSYNTH 1.2.0 \u00b7 update",
+      "product": "SMK-37 Elite_19649",
+      "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Elite.fwsc",
       "size": 651819,
-      "sha": "f98ea632bbbfcad3701fecfd89e8d3ebbfa1d7d31989260c3ffaeb63c10c23a1"
+      "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"
     }
   }
 }

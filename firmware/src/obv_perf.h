@@ -26,28 +26,49 @@ static uint32_t perf_drum_bank(void) {return pf_bank()==4u;}
 static uint32_t pb_down[NPAT],pb_source[NPAT],pb_fired[NPAT],pb_confirm,pb_confirm_t,pb_confirm_source;
 static uint32_t preset_ui,save_ui_dirty,save_ui_restore,save_ui_t,preset_part,preset_pattern,preset_home_cancel,preset_down,preset_t,preset_long;
 static patch_t preset_snapshot;
+static unsigned preset_cursor,preset_named;
+static const char PRESET_CHARS[]=" ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
 static void pb_cancel(void){if(pb_confirm)save_ui_restore=1;pb_confirm=0;copy_arm=0;pf_redraw();}
 static uint32_t pb_busy(void){return pb_write_target&&(copy_to||pat_save_say);}
 static unsigned save_ui_active(void){return preset_ui||pb_confirm;}
-static void preset_begin(void){preset_part=seq_trk%NTRK;preset_pattern=set.pat;preset_snapshot=live_p[preset_part];save_to=trk_prog[preset_part];layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();pb_cancel();save_ui_dirty=1;}
+static void preset_begin(void){preset_part=seq_trk%NTRK;preset_pattern=set.pat;preset_snapshot=live_p[preset_part];preset_cursor=preset_named=0;save_to=trk_prog[preset_part];layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();pb_cancel();save_ui_dirty=1;}
 static void preset_commit(void){
  if(pb_busy()||copy_to||pat_queue||set.pat!=preset_pattern){preset_ui=4;save_ui_t=fm1_ms;save_ui_dirty=1;say("FINISH PATTERN SAVE FIRST");return;}
  unsigned n=save_to%NPROG,t=preset_part;
- preset_snapshot=live_p[t];prog_put(n,&preset_snapshot);trk_prog[t]=n;trk_edited[t]=0;set.tprog[t]=(uint8_t)n;if(!t)set.prog=(uint8_t)n;
+ patch_t next=live_p[t];if(preset_named)memcpy(next.v+NPARAM,preset_snapshot.v+NPARAM,PATCH_NAME);preset_snapshot=next;
+ memcpy(live_p[t].v+NPARAM,next.v+NPARAM,PATCH_NAME);prog_put(n,&preset_snapshot);trk_prog[t]=n;trk_edited[t]=0;set.tprog[t]=(uint8_t)n;if(!t)set.prog=(uint8_t)n;
  for(unsigned u=0;u<NTRK;u++)if(u!=t&&trk_prog[u]==n&&!trk_edited[u]){live_p[u]=preset_snapshot;if(!u)fx_keep(&live_p[0]);}
  set_dirty=1;set_t=fm1_ms;manual_store_request=1;preset_ui=2;save_ui_dirty=1;
+}
+/* 1 edit, 6 review, 2 pending write, 3 saved, 4 failed; quick BT skips edit/review. */
+static void preset_turn(unsigned i,int e){
+ if(preset_ui!=1||!e)return;
+ if(i==0)preset_cursor=(unsigned)clampi((int)preset_cursor+e,0,PATCH_NAME-1);
+ else if(i==1){unsigned n=sizeof PRESET_CHARS-1u,at=0;while(at<n&&PRESET_CHARS[at]!=(char)preset_snapshot.v[NPARAM+preset_cursor])at++;if(at==n)at=0;int v=((int)at+clampi(e,-127,127)+(int)n*4)%(int)n;preset_snapshot.v[NPARAM+preset_cursor]=(uint8_t)PRESET_CHARS[v];}
+ else if(i==ENC_PRESETS)save_to=(unsigned)((int)save_to+clampi(e,-127,127)+(int)NPROG*4) % NPROG;
+ else return;
+ save_ui_dirty=1;
 }
 static uint32_t save_button_poll(uint32_t b,uint32_t rel){
  if(preset_ui==3&&fm1_ms-save_ui_t>=2200u){preset_ui=0;save_ui_restore=1;pf_redraw();}
  if(b>>BTN_SAVE&1u){
   preset_down=1;preset_t=fm1_ms;preset_long=0;
-  if(preset_ui==1)preset_long=2;else if(preset_ui==2)preset_long=3;else{preset_ui=0;preset_begin();}
+  if(preset_ui==1)preset_long=2;
+  else if(preset_ui==6||preset_ui==4)preset_long=4;
+  else if(preset_ui==2)preset_long=3;
+  else{preset_ui=0;preset_begin();}
  }
- if(preset_down&&(fm1_in.buttons>>BTN_SAVE&1u)&&fm1_ms-preset_t>=700u&&!preset_long){preset_long=1;preset_ui=1;save_ui_dirty=1;}
+ if(preset_down&&(fm1_in.buttons>>BTN_SAVE&1u)&&fm1_ms-preset_t>=700u&&!preset_long){preset_long=1;preset_named=1;preset_ui=1;save_ui_dirty=1;}
  if((rel>>BTN_SAVE&1u)&&preset_down){
-  preset_down=0;if(!preset_long||preset_long==2)preset_commit();
+  preset_down=0;
+  if(preset_long==2){preset_ui=6;save_ui_dirty=1;}
+  else if(!preset_long||preset_long==4)preset_commit();
  }
- if((preset_ui==1||preset_ui==4)&&(b&((1u<<BTN_HOME)|(1u<<BTN_KNOB_BANK)))){preset_ui=0;preset_down=0;save_ui_restore=1;pf_redraw();if(b>>BTN_HOME&1u)preset_home_cancel=1;}
+ if((preset_ui==1||preset_ui==6||preset_ui==4)&&(b&((1u<<BTN_HOME)|(1u<<BTN_KNOB_BANK)))){
+  if((preset_ui==6||preset_ui==4)&&(b>>BTN_HOME&1u)){preset_ui=1;preset_named=1;save_ui_dirty=1;}
+  else{preset_ui=0;save_ui_restore=1;pf_redraw();}
+  preset_down=0;if(b>>BTN_HOME&1u)preset_home_cancel=1;
+ }
  b&=~(1u<<BTN_SAVE);
  if(preset_ui){uint32_t allowed=(1u<<BTN_PLAY)|(1u<<BTN_REC);b&=allowed;}
  return b;
@@ -100,8 +121,9 @@ static void save_ui_draw(void){
  unsigned waiting=preset_ui==2?!!ctl_seq_run:0u;
  unsigned elapsed=fm1_ms-pb_confirm_t,left=elapsed>=4000u?0u:(4999u-elapsed)/1000u;
  unsigned redraw=save_ui_dirty||kind!=mode||dest!=slot||part!=preset_part||wait!=waiting;
- if(!redraw){if(pb_confirm&&seconds!=left){seconds=left;save_ui_countdown(left);}return;}
+ if(!redraw){if(pb_confirm&&seconds!=left){seconds=left;if(zm_zoom)zm_save_draw(mode,waiting,left);else save_ui_countdown(left);}return;}
  save_ui_dirty=0;kind=mode;dest=slot;part=preset_part;wait=waiting;seconds=left;
+ if(zm_zoom||preset_ui){zm_save_draw(mode,waiting,left);return;}
  cv_begin(240,120,C_PANEL);cv_text(8,8,&FONT_S,"SMKSYNTH / SAVE",C_AMBER);cv_rect(8,30,224,1,C_RED);
  char line[40];line[0]=0;
  if(pb_confirm){scat(line,"OVERWRITE PATTERN ");fmt_u(line+slen(line),pb_confirm);cv_text(8,49,&FONT_S,line,C_RED);cv_text(8,75,&FONT_S,"REPLACE STORED PATTERN?",C_CREAM);}
@@ -290,7 +312,7 @@ static uint32_t pf_home_down,pf_home_t,pf_home_long;
 static uint32_t pf_home_poll(uint32_t b,uint32_t rel){
  if(b>>BTN_HOME&1u){pf_home_down=1;pf_home_t=fm1_ms;pf_home_long=preset_home_cancel?2u:layer?2u:0u;if(preset_home_cancel){preset_home_cancel=0;b&=~(1u<<BTN_HOME);}if(!pf_home_long)b&=~(1u<<BTN_HOME);}
  if(pf_home_down&&(fm1_in.buttons>>BTN_HOME&1u)&&fm1_ms-pf_home_t>=700u&&pf_home_long!=1u){
-  pf_home_long=1;pf_seq_mode=0;layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();pf_page_request=PG_PERFORM+1u;pf_redraw();dirty_hdr=1;
+  pf_home_long=1;zm_scope=zm_focus_on=0;pf_seq_mode=0;layer=L_NONE;layer_lock=0;step_held=-1;audition_off();entry_reset();pf_page_request=PG_PERFORM+1u;pf_redraw();dirty_hdr=1;
  }
  if(rel>>BTN_HOME&1u){if(pf_home_down&&!pf_home_long)b|=1u<<BTN_HOME;pf_home_down=0;}
  return b;

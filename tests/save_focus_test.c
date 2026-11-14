@@ -15,7 +15,7 @@ static void tap_bt(unsigned ms){fm1_in.buttons=1u<<BTN_SAVE;save_button_poll(fm1
 int main(void){engine_init();for(unsigned i=0;i<NPSECT;i++)psect[i].tag=PS_TAG;init_parts();set.m_vol=100;set.tempo=120;fx_sync();mix_apply();pf_init();pat_init(&pat);step_held=-1;layer=L_NONE;seq_trk=0;page=PG_SEQ;
  /* BT short is always preset-only, even on the sequencer and Split/Layer. */
  seq_trk=2;unsigned old=trk_prog[2];fm1_ms=100;tap_bt(120);assert(preset_ui==2&&preset_part==2&&save_to==old&&!pat_save_say&&!copy_to&&manual_store_request);save_ui_draw();write_ppm_as("build/u2-preset-writing.ppm");
- preset_ui=0;manual_store_request=0;page=PG_KEYBOARD;layer=L_SEQ;layer_lock=1;tap_bt(900);assert(preset_ui==1&&!layer&&!layer_lock&&!pat_save_say);save_to=42;save_ui_draw();write_ppm_as("build/u2-preset-as.ppm");tap_bt(120);assert(preset_ui==2&&trk_prog[2]==42&&!pat_save_say);preset_ui=0;set_dirty=ps_dirty=manual_store_request=0;
+ preset_ui=0;manual_store_request=0;page=PG_KEYBOARD;layer=L_SEQ;layer_lock=1;tap_bt(900);assert(preset_ui==1&&!layer&&!layer_lock&&!pat_save_say);save_to=42;save_ui_draw();write_ppm_as("build/u2-preset-as.ppm");tap_bt(120);assert(preset_ui==6);tap_bt(120);assert(preset_ui==2&&trk_prog[2]==42&&!pat_save_say);preset_ui=0;set_dirty=ps_dirty=manual_store_request=0;
  /* Existing current slot requires hold + distinct short tap, not hold release. */
  pat_used=1;set.pat=0;pf_manual_seq=2;pb_event(0,100);fm1_ms+=800;pb_save(0);assert(pb_confirm==1&&!pat_save_say&&!copy_to);pb_event(0,0);assert(pb_confirm==1&&!pat_save_say);save_ui_draw();write_ppm_as("build/u2-overwrite.ppm");
  assert(pb_led(0)!=pb_led(1));fm1_ms+=4000;pf_hold_poll();assert(!pb_confirm&&!pat_save_say&&!copy_to);

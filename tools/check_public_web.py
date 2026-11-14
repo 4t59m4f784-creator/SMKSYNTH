@@ -52,10 +52,10 @@ def check(site):
         if folder in ('', 'install'):
             origin='https://4t59m4f784-creator.github.io/SMKSYNTH/'
             assert parser.meta['og:url']==origin+('install/' if folder else '')
-            assert parser.meta['og:image']==origin+'assets/smksynth-social-v1.png'
+            assert parser.meta['og:image']==origin+'assets/smksynth-social-v2.png'
             assert parser.meta['og:image:width']=='1200' and parser.meta['og:image:height']=='630'
             assert parser.meta['twitter:card']=='summary_large_image'
-            card=(site/'assets/smksynth-social-v1.png').read_bytes()
+            card=(site/'assets/smksynth-social-v2.png').read_bytes()
             assert card[:8]==b'\x89PNG\r\n\x1a\n' and int.from_bytes(card[16:20],'big')==1200 and int.from_bytes(card[20:24],'big')==630
         for link in parser.links:
             dependency(page, link)

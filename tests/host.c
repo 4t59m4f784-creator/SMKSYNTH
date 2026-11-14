@@ -42,7 +42,7 @@ static volatile uint32_t fm1_ms;
 static struct {
     uint32_t notes, buttons, frames, adc_ok, adc_miss;
     uint64_t keys;
-    uint8_t key_vel[FM1_NKEY], fader[4];
+    uint8_t key_vel[FM1_NKEY], fader[4], pad_st[16];
     uint16_t wheel[2], pedal, batt, pad_raw[16], pad_base[16];
 } fm1_in = {.wheel = {535, 620}};               /* (the wheels at rest, as a unit reads them) */
 static uint8_t smk_store_cleared, smk_trim_ok;
@@ -147,6 +147,10 @@ static int settings_save(const void *p, uint32_t n)
 #if BOARD_SMK37
 static uint8_t host_perf[2][4096];
 static uint32_t host_perf_len[2],host_perf_fail;
+static uint8_t host_mm[2][4096];
+static unsigned host_mm_len[2],host_mm_fail;
+static int mm_store_load(unsigned i,void *p,unsigned n){if(i>1u||host_mm_len[i]!=n)return -1;memcpy(p,host_mm[i],n);return 0;}
+static int mm_store_save(unsigned i,const void *p,unsigned n){if(host_mm_fail){host_mm_fail=0;return -1;}if(i>1u||n>4096u)return -1;memcpy(host_mm[i],p,n);host_mm_len[i]=n;return 0;}
 static int perf_store_load(uint32_t i,void *p,uint32_t n){if(i>=2u||host_perf_len[i]!=n)return -1;memcpy(p,host_perf[i],n);return 0;}
 static int perf_store_save(uint32_t i,const void *p,uint32_t n){host_write_count[3]++;if(host_perf_fail){host_perf_fail=0;return -1;}if(i>=2u||n>4096u)return -1;memcpy(host_perf[i],p,n);host_perf_len[i]=n;return 0;}
 #endif

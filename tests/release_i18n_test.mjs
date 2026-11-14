@@ -8,8 +8,8 @@ const en=load('en'),pt=load('pt');
 assert.equal(en.document.documentElement.lang,'en');assert.equal(pt.document.documentElement.lang,'pt-BR');
 for(const [input,want] of [
  ['Conectar e consultar','Connect and identify'],
- ['Selecione um arquivo SMKSYNTH 1.1.0 ou de uma versão anterior compatível.','Select a SMKSYNTH 1.1.0 file or a compatible earlier version.'],
- ['SMKSYNTH 1.1.0 executando · áudio ativo · memória independente do teclado','SMKSYNTH 1.1.0 running · audio active · memory independent of the keyboard'],
+ ['Selecione um arquivo SMKSYNTH 1.2.0 ou de uma versão anterior compatível.','Select a SMKSYNTH 1.2.0 file or a compatible earlier version.'],
+ ['SMKSYNTH 1.2.0 executando · áudio ativo · memória independente do teclado','SMKSYNTH 1.2.0 running · audio active · memory independent of the keyboard'],
  ['Identidade informada: SMK-37 Pro_016','Reported identity: SMK-37 Pro_016'],
  ['Exportação não concluída: Sessão indisponível ou expirada.','Export did not complete: Session unavailable or expired.'],
  ['PADRÃO 5 · 16 PADS · P1–P16','PATTERN 5 · 16 PADS · P1–P16'],

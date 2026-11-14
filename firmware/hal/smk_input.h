@@ -708,7 +708,10 @@ static int32_t fm1_adc_read(uint32_t ch)
     if (ch == FM1_ADC_BATT)
         return fm1_in.batt ? (int32_t)fm1_in.batt : -1;
     if (ch == FM1_ADC_MASTER) {
-        smk_master += fm1_enc_take(SMK_ENC_MASTER) * 24;
+#ifndef SMK_CONTROLLER_ACTIVE
+#define SMK_CONTROLLER_ACTIVE 0
+#endif
+        if(!SMK_CONTROLLER_ACTIVE)smk_master += fm1_enc_take(SMK_ENC_MASTER) * 24;
         smk_master = smk_master < 0 ? 0 : smk_master > 1023 ? 1023 : smk_master;
         return smk_master;
     }

@@ -48,7 +48,8 @@
 #define OBV_DATA_FAMILY "OBERVAV"               /* (tools/build.py sets it: SMK_DATA_FAMILY) */
 #endif
 #if OBV_VOICE_HW
-#define FL_RANGE_OK(off,n) (VOICE_DATA_WRITE_OK(off,n)||FL_IN(off,n,FL_OTA_LO,FL_OTA_HI))
+#define MIDI_MAP_AT 0x000B3000u
+#define FL_RANGE_OK(off,n) (VOICE_DATA_WRITE_OK(off,n)||FL_IN(off,n,MIDI_MAP_AT,MIDI_MAP_AT+0x2000u)||FL_IN(off,n,FL_OTA_LO,FL_OTA_HI))
 #else
 #define FL_RANGE_OK(off, n) (FL_IN(off, n, FL_OTA_LO, FL_OTA_HI) || FL_IN(off, n, SETTINGS_AT, SETTINGS_AT + 0x1000u) || \
                              FL_IN(off, n, BLOBS_AT, BLOBS_AT + NBLOB * 0x1000u) || \
@@ -90,3 +91,8 @@ _Static_assert(PFAV_AT >= PSECT_AT + NPSECT*0x1000u && PFAV_AT+0x2000u <= VOICE_
 _Static_assert(PFAV_AT >= PSECT_AT + NPSECT*0x1000u && PFAV_AT+0x2000u <= OWNER_AT,"favourites overlap store");
 #endif
 _Static_assert(FL_WIN_SAFE(PFAV_AT,PFAV_AT+0x2000u),"favourites overlap protected flash");
+
+#if OBV_VOICE_HW
+_Static_assert(FL_WIN_SAFE(MIDI_MAP_AT,MIDI_MAP_AT+0x2000u),"MIDI maps cross protected flash");
+_Static_assert(MIDI_MAP_AT>=FL_DATA_LO&&MIDI_MAP_AT+0x2000u<=FL_DATA_HI,"MIDI maps outside VM");
+#endif

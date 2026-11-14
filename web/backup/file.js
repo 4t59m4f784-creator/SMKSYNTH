@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {supportedFirmware} from './compatibility.js?v=release-110';
+import {supportedFirmware} from './compatibility.js?v=release-120';
 import {inventory} from './bank.js';
-import {digest} from './client.js?v=release-110';
+import {digest} from './client.js?v=release-120';
 export async function parseFile(f){
  if(f.size>2*1024*1024)throw Error('Arquivo grande demais para este formato.');
  const j=JSON.parse(await f.text());
