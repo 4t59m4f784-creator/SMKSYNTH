@@ -20,4 +20,4 @@ Export a backup before returning to M-VAVE firmware. Use the manufacturer's M-UP
 
 ## After installation
 
-See the [manual](MANUAL.en.md) for USB/TRS routing, physical sustain and GLOBE + PLAY Panic. ENDLESS remains a separate line; this release preserves saved-bank bytes on update but does not add ENDLESS features. Restoring the prior backup is required to undo edits made in another line.
+See the [manual](MANUAL.en.md) for USB/TRS routing, physical sustain and GLOBE + PLAY Panic. Version 1.2.0 includes ENDLESS and MIDI MODE. Update preserves the saved bank and compatible separate theme/map records. A .smksynth backup contains the synth bank, not MIDI maps or theme. Restore the prior backup to undo synth-bank edits made in another line.

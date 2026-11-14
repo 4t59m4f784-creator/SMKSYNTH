@@ -85,7 +85,7 @@ Drum Pads usam violeta em repouso e branco no toque ou nos hits da sequência. T
 
 No [instalador público](https://4t59m4f784-creator.github.io/SMKSYNTH/install/), escolha **Atualizar** se já usa uma versão pública anterior ou experimental compatível até MO1a. O banco salvo é preservado. Exporte um backup antes e aguarde a identidade final `SMK-37 Pro_19649`.
 
-Para **Instalar** pela primeira vez, o SMK-37 Pro precisa estar no firmware oficial M-VAVE V016 (`SMK-37 Pro_016`). Essa opção inicializa o banco com cinco patterns e oito favoritos. Outros modelos são recusados. Use Chrome/Edge no computador, cabo USB de dados e alimentação estável. Firmware oficial M-VAVE não é redistribuído aqui.
+Para **Instalar** pela primeira vez, use a V016 oficial do modelo conectado (`SMK-37 Pro_016` ou `SMK-37 Elite_016`). Essa opção inicializa o banco com cinco patterns e oito favoritos. O instalador seleciona automaticamente o pacote Pro ou Elite. Use Chrome/Edge no computador, cabo USB de dados e alimentação estável. Firmware oficial M-VAVE não é redistribuído aqui.
 
 Transferência interrompida: retome pelo mesmo instalador, navegador e pacote. O instalador mantém links para retomar versões anteriores. [Guia completo de instalação e recuperação](docs/INSTALLATION.md).
 

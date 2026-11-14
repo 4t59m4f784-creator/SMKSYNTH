@@ -23,7 +23,7 @@ SMKSYNTH was developed using AI. Marcus Padrini defined the goals and performanc
 
 Factory setup: five patterns by Marcus Padrini, eight favourites, empty slots 6–16 and a 90 BPM starting tempo. The base preset bank is unchanged. Edited sounds live in scene/favourite snapshots; no extra user presets are installed.
 
-**First installation requires official M‑VAVE V016 on SMK‑37 Pro, identifying as `SMK-37 Pro_016`.** Other models/versions are rejected. First installation initializes the bank. Existing SMKSYNTH 1.0.x and SUPER SS1/SS2/SS3 users can choose Update to preserve their saved bank. Export work before returning to stock. Official M‑VAVE firmware is not redistributed.
+**First installation requires your model’s official M-VAVE V016: `SMK-37 Pro_016` or `SMK-37 Elite_016`.** The same page identifies Pro/Elite and selects the correct package. First installation initializes the bank. Existing public or compatible experimental SMKSYNTH builds through MO1a can choose Update to preserve the saved bank. Export a backup first. Official M-VAVE firmware is not redistributed.
 
 [Website](https://4t59m4f784-creator.github.io/SMKSYNTH/?lang=en) · [Simulator](https://4t59m4f784-creator.github.io/SMKSYNTH/simulator/?lang=en) · [Installer](https://4t59m4f784-creator.github.io/SMKSYNTH/install/?lang=en) · [Backup](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/?lang=en)
 
@@ -52,4 +52,4 @@ Stereo USB audio is retained (16-bit, 44.1/48 kHz), tested on Mac and iPhone wit
 
 ## Official release 1.2.0
 
-[One installer for Pro and Elite](https://4t59m4f784-creator.github.io/SMKSYNTH/install/?lang=en) automatically detects the model and selects first installation or bank-preserving update. An actual Elite user validated its installation workflow. All MIDI M1.2 base features were approved on Pro hardware by Marcus. TRS/DIN and USB MIDI OUT use consecutive part channels; pitch bend and mod wheel follow the selected part. Physical sustain sends CC64 across the four parts. Hold GLOBE and press PLAY for MIDI PANIC. The release also fixes held-note release after changing voice mode. ENDLESS remains separate. [Full release notes](RELEASE-1.2.0.en.md).
+[One installer for Pro and Elite](https://4t59m4f784-creator.github.io/SMKSYNTH/install/?lang=en) automatically detects the model and selects first installation or bank-preserving update. An actual Elite user validated its installation workflow. All MIDI M1.2 base features were approved on Pro hardware by Marcus. TRS/DIN and USB MIDI OUT use consecutive part channels; pitch bend and mod wheel follow the selected part. Physical sustain sends CC64 across the four parts. Hold GLOBE and press PLAY for MIDI PANIC. The release also fixes held-note release after changing voice mode. ENDLESS and MIDI MODE are included in 1.2.0. [Full release notes](RELEASE-1.2.0.en.md).
