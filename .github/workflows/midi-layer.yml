@@ -1,0 +1,28 @@
+name: MIDI Layers ML1
+on:
+  push:
+    branches: [experimental/midi-layer-ml1]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate ML1 runtime and installer
+        run: |
+          mkdir -p build/ml1 build/mo1 build/zm1 build/zm3
+          sh tests/run_physical_controls_tests.sh
+          cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/ml1/layer-asan tests/midi_layer_test.c
+          ASAN_OPTIONS=detect_leaks=0 build/ml1/layer-asan
+          node tests/midi_layer_installer_test.mjs
+          python3 tests/midi_layer_packages_test.py
+          node tests/midi_layer_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm
+          node tests/midi_backpressure_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm
+          node tests/zoom_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm
+          node tests/preset_name_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm
+          node tests/endless_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm

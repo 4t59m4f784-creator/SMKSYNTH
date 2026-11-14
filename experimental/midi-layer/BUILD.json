@@ -1,0 +1,14 @@
+{
+  "version": "1.2.0-ml1",
+  "identity": 19650,
+  "official_base": "1.2.0 /19649",
+  "native_asan_ubsan": "passed",
+  "max_tested_keys": 37,
+  "max_tested_channels": 16,
+  "static_ram_bytes": 95648,
+  "static_ram_limit": 98304,
+  "pool_bytes": 328368,
+  "pool_limit": 344064,
+  "wasm_sha256": "1ce0a2f898f1d4f58f04dee324dbec337467d2b2ef61d3a1ece6991bf1321444",
+  "hardware_tested": false
+}

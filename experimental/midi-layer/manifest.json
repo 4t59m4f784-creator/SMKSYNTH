@@ -1,0 +1,30 @@
+{
+  "pro.update": {
+    "name": "Instalar ML1 \u00b7 Pro",
+    "product": "SMK-37 Pro_19650",
+    "url": "./SMKSYNTH-1.2.0-ml1-SMK37-Pro.fwsc",
+    "size": 651819,
+    "sha": "e909d425652f5abd08172ac27a17ed7d27f14ad5913f40ca230405660df735dc"
+  },
+  "pro.release": {
+    "name": "Retornar \u00e0 oficial 1.2.0 \u00b7 Pro",
+    "product": "SMK-37 Pro_19649",
+    "url": "./SMKSYNTH-1.2.0-return-SMK37-Pro.fwsc",
+    "size": 651819,
+    "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"
+  },
+  "elite.update": {
+    "name": "Instalar ML1 \u00b7 Elite",
+    "product": "SMK-37 Elite_19650",
+    "url": "./SMKSYNTH-1.2.0-ml1-SMK37-Elite.fwsc",
+    "size": 651819,
+    "sha": "20442418d7647c55c43ba83c108d584cd6597abd227e6e346e53d1d586e0c952"
+  },
+  "elite.release": {
+    "name": "Retornar \u00e0 oficial 1.2.0 \u00b7 Elite",
+    "product": "SMK-37 Elite_19649",
+    "url": "./SMKSYNTH-1.2.0-return-SMK37-Elite.fwsc",
+    "size": 651819,
+    "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"
+  }
+}
