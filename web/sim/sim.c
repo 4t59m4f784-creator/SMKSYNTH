@@ -343,3 +343,8 @@ EXPORT uint32_t sim_scope_view(void){return zm_scope_active();}
 EXPORT uint32_t sim_theme_pending(void){return zm_theme_pending;}
 EXPORT uint32_t sim_zoom_focus(void){return zm_focus_visible();}
 EXPORT uint32_t sim_mix_row(void){return mix_row;}
+
+EXPORT uint32_t sim_midi_key_channels(void){return mm_key_channels;}
+EXPORT uint32_t sim_midi_channel_held(void){return mm_channel_held;}
+EXPORT uint32_t sim_midi_pad_bank(void){return mm_pbank;}
+EXPORT uint32_t sim_midi_key_sent(uint32_t k){return k<37?mm_key_sent[k]:0;}

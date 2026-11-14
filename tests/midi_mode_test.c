@@ -30,7 +30,7 @@ int main(void){
  /* Controller CCs coalesce under backpressure; note release goes first. */
  host_midi_count=0;key(12,1);drain();host_midi_blocked=1;
  for(unsigned n=0;n<1000;n++)mm_cv(0,(int)(n%128),0);
- key(12,0);assert(mm_w-mm_r==1);host_midi_blocked=0;drain();msg(1,0x80,60,0);msg(2,0xB0,70,103);
+ key(12,0);assert(mm_key_sent[12]&&!mm_key_target[12]);host_midi_blocked=0;drain();msg(1,0x80,60,0);msg(2,0xB0,70,103);
  mm_profile()->relative=1;host_midi_count=0;mm_cv(0,170,1);drain();assert(host_midi_count==3);msg(0,0xB0,70,127);msg(1,0xB0,70,127);msg(2,0xB0,70,108);mm_profile()->relative=0;
  /* Editor: physical pad pick, typed mapping, per-pad saved palette. */
  button(BTN_EDIT);assert(mm_edit&&mm_pick);pad(3,100);pad(3,0);assert(!mm_pick&&mm_sel==MM_PAD+3);
@@ -43,9 +43,9 @@ int main(void){
  host_mm[mm_slot][8]=255;mm_boot();assert(mm_profile()->color[3]==1); /* corrupt latest falls back */
  /* Four maps and channels stay independent. Held key blocked across changes. */
  mm_enter();drain();mm_setting_turn(1,1);assert(mm_data.selected==1&&mm_profile()->color[3]==0);mm_setting_turn(2,4);assert(mm_main_ch()==5);drain();key(0,1);drain();unsigned count=host_midi_count;mm_setting_turn(1,-1);assert(mm_main_ch()==1);drain();assert(host_midi_count==count+81);step();drain();assert(host_midi_count==count+83);key(0,0);key(0,1);drain();msg(host_midi_count-1,0x90,48,101);key(0,0);drain();
- /* Wheels respect configured channel and full 14-bit bend. */
- mm_profile()->map[MM_PITCH].ch=7;mm_wheel_prev[0]=-1;host_midi_count=0;fm1_in.wheel[0]=700;mm_wheels_poll();drain();msg(0,0xE6,127,127);
- mm_profile()->map[MM_MOD].ch=8;fm1_in.wheel[1]=485;mm_wheels_poll();drain();msg(host_midi_count-1,0xB7,1,127);
+ /* Wheels follow keyboard routing and full 14-bit bend. */
+ mm_profile()->map[MM_PITCH].ch=7;mm_wheel_prev[0]=-1;host_midi_count=0;fm1_in.wheel[0]=700;mm_wheels_poll();drain();msg(0,0xE0,127,127);
+ mm_profile()->map[MM_MOD].ch=8;fm1_in.wheel[1]=485;mm_wheels_poll();drain();msg(host_midi_count-1,0xB0,1,127);
  /* Physical sustain in both polarities, main channel only, no local sustain. */
  for(unsigned polarity=0;polarity<2;polarity++){
   memset(&smk_pedal,0,sizeof smk_pedal);unsigned rest=polarity?1000:0;fm1_in.pedal=rest;for(unsigned n=0;n<130;n++)step();drain();host_midi_count=0;
