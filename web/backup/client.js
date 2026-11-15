@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {canRestore,supportedFirmware} from './compatibility.js?v=release-120';
-import {BackupClient,unpack} from './legacy-client.js';
-import {crc32,SIZE} from './bank.js';
+import {canRestore,supportedFirmware} from './compatibility.js?v=release-121';
+import {BackupClient,unpack} from './legacy-client.js?v=release-121';
+import {crc32,SIZE} from './bank.js?v=release-121';
 const prefix=[125,83,77,75,66,1];
 export const hex=a=>Array.from(a,x=>x.toString(16).padStart(2,'0')).join('');
 export const digest=async a=>hex(new Uint8Array(await crypto.subtle.digest('SHA-256',a)));

@@ -161,13 +161,61 @@ static volatile uint32_t so_w, so_r;
 #define MQ 64u
 static uint32_t midi_in_q[MQ], midi_out_q[MQ];
 static volatile uint32_t mi_w, mi_r, mo_w, mo_r;
-static void midi_out_event(uint32_t pkt)            /* from the audio ISR */
+#if BOARD_SMK37 && !defined(FELUCCA_LOADER)
+#define USB_TRS_ISOLATION 1
+static volatile uint8_t mo_overflow, mo_recover;
+#endif
+static void midi_out_event(uint32_t pkt)            /* main-loop producer */
 {
+#if USB_TRS_ISOLATION
+    if (mo_overflow || mo_recover)
+        return;
+#endif
     if (usb.config && mo_w - mo_r < MQ) {
         midi_out_q[mo_w % MQ] = pkt;
         RING_PUBLISH();
         mo_w++;
     }
+#if USB_TRS_ISOLATION
+    else if (usb.config) {
+        /* Dropping just a Note Off would leave the USB receiver sounding.
+         * Once it reads again, discard stale events and reset every channel.
+         * The TRS stream continues; USB resumes with subsequent new gestures. */
+        mo_overflow = 1;
+    }
+#endif
+}
+static int midi_out_pending(void) {
+#if USB_TRS_ISOLATION
+    return mo_overflow || mo_recover || mo_r != mo_w;
+#else
+    return mo_r != mo_w;
+#endif
+}
+static int midi_out_take(uint32_t *pkt)              /* USB consumer only */
+{
+#if USB_TRS_ISOLATION
+    if (mo_overflow) {
+        mo_r = mo_w;
+        mo_recover = 48;
+        RING_PUBLISH();
+        mo_overflow = 0;
+    }
+    if (mo_recover) {
+        unsigned i = 48u - mo_recover;
+        unsigned cc = i % 3u == 0 ? 64u : i % 3u == 1 ? 123u : 120u;
+        *pkt = 0x0bu | (0xb0u | i / 3u) << 8 | cc << 16;
+        mo_recover--;
+        return 1;
+    }
+#endif
+    if (mo_r == mo_w)
+        return 0;
+    RING_PUBLISH();
+    *pkt = midi_out_q[mo_r % MQ];
+    RING_PUBLISH();
+    mo_r++;
+    return 1;
 }
 
 /* ------------------------------------------------------- descriptors --- */
@@ -875,10 +923,18 @@ static void ep1_tx(void)
 {
     uint32_t csr, n = 0;
 #if FELUCCA_OTA
+#if USB_TRS_ISOLATION
+    if (!midi_out_pending() && so_w == so_r)
+#else
     if (mo_w == mo_r && so_w == so_r)
+#endif
         return;
 #else
+#if USB_TRS_ISOLATION
+    if (!midi_out_pending())
+#else
     if (mo_w == mo_r)
+#endif
         return;
 #endif
     sie_wr(S_INDEX, 1);
@@ -897,20 +953,35 @@ static void ep1_tx(void)
         n += 4u;
         so_r++;
     }
+#if USB_TRS_ISOLATION
+    while (!sx_busy && so_r == so_w && midi_out_pending() && n < 64u) {
+#else
     while (!sx_busy && so_r == so_w && mo_r != mo_w && n < 64u) {
+#endif
+#else
+#if USB_TRS_ISOLATION
+    while (midi_out_pending() && n < 64u) {
 #else
     while (mo_r != mo_w && n < 64u) {
 #endif
+#endif
         uint32_t pkt;
-        RING_PUBLISH();                                 /* the audio ISR (producer) can preempt us: */
-        pkt = midi_out_q[mo_r % MQ];                    /* slot read strictly between the index checks */
+#if USB_TRS_ISOLATION
+        if (!midi_out_take(&pkt))
+            break;
+#else
+        RING_PUBLISH();
+        pkt = midi_out_q[mo_r % MQ];
+#endif
         ep1tx[n] = (uint8_t)pkt;
         ep1tx[n + 1] = (uint8_t)(pkt >> 8);
         ep1tx[n + 2] = (uint8_t)(pkt >> 16);
         ep1tx[n + 3] = (uint8_t)(pkt >> 24);
         n += 4u;
+#if !USB_TRS_ISOLATION
         RING_PUBLISH();
         mo_r++;
+#endif
     }
     if (!n)
         return;
@@ -1224,6 +1295,9 @@ static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
         usb.config = 0;
         usb.suspended = 0;
         mo_r = mo_w;                                    /* nothing stale for the next host */
+#if USB_TRS_ISOLATION
+        mo_overflow = mo_recover = 0;
+#endif
         usb.sx_on = 0;
 #if FELUCCA_OTA
         so_r = so_w;

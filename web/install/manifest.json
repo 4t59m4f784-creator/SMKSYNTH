@@ -2,35 +2,35 @@
   "pro": {
     "model": "SMK-37 Pro",
     "release": {
-      "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
-      "product": "SMK-37 Pro_19649",
-      "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Pro.fwsc",
+      "name": "SMKSYNTH 1.2.1 \u00b7 Endless MIDI \u00b7 first-install",
+      "product": "SMK-37 Pro_19653",
+      "url": "./firmware/SMKSYNTH-1.2.1-first-install-SMK37-Pro.fwsc",
       "size": 651327,
-      "sha": "5102f583e898aa573bff0ac98dd0939c3fe7114f021639f5724c952daaf39659"
+      "sha": "4f8cbca53489ed4f3fbe94e49eb59130fe6f1ea9c210b6152ae405dc0efa9bf2"
     },
     "update": {
-      "name": "SMKSYNTH 1.2.0 \u00b7 update",
-      "product": "SMK-37 Pro_19649",
-      "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Pro.fwsc",
+      "name": "SMKSYNTH 1.2.1 \u00b7 Endless MIDI \u00b7 update",
+      "product": "SMK-37 Pro_19653",
+      "url": "./firmware/SMKSYNTH-1.2.1-update-SMK37-Pro.fwsc",
       "size": 651819,
-      "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"
+      "sha": "523c780a70945e5524d6574006eff81b9c08c54ff0a7578c2cabe4a33187e5ac"
     }
   },
   "elite": {
     "model": "SMK-37 Elite",
     "release": {
-      "name": "SMKSYNTH 1.2.0 \u00b7 first-install",
-      "product": "SMK-37 Elite_19649",
-      "url": "./firmware/SMKSYNTH-1.2.0-first-install-SMK37-Elite.fwsc",
+      "name": "SMKSYNTH 1.2.1 \u00b7 Endless MIDI \u00b7 first-install",
+      "product": "SMK-37 Elite_19653",
+      "url": "./firmware/SMKSYNTH-1.2.1-first-install-SMK37-Elite.fwsc",
       "size": 651327,
-      "sha": "052496ea37f361aade975f9c6b08b62d891010e666fbe3a9845f939322acf598"
+      "sha": "794958107507bcd9617d308162b811d56d5e723d9f9ad91513d19cd6f03b8e70"
     },
     "update": {
-      "name": "SMKSYNTH 1.2.0 \u00b7 update",
-      "product": "SMK-37 Elite_19649",
-      "url": "./firmware/SMKSYNTH-1.2.0-update-SMK37-Elite.fwsc",
+      "name": "SMKSYNTH 1.2.1 \u00b7 Endless MIDI \u00b7 update",
+      "product": "SMK-37 Elite_19653",
+      "url": "./firmware/SMKSYNTH-1.2.1-update-SMK37-Elite.fwsc",
       "size": 651819,
-      "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"
+      "sha": "80da2382396bfc8a58841520ad56151016265d68de8db8838a9bb0ff902e6cc4"
     }
   }
 }

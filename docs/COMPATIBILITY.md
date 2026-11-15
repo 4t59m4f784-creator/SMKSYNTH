@@ -16,3 +16,8 @@
 | Public factory collection | Awaiting Marcus's selection |
 
 Saved-data compatibility and update-loader preservation are distinct. An old installer can overwrite storage even if the new program understands the data. Use only the documented version path and keep backups.
+
+
+## Endless MIDI 1.2.1
+
+Edição oficial: Endless MIDI, identidade 19653 para Pro e Elite. Inclui ENDLESS com MIDI USB/TRS por parte, seleção e layers de canais do teclado pelo banco B do MODO MIDI, rodas e sustain, bateria e identificação da versão. Pads A, encoders e faders mantêm os canais de seus mapas. Consulte o [manual atual](MANUAL.md) e as [notas da versão](RELEASE-1.2.1.md) para o fluxo completo. ML1 /19650, ML1a /19651 e Endless MIDI A /19652 atualizam diretamente, preservando os dados salvos.

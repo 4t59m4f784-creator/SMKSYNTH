@@ -1,8 +1,8 @@
-# SMKSYNTH 1.2.0 - Complete manual
+# SMKSYNTH 1.2.1 - Complete manual
 
-[PDF](pdf/SMKSYNTH-1.2.0-Manual-EN.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.2.1-Manual-EN.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Reference: firmware 1.2.0, SMK-37 Pro_19649 / SMK-37 Elite_19649.
+Reference: firmware 1.2.1, SMK-37 Pro_19653 / SMK-37 Elite_19653.
 
 ## Contents
 
@@ -39,7 +39,7 @@ Developed using AI: Marcus Padrini defined and directed the experience, created 
 
 ## 1. Overview and navigation
 
-Firmware 1.2.0 for M-VAVE SMK-37 Pro / Elite. Four parts A-D; ANALOG (OberVave) or DRUM-X per part. Eight shared ANALOG voices. 16 patterns; up to 256 steps per track and four notes per ANALOG step.
+Firmware 1.2.1 for M-VAVE SMK-37 Pro / Elite. Four parts A-D; ANALOG (OberVave) or DRUM-X per part. Eight shared ANALOG voices. 16 patterns; up to 256 steps per track and four notes per ANALOG step.
 
 ![knobs](diagrams/knobs-en.svg)
 
@@ -397,7 +397,7 @@ Saving is manual: an on-screen edit is not a flash write. Stop transport, releas
 1. For first installation, start from your Pro or Elite model’s official M-VAVE V016 firmware. Use official M-UPGRADE to return to that version.
 2. Export your .smksynth before returning to stock. First installation initializes/replaces the bank.
 3. Use Chrome/Edge on a computer, HTTPS, a USB data cable and stable power. Close other MIDI applications.
-4. In the web installer, connect, check source/target and confirm. Wait for SMK-37 Pro_19649 / SMK-37 Elite_19649.
+4. In the web installer, connect, check source/target and confirm. Wait for SMK-37 Pro_19653 / SMK-37 Elite_19653.
 5. If interrupted, resume in the same browser/site using the same package. Do not change installer midway.
 
 Backup: stop PLAY/REC, release controls/notes and connect the tool. Export the current bank in this session before restoring. Choose the file, review and type RESTAURAR (also in the English interface). Restoration replaces the whole bank; it does not merge. On completion, reboot and check your sounds.
@@ -477,7 +477,7 @@ MIDI Clock/Start/Stop output and automatic Program Change on internal preset sel
 
 Press GLOBE and PLAY together in either order. This stops PLAY/REC, clears HOLD/sustain and pending notes, and cuts internal voices. USB and TRS send CC64=0, CC123=0 and CC120=0 on all 16 channels. Release the pedal before using sustain again. Effect tails may finish normally.
 
-1.2.0 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
+1.2.1 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
 
 ## MIDI appendix / 1
 
@@ -571,7 +571,7 @@ Constants: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. For pages a
 
 ## Updates and USB audio
 
-Already using SMKSYNTH? Export a backup and choose Update in the public installer. Public versions and compatible experimental builds through MO1a are accepted and the saved bank is preserved. Install is only for first installation from V016 and replaces the bank. The new public identity is SMK-37 Pro_19649 / SMK-37 Elite_19649.
+Already using SMKSYNTH? Export a backup and choose Update in the public installer. Public versions and compatible experimental builds through Endless MIDI A are accepted and the saved bank is preserved. Install is only for first installation from V016 and replaces the bank. The new public identity is SMK-37 Pro_19653 / SMK-37 Elite_19653.
 
 Stereo 16-bit USB audio, 44.1/48 kHz: tested on Mac and on iPhone with AudioShare. Known issue: iPhone video recordings using USB audio may contain clicks or dropouts.
 
@@ -583,3 +583,8 @@ Stereo 16-bit USB audio, 44.1/48 kHz: tested on Mac and on iPhone with AudioShar
 - [Backup](https://4t59m4f784-creator.github.io/SMKSYNTH/backup/?lang=en)
 
 [GitHub](https://github.com/4t59m4f784-creator/SMKSYNTH)
+
+
+## Endless MIDI 1.2.1
+
+Official edition: Endless MIDI, identity 19653 for Pro and Elite. Includes ENDLESS per-part USB/TRS MIDI, controller bank B channel selection/layers for the keyboard, wheels and sustain, plus battery and release identification. Bank A pads and encoders/faders retain map channels. See the [current manual](MANUAL.en.md) and [release notes](RELEASE-1.2.1.en.md) for the complete workflow. ML1 /19650, ML1a /19651 and Endless MIDI A /19652 can update directly while preserving saved data.

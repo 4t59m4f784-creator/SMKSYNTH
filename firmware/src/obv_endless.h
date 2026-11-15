@@ -165,6 +165,9 @@ static void endless_draw(unsigned force){
  if(force||hk!=header){
   header=hk;cv_begin(240,44,C_PANEL);char title[24]="ENDLESS ";title[8]=TRK_L[t];title[9]=0;cv_text(8,2,&FONT_S,title,en?C_TRKC[t]:C_DIMT);
   cv_text(128,2,&FONT_S,"Q16",C_DIMT);
+#if BOARD_SMK37
+  smk_battery_icon(163,4);
+#endif
   const char*state=end_record?"REC":end_pending?"WAIT":!en?"OFF":running?"PLAY":"STOP";if(end_record){cv_rect(194,0,44,19,C_RED);cv_text(199,2,&FONT_S,"REC",RGB(255,255,255));}
   else cv_text(232-text_w(&FONT_S,state),2,&FONT_S,state,color);
   char name[29];unsigned nn=0;if(toasting){while(nn<18u&&toast[nn]){name[nn]=toast[nn];nn++;}}else{memcpy(name,live_p[t].v+NPARAM,PATCH_NAME);nn=PATCH_NAME;}name[nn]=0;cv_text(8,23,&FONT_S,name,C_DIMT);

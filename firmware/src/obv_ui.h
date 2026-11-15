@@ -163,6 +163,10 @@ static void ui_pattern_badge(int x,int y){
 }
 #endif
 /* trk: the track the panel is on (its letter before the name, in its colour; the number in red for A) */
+#if BOARD_SMK37
+#include "smk_release.h"
+#include "smk_battery.h"
+#endif
 static void ui_header(uint32_t prog, const uint8_t *name, uint32_t edited, const char *tags, uint32_t trk, uint32_t favourite)
 {
     char n[PATCH_NAME + 2], tl[2] = {(char)('A' + trk % 4u), 0};
@@ -187,7 +191,11 @@ static void ui_header(uint32_t prog, const uint8_t *name, uint32_t edited, const
 #else
     cv_text(54, 22, &FONT_S, tags, C_DIMT);
 #endif
+#if BOARD_SMK37
+    smk_battery_icon(213,6);
+#else
     draw_logo_small(240 - 4 - text_w(&FONT_S, "SMKSYNTH"), 4);
+#endif
     cv_rect(0, 42, 240, 1, C_RULE);
     cv_blit(0, 0);
 }
@@ -645,6 +653,12 @@ static void ui_splash(void)
     static const uint16_t STRIKE[12] = {0, 90, 20, 0, 200, 60, 30, 256, 180, 256, 256, 256};
     uint32_t t0 = fm1_ms, k;
     lcd_fill(0, 0, 240, 240, C_PANEL);
+#if BOARD_SMK37
+    cv_begin(240,38,C_PANEL);
+    cv_text((240-text_w(&FONT_S,SMK_RELEASE_NAME))/2,0,&FONT_S,SMK_RELEASE_NAME,C_CREAM);
+    cv_text((240-text_w(&FONT_S,APP_VER))/2,19,&FONT_S,APP_VER,C_DIMT);
+    cv_blit(0,199);
+#endif
     for (k = 0; k < 30u; k++) {
         uint32_t fade = k < 12u ? STRIKE[k] : 256u, sub = k < 16u ? 0u : (k - 16u) * 32u;
         int32_t x_to = k < 10u ? 0 : (int32_t)((k - 10u) * (k - 10u) * 240u / 196u) + 2;   /* eases in, 10 .. 24 */

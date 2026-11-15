@@ -1,14 +1,14 @@
-# Public 1.2.0 validation
+# Public 1.2.1 validation
 
 - Marcus approved MO1a /19648 on Pro hardware, including ENDLESS, MIDI MODE, Zoom, preset naming and colours. A real user previously validated the Elite installation flow. Promotion changes version/identity without changing approved behaviour.
-- Stable identities: SMK-37 Pro_19649 and SMK-37 Elite_19649. Pro application 224880 bytes; RAM 95392/98304; pool 328368/344064; loader 7703 bytes. These are build limits, not real-time audio-load measurements.
-- All four final packages have SHA-256, CRC, model, application/loader identity and seed checks. First installation contains the factory bank; Update retains bank bytes. Simulated 1.1.0 → 1.2.0 updates passed 56 interruption/resume points per model, including protected areas and journal handling.
+- Stable identities: SMK-37 Pro_19653 and SMK-37 Elite_19653. Pro application 224880 bytes; RAM 95392/98304; pool 328368/344064; loader 7703 bytes. These are build limits, not real-time audio-load measurements.
+- All four final packages have SHA-256, CRC, model, application/loader identity and seed checks. First installation contains the factory bank; Update retains bank bytes. Simulated 1.1.0 → 1.2.1 updates passed 56 interruption/resume points per model, including protected areas and journal handling.
 - Native regressions cover per-part MIDI, ENDLESS, sustain/Panic, controller transitions, output backpressure, long SUPER tails with five-voice allocation, colours, presets, sequencing, pads, Split/Layer and physical controls.
 - Public WASM executes the real firmware loop for ENDLESS (3/5/7 lengths, fixed C4, HOLD, drums and saves), independent MIDI keys/pads/controls, synth return, persistent theme and separate preset confirmation. The demo retains five patterns, eight favourites, 90 BPM and no extra personal presets.
 - Website, installer and simulator retain PT/EN; links, four pins, corresponding source and four versioned PDFs are checked. The hero captures the actual firmware splash renderer.
-- Each of the four final 1.2.0 packages has not had a new physical installation. Host/simulated-flash tests do not replace hardware CPU/audio testing. Known iPhone USB-video clicks/dropouts remain.
+- Each of the four final 1.2.1 packages has not had a new physical installation. Host/simulated-flash tests do not replace hardware CPU/audio testing. Known iPhone USB-video clicks/dropouts remain.
 
-Hashes: [RELEASE.json](../RELEASE.json). Downloads: `releases/1.2.0/SHA256SUMS.txt`.
+Hashes: [RELEASE.json](../RELEASE.json). Downloads: `releases/1.2.1/SHA256SUMS.txt`.
 
 ## Historical 1.0.3 record
 
@@ -31,3 +31,8 @@ USB audio keeps the UA1/1.0.2 implementation, tested on Mac and on iPhone with A
 Package, WASM and factory-content hashes are in [RELEASE.json](../RELEASE.json); download checksums are in `releases/1.0.3/SHA256SUMS.txt`. Supersaw origin: [Clipper](https://github.com/isod89/clipper-fm1).
 
 Host and simulated-flash checks do not measure physical CPU time. Hardware sound/performance approval is Marcus’s SS3 test; it does not guarantee every unison/effects/polyphony combination.
+
+
+## Endless MIDI 1.2.1
+
+Official edition: Endless MIDI, identity 19653 for Pro and Elite. Includes ENDLESS per-part USB/TRS MIDI, controller bank B channel selection/layers for the keyboard, wheels and sustain, plus battery and release identification. Bank A pads and encoders/faders retain map channels. See the [current manual](MANUAL.en.md) and [release notes](RELEASE-1.2.1.en.md) for the complete workflow. ML1 /19650, ML1a /19651 and Endless MIDI A /19652 can update directly while preserving saved data.

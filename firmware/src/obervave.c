@@ -2768,6 +2768,7 @@ static void app_main(void)
         uint32_t rel, b, lit = 0, base = (uint32_t)(KEY0 + 12 * keyboard_base_octave()), np = page;
         platform_poll();
 #if BOARD_SMK37
+        if(smk_battery_poll()){dirty_hdr=dirty_page=1;end_ui_seen=0;if(mm_on)mm_full_dirty();}
         mm_service();
         if(mm_on){mm_poll();continue;}
         if(mm_wait_release){uint32_t rel;fm1_input_edges(&rel);while(smk_pad_take()>=0){}while(smk_extkey_take()>=0){}for(unsigned e=0;e<8;e++)fm1_enc_take(e);mm_discard_midi();if(mm_return_poll())continue;leds_prev=glow_prev=0xFFFFFFFFu;leds_q=hints_key=0xFFFFFFFFu;}

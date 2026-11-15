@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {crc32,SIZE} from './bank.js';
+import {crc32,SIZE} from './bank.js?v=release-121';
 const prefix=[125,83,77,75,66,1];
 export function unpack(a){let acc=0,bits=0,out=[];for(const v of a){acc|=v<<bits;bits+=7;if(bits>=8){out.push(acc&255);acc>>>=8;bits-=8;}}return Uint8Array.from(out);}
 export class BackupClient{

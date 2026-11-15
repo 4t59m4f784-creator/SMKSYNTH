@@ -1,15 +1,17 @@
-# SMKSYNTH 1.2.0 - Quick start guide
+# SMKSYNTH 1.2.1 - Endless MIDI - Quick start guide
 
-[PDF](pdf/SMKSYNTH-1.2.0-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.2.1-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Reference: firmware 1.2.0, SMK-37 Pro_19649 / SMK-37 Elite_19649.
+Reference: firmware 1.2.1, SMK-37 Pro_19653 / SMK-37 Elite_19653.
 
 ## Contents
 
 - Quick start / 1. First steps
 - ENDLESS: record and perform
 - MIDI MODE: independent controller
+- MIDI MODE: bank B channels and layers
 - Theme, oscilloscope and saving
+- Battery and release identification
 - Quick start / 2. Favourites and Split/Layer
 - Quick start / 3. Patterns and drums
 - Quick start / 4. Record, save and restore
@@ -22,7 +24,7 @@ Developed using AI: Marcus Padrini defined and directed the experience, created 
 
 ## Quick start / 1. First steps
 
-SMKSYNTH 1.2.0 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
+SMKSYNTH 1.2.1 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
 
 1. Set K8/master to a suitable level and press PLAY.
 2. K6 selects A-D; K7 changes the part preset.
@@ -58,11 +60,28 @@ In MIDI MODE the synthesizer is silent and controls send MIDI through USB and TR
 1. In the synth, cycle GLOBE to MIDI MODE. Before activation the page shows only the entry control; turn K1 right.
 2. In MIDI MODE, GLOBE opens settings: K1 left returns to the synth; K2 selects MAP 1-4; K3 sets main channel 1-16; K4 selects ABS or REL encoders. This channel is independent of the synth part base channel.
 3. KNOB BANK and FADER BANK switch banks A/B. Press both together to switch pad bank. OCT-/+ transpose the keyboard.
-4. Tap PARA to edit. Move the desired control or use K5/OCT to select it. K1 selects an allowed type (OFF, CC, CC TOGGLE, NOTE or PITCH BEND), K2 the CC/note number, K3 channel (MAIN or 1-16), and K4 pad colour. Available types depend on the control.
-5. BT saves all four maps, including channels, colours and behaviour. Release keys, pads and pedal before saving. PARA returns to the performance overview. ABS encoders accelerate with turning speed; REL uses relative messages.
+4. Tap PARA to edit. Move the desired control or use K5/OCT to select it. K1 selects an allowed type (OFF, CC, CC TOGGLE, NOTE or PITCH BEND), K2 the CC/note number, K3 channel (MAIN or 1-16), and K4 bank A pad colour. Bank B is reserved for keyboard channels and cannot be edited. Wheels follow keyboard channels (KEYS). Available types depend on the control.
+5. BT saves all four maps, including configured channels, colours and behaviour. The temporary bank B selection is not saved. Release keys, pads and pedal before saving. PARA returns to the performance overview. ABS encoders accelerate with turning speed; REL uses relative messages.
 6. The display keeps three independent areas: last controller value and bars, pads with activity, and a 37-key virtual keyboard showing chords. GLOBE + PLAY triggers MIDI PANIC.
 
 The simulator demonstrates the interface and retains browser memory; it does not replace physical USB/TRS port testing. A .smksynth backup stores the synth bank; MIDI maps and theme use separate memory and are not included in that file.
+
+## MIDI MODE: bank B channels and layers
+
+This bank belongs only to MIDI MODE, which replaces the synth while active. Synth performance, Split/Layer and pattern banks keep their existing functions. ENDLESS still sends MIDI on each synth part channel, independently of controller bank B.
+
+1. Enter MIDI MODE. Press KNOB BANK + FADER BANK together until CHANNELS / bank B appears.
+2. Tap and release one pad alone: pad 1 selects channel 1, pad 3 channel 3, through pad 16 / channel 16. The keyboard then transmits on that channel. Bank B pads send neither notes nor CCs.
+3. To create a layer, hold one pad while pressing the other desired channels. Example: hold 1, press 3 and 6, then release all pads. The keyboard transmits on channels 1, 3 and 6. Illuminated pads show the selection.
+4. The selection remains after releasing pads and returning to bank A. A new single-pad gesture replaces the whole layer with that channel. No need to deselect previous channels.
+
+| Source | Destination in MIDI MODE |
+| --- | --- |
+| Keyboard, pitch bend, mod wheel and sustain | All selected channels; USB and TRS/DIN. |
+| Encoders, faders and bank A pads | Configured map channels; independent of the layer. |
+| Previously held notes | Note Off retains original channels and pitches after changing layer or octave. |
+
+Sustain release also reaches previously used channels. Entering MIDI MODE, switching MAP or changing main channel resets selection to that map main channel (default: 1). Bank B selection is temporary. Previous bank B pad mappings remain stored but inactive in this release.
 
 ## Theme, oscilloscope and saving
 
@@ -78,6 +97,20 @@ Performance values are the default view. A short PATCH opens the logo, overall-o
 | Save as / rename | Long BT opens editing. K1 moves cursor; K2 chooses character (up to 10); K7 selects slot 01-99. The screen shows the program already in the destination. |
 | Review replacement | BT opens the name/destination review, showing the program to be replaced. Release and press BT again to write. |
 | Back / cancel | PATCH from review returns to editing; PATCH from editing cancels without writing. |
+
+## Battery and release identification
+
+Endless MIDI is this public edition name. The bottom of the splash shows its name and technical version 1.2.1. To check later, cycle GLOBE to THEME: that page also shows ENDLESS MIDI and the technical version in either theme. The technical number is updated for every release build.
+
+A discreet battery meter appears in Obervave and Zoom headers, the oscilloscope, ENDLESS view and MIDI MODE performance. It uses the existing instrument reading, filtered to avoid fluctuations. It does not change audio or write settings.
+
+| Indicator | Meaning |
+| --- | --- |
+| 1 to 4 bars | Approximate charge bands, not a percentage. |
+| Lowest band in red | Low battery; connect power. |
+| Grey outline without bars | Reading unavailable or still settling; does not mean full. |
+
+The meter does not detect charging or guarantee remaining runtime. Allow a few seconds for its initial reading to settle. Connecting USB does not automatically turn the icon into a full battery.
 
 ## Quick start / 2. Favourites and Split/Layer
 
@@ -176,7 +209,7 @@ MIDI Clock/Start/Stop output and automatic Program Change on internal preset sel
 
 Press GLOBE and PLAY together in either order. This stops PLAY/REC, clears HOLD/sustain and pending notes, and cuts internal voices. USB and TRS send CC64=0, CC123=0 and CC120=0 on all 16 channels. Release the pedal before using sustain again. Effect tails may finish normally.
 
-1.2.0 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
+1.2.1 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
 
 ## Links
 

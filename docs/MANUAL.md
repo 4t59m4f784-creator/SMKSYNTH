@@ -1,15 +1,17 @@
-# SMKSYNTH 1.2.0 - Manual completo
+# SMKSYNTH 1.2.1 - Endless MIDI - Manual completo
 
-[PDF](pdf/SMKSYNTH-1.2.0-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.2.1-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Referência: firmware 1.2.0, SMK-37 Pro_19649 / SMK-37 Elite_19649.
+Referência: firmware 1.2.1, SMK-37 Pro_19653 / SMK-37 Elite_19653.
 
 ## Índice
 
 - 1. Visão geral e navegação
 - ENDLESS: gravar e tocar
-- MIDI MODE: controlador independente
+- MODO MIDI: controlador independente
+- MODO MIDI: canais e layers pelo banco B
 - Tema, osciloscópio e salvamento
+- Bateria e identificação da versão
 - 2. Botões: referência
 - 3. Performance, faders e rodas
 - 4. Favoritos e presets
@@ -39,7 +41,7 @@ Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os 
 
 ## 1. Visão geral e navegação
 
-Firmware 1.2.0 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
+Firmware 1.2.1 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
 
 ![knobs](diagrams/knobs-pt.svg)
 
@@ -70,18 +72,35 @@ ENDLESS faz parte da versão oficial 1.2. Funciona em SINGLE, com as quatro part
 
 ENDLESS transmite as notas por MIDI USB e TRS/DIN usando o canal de cada parte, como o sequenciador normal. Não envia MIDI Clock/Start/Stop.
 
-## MIDI MODE: controlador independente
+## MODO MIDI: controlador independente
 
 No MIDI MODE o sintetizador fica silencioso e os controles enviam MIDI por USB e TRS/DIN. Não inclui Bluetooth. A entrada e a saída encerram as notas e limpam modulação temporária para preservar o timbre ao retornar ao synth.
 
 1. No synth, percorra GLOBE até MIDI MODE. Antes de ativar, a tela mostra somente o comando de entrada; gire K1 para a direita.
 2. No MIDI MODE, GLOBE abre os ajustes: K1 à esquerda retorna ao synth; K2 escolhe MAP 1-4; K3 define o canal principal 1-16; K4 escolhe encoders ABS ou REL. O canal deste modo é independente do canal-base das partes do synth.
 3. KNOB BANK e FADER BANK alternam os bancos A/B. Pressione os dois juntos para trocar o banco dos pads. OCT-/+ transpõem o teclado.
-4. Toque PARA para editar. Mova o controle desejado ou use K5/OCT para selecioná-lo. K1 escolhe o tipo permitido (OFF, CC, CC TOGGLE, NOTE ou PITCH BEND), K2 o número CC/nota, K3 o canal (MAIN ou 1-16) e K4 a cor dos pads. Nem todos os tipos se aplicam a todos os controles.
-5. BT salva os quatro mapas, incluindo canais, cores e comportamento. Solte teclas, pads e pedal antes de salvar. PARA volta à visão de performance. Encoders ABS aceleram conforme a velocidade; REL usa mensagens relativas.
+4. Toque PARA para editar. Mova o controle desejado ou use K5/OCT para selecioná-lo. K1 escolhe o tipo permitido (OFF, CC, CC TOGGLE, NOTE ou PITCH BEND), K2 o número CC/nota, K3 o canal (MAIN ou 1-16) e K4 a cor dos pads do banco A. O banco B é reservado aos canais do teclado e não é editável. Rodas seguem os canais do teclado (KEYS). Nem todos os tipos se aplicam a todos os controles.
+5. BT salva os quatro mapas, incluindo canais configurados, cores e comportamento. A seleção temporária do banco B não é salva. Solte teclas, pads e pedal antes de salvar. PARA volta à visão de performance. Encoders ABS aceleram conforme a velocidade; REL usa mensagens relativas.
 6. A tela mantém três áreas independentes: último controle com valor e barras, pads com atividade e teclado virtual de 37 teclas com acordes. GLOBE + PLAY aciona MIDI PANIC.
 
 O simulador demonstra a interface e preserva sua memória no navegador; não substitui um teste das portas físicas USB/TRS. O backup .smksynth guarda o banco do synth; mapas MIDI e tema ficam em memória separada e não são incluídos nesse arquivo.
+
+## MODO MIDI: canais e layers pelo banco B
+
+Este banco pertence exclusivamente ao MODO MIDI, que substitui o synth enquanto está ativo. No synth, os bancos de performance, Split/Layer e patterns continuam com suas funções. ENDLESS continua enviando MIDI pelo canal de cada parte do synth, não pela seleção do banco B do controlador.
+
+1. Entre no MODO MIDI. Pressione KNOB BANK + FADER BANK juntos até aparecer CHANNELS / banco B.
+2. Toque e solte um pad sozinho: pad 1 seleciona canal 1, pad 3 seleciona canal 3 e assim por diante até pad 16 / canal 16. O teclado passa a transmitir nesse canal. Os pads B não enviam notas nem CCs.
+3. Para formar um layer, mantenha um pad pressionado enquanto toca os outros canais desejados. Exemplo: segure 1, pressione 3 e 6 e depois solte todos. O teclado passa a transmitir simultaneamente nos canais 1, 3 e 6. Os pads iluminados mostram a seleção.
+4. A seleção permanece ao soltar os pads e ao voltar ao banco A. Um novo toque em um pad sozinho substitui todo o layer por aquele canal. Não é necessário desmarcar os canais anteriores.
+
+| Origem | Destino no MODO MIDI |
+| --- | --- |
+| Teclado, pitch bend, mod wheel e sustain | Todos os canais selecionados; USB e TRS/DIN. |
+| Encoders, faders e pads A | Canais configurados no mapa; independentes do layer. |
+| Notas já mantidas | Note Off conserva os canais e notas originais, mesmo após trocar o layer ou a oitava. |
+
+Sustain libera também canais usados anteriormente. Entrar no MODO MIDI, trocar MAP ou mudar o canal principal reinicia a seleção no canal principal desse mapa (padrão: 1). A seleção B é temporária. Os antigos mapas dos pads B permanecem guardados, mas ficam inativos nesta versão.
 
 ## Tema, osciloscópio e salvamento
 
@@ -97,6 +116,20 @@ Performance com valores é a tela padrão. PATCH curto abre a tela de logo, osci
 | Salvar como / renomear | BT longo abre edição. K1 move cursor; K2 escolhe caractere (até 10); K7 escolhe posição 01-99. A tela mostra o programa já presente no destino. |
 | Revisar substituição | BT abre a revisão do nome e destino, com o programa que será substituído. Solte e pressione BT novamente para gravar. |
 | Voltar / cancelar | PATCH na revisão volta à edição; PATCH na edição cancela sem escrever. |
+
+## Bateria e identificação da versão
+
+Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.2.1. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
+
+O medidor discreto de bateria aparece nos cabeçalhos Obervave e Zoom, no osciloscópio, na tela ENDLESS e na performance do MODO MIDI. Usa a leitura existente do instrumento, filtrada para evitar oscilações. Não altera o áudio nem grava configurações.
+
+| Indicação | Significado |
+| --- | --- |
+| 1 a 4 barras | Faixas aproximadas de carga, sem porcentagem. |
+| Menor faixa vermelha | Bateria baixa; providencie alimentação. |
+| Contorno cinza sem barras | Leitura indisponível ou ainda estabilizando; não indica carga cheia. |
+
+O medidor não identifica carregamento nem garante autonomia restante. Aguarde alguns segundos para a primeira indicação estabilizar. Conectar USB não transforma automaticamente o ícone em carga cheia.
 
 ## 2. Botões: referência
 
@@ -397,7 +430,7 @@ Salvamento manual: uma edição na tela não é uma escrita em flash. Pare o tra
 1. Para primeira instalação, parta do firmware oficial M-VAVE V016 do seu modelo Pro ou Elite. Use o M-UPGRADE oficial para retornar a essa versão.
 2. Exporte seu .smksynth antes de retornar ao oficial. A primeira instalação inicializa/substitui o banco.
 3. Use Chrome/Edge no computador, HTTPS, cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
-4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19649 / SMK-37 Elite_19649.
+4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19653 / SMK-37 Elite_19653.
 5. Se interromper, retome no mesmo navegador/site com o mesmo pacote. Não troque de instalador no meio.
 
 Backup: pare PLAY/REC, solte controles/notas e conecte a ferramenta. Exporte o banco atual nesta sessão antes de restaurar. Escolha o arquivo, revise e digite RESTAURAR (também na interface inglesa). Restauração substitui o banco inteiro; não mescla. Ao concluir, reinicie e confira seus sons.
@@ -477,7 +510,7 @@ Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program 
 
 Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
 
-A 1.2.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
+A 1.2.1 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Apêndice MIDI / 1
 
@@ -571,7 +604,7 @@ Constantes: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. Para cada 
 
 ## Atualização e áudio USB
 
-Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até MO1a são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19649 / SMK-37 Elite_19649.
+Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até Endless MIDI A são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19653 / SMK-37 Elite_19653.
 
 Áudio USB estéreo de 16 bits, 44,1/48 kHz: testado no Mac e no iPhone com AudioShare. Problema conhecido: vídeos gravados no iPhone com áudio USB podem conter cliques ou cortes.
 

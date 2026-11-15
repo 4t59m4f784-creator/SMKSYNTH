@@ -11,9 +11,10 @@ for(let n=0;n<12;n++){
  enc(2,4);assert.equal(e.ex.sim_midi_last(),2);assert(e.ex.sim_midi_last_value()>0);
  e.input({t:'fader',f:0,v:93});e.advance(150);assert.equal(e.ex.sim_midi_last(),16);assert.equal(e.ex.sim_midi_last_value(),93);
  if(n%2){e.input({t:'btn',b:0,down:true});e.input({t:'btn',b:1,down:true});e.advance(80);e.input({t:'btn',b:0,down:false});e.input({t:'btn',b:1,down:false});e.advance(100);}
- const padSource=32+(n%2)*16,previous=e.ex.sim_fb_hash();
- e.input({t:'pad',p:8,v:113});e.advance(100);assert.equal(e.ex.sim_midi_last(),padSource);assert.equal(e.ex.sim_midi_last_value(),113);assert.notEqual(e.ex.sim_fb_hash(),previous);
- e.input({t:'pad',p:8,v:0});e.advance(100);assert.equal(e.ex.sim_midi_last(),padSource);assert.equal(e.ex.sim_midi_last_value(),113,'Keep last pad note velocity readable after release');
+ const previous=e.ex.sim_fb_hash();e.input({t:'pad',p:8,v:113});e.advance(100);
+ if(n%2){assert.equal(e.ex.sim_midi_key_channels(),256);assert.equal(e.ex.sim_midi_last(),16);}else{assert.equal(e.ex.sim_midi_last(),32);assert.equal(e.ex.sim_midi_last_value(),113);}
+ assert.notEqual(e.ex.sim_fb_hash(),previous);e.input({t:'pad',p:8,v:0});e.advance(100);
+ if(n%2){assert.equal(e.ex.sim_midi_key_channels(),256);assert.equal(e.ex.sim_midi_channel_held(),0);}else assert.equal(e.ex.sim_midi_last_value(),113);
  // Exit through the real controller GLOBAL, with the host still blocked.
  b(10);enc(0,-1);assert.equal(e.ex.sim_midi_mode(),0);assert.equal(e.ex.sim_midi_return_wait(),0);assert.equal(e.ex.sim_page(),30);
  const fb=new Uint16Array(e.ex.memory.buffer,e.ex.sim_fb(),57600);assert(new Set(fb).size>3,'Synth MIDI entry page must render instead of going black');

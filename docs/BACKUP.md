@@ -27,3 +27,8 @@ If interrupted, reconnect and select the **same original file**. The pending ope
 Simulator-session JSON and device `.smksynth` are different formats and storage systems. This release does not convert one to the other.
 
 Files are processed by the browser and device; the backup application does not upload bank contents to a server. Your download folder is the place to retain your copies.
+
+
+## Endless MIDI 1.2.1
+
+Edição oficial: Endless MIDI, identidade 19653 para Pro e Elite. Inclui ENDLESS com MIDI USB/TRS por parte, seleção e layers de canais do teclado pelo banco B do MODO MIDI, rodas e sustain, bateria e identificação da versão. Pads A, encoders e faders mantêm os canais de seus mapas. Consulte o [manual atual](MANUAL.md) e as [notas da versão](RELEASE-1.2.1.md) para o fluxo completo. ML1 /19650, ML1a /19651 e Endless MIDI A /19652 atualizam diretamente, preservando os dados salvos.

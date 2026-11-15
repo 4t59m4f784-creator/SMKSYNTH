@@ -1,8 +1,8 @@
-# Building SMKSYNTH 1.2.0
+# Building SMKSYNTH 1.2.1
 
 [Português](BUILD.md) · [English](BUILD.en.md)
 
-Identity: `SMK-37 Pro_19649`. Runtime base: approved MO1a commit `f9a2ab2162a4f19e13709f4f57d95aa30ad65c8b`. Synthesis, sequencing, interface and data formats are preserved from that base.
+Identity: `SMK-37 Pro_19653`. Runtime base: approved Endless MIDI A commit `11d0aa566c079342d7a33fc3e7b382e64f92104e`. Synthesis, sequencing, interface and data formats are preserved from that base.
 
 ## Requirements
 
@@ -24,11 +24,11 @@ The author’s backup is not needed to rebuild. `tools/prepare_factory_seed.c` d
 ```sh
 export JIELI_TOOLCHAIN=/path/to/jieli-linux-toolchains
 python3 tools/build.py --voice-hardware --board smk37 --model pro \
-  --release 1.2.0 --identity 19649 --first-install \
+  --release 1.2.1 --identity 19653 --first-install \
   --factory-bank factory/bank-SMK16P1.bin --sdk /path/to/SDK
 ```
 
-Output: `build/obervave-1.2.0-smk37.fwsc`; distribution name: `SMKSYNTH-1.2.0-SMK37-Pro.fwsc`.
+Output: `build/obervave-1.2.1-smk37.fwsc`; distribution name: `SMKSYNTH-1.2.1-first-install-SMK37-Pro.fwsc`.
 
 The first-install profile uses the platform’s standard full-area loader to initialize `0x4000..0x9CFFF`, including the SMK16P1 seed. The application retains SMK16P1 storage. The browser requires official V016; this is not the SUPER SS3 bank-preserving updater.
 
@@ -37,10 +37,10 @@ The restore journal starts erased at `0x55000..0x56FFF`; the seed occupies `0x57
 ## Simulator and web distribution
 
 ```sh
-sh tools/build_controls_sim.sh
-cp build/controls/SMKSYNTH-1.2.0.wasm web/simulator/obervave-voice.wasm
+SIM_VERSION=1.2.1 sh tools/build_controls_sim.sh
+cp build/controls/SMKSYNTH-1.2.1.wasm web/simulator/obervave-voice.wasm
 node tests/release_demo_wasm_test.mjs
-node tests/release_101_installer_test.mjs
+node tests/release_110_installer_test.mjs
 node tests/release_i18n_test.mjs
 python3 tools/package_release.py build/public-site
 ```
@@ -59,8 +59,13 @@ The GitHub Pages workflow uses that mode. The release workflow uploads the commi
 
 Use the same build command without `--first-install --factory-bank factory/bank-SMK16P1.bin` to build the bank-preserving update. The first-install and update packages are separate; do not interchange them. `obv_supersaw.c` is compiled at `-O2`; the main application and USB paths retain `-Os`. SUPER attribution: [Clipper](https://github.com/isod89/clipper-fm1); see LICENSING.md.
 
-## 1.2.0
+## 1.2.1
 
-`python3 tools/build.py --board smk37 --model pro --release 1.2.0 --identity 19649 --voice-hardware --sdk /path/to/sdk`
+`python3 tools/build.py --board smk37 --model pro --release 1.2.1 --identity 19653 --voice-hardware --sdk /path/to/sdk`
 
-Elite: `--model elite`. First install: add `--first-install --factory-bank factory/bank-SMK16P1.bin`. Update omits both. Simulator: `SIM_VERSION=1.2.0 sh tools/build_controls_sim.sh`. Stable and MO1a use the same runtime paths; OBV_EXPERIMENTAL only shows the experimental boot label.
+Elite: `--model elite`. First install: add `--first-install --factory-bank factory/bank-SMK16P1.bin`. Update omits both. Simulator: `SIM_VERSION=1.2.1 SIM_VERSION=1.2.1 sh tools/build_controls_sim.sh`. Stable and Endless MIDI A use the same runtime paths; OBV_EXPERIMENTAL only shows the experimental boot label.
+
+
+## Endless MIDI 1.2.1
+
+Official edition: Endless MIDI, identity 19653 for Pro and Elite. Includes ENDLESS per-part USB/TRS MIDI, controller bank B channel selection/layers for the keyboard, wheels and sustain, plus battery and release identification. Bank A pads and encoders/faders retain map channels. See the [current manual](MANUAL.en.md) and [release notes](RELEASE-1.2.1.en.md) for the complete workflow. ML1 /19650, ML1a /19651 and Endless MIDI A /19652 can update directly while preserving saved data.

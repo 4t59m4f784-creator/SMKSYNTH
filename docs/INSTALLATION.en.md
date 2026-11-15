@@ -1,11 +1,11 @@
-# SMKSYNTH 1.2.0 - Installation and recovery
+# SMKSYNTH 1.2.1 - Installation and recovery
 
 The same [installer](../install/?lang=en) supports SMK-37 Pro and SMK-37 Elite. It identifies the model and selects a specific package automatically. Use desktop Chrome/Edge over HTTPS, a USB data cable and stable power; close other MIDI apps.
 
 1. Connect and identify. The keyboard is not accessed until you click Connect.
 2. From official V016 of the connected model, the page offers first installation. This initializes/replaces the bank with five patterns and eight favourites.
 3. From supported SMKSYNTH builds, the page offers Update, preserving saved programs, favourites, patterns and settings. Save changes and export a [backup](../backup/?lang=en) before updating.
-4. Check the detected model and operation, confirm and keep the connection until target identity `SMK-37 Pro_19649` or `SMK-37 Elite_19649` is confirmed.
+4. Check the detected model and operation, confirm and keep the connection until target identity `SMK-37 Pro_19653` or `SMK-37 Elite_19653` is confirmed.
 5. Connect the sustain pedal before restarting and keep it released during startup.
 
 ## Interrupted transfers
@@ -20,4 +20,9 @@ Export a backup before returning to M-VAVE firmware. Use the manufacturer's M-UP
 
 ## After installation
 
-See the [manual](MANUAL.en.md) for USB/TRS routing, physical sustain and GLOBE + PLAY Panic. Version 1.2.0 includes ENDLESS and MIDI MODE. Update preserves the saved bank and compatible separate theme/map records. A .smksynth backup contains the synth bank, not MIDI maps or theme. Restore the prior backup to undo synth-bank edits made in another line.
+See the [manual](MANUAL.en.md) for USB/TRS routing, physical sustain and GLOBE + PLAY Panic. Version 1.2.1 includes ENDLESS and MIDI MODE. Update preserves the saved bank and compatible separate theme/map records. A .smksynth backup contains the synth bank, not MIDI maps or theme. Restore the prior backup to undo synth-bank edits made in another line.
+
+
+## Endless MIDI 1.2.1
+
+Official edition: Endless MIDI, identity 19653 for Pro and Elite. Includes ENDLESS per-part USB/TRS MIDI, controller bank B channel selection/layers for the keyboard, wheels and sustain, plus battery and release identification. Bank A pads and encoders/faders retain map channels. See the [current manual](MANUAL.en.md) and [release notes](RELEASE-1.2.1.en.md) for the complete workflow. ML1 /19650, ML1a /19651 and Endless MIDI A /19652 can update directly while preserving saved data.
