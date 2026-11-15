@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import fs from 'node:fs';import assert from 'node:assert/strict';import {Engine} from '../web/simulator/engine.js';
+fs.mkdirSync('build/ml1',{recursive:true});
 const w=fs.readFileSync(process.argv[2]),seed=fs.readFileSync('factory/simulator-session.bin');const e=new Engine(w,seed.buffer.slice(seed.byteOffset,seed.byteOffset+seed.byteLength));e.advance(5000);
 const b=(n,ms=80)=>{e.input({t:'btn',b:n,down:true});e.advance(ms);e.input({t:'btn',b:n,down:false});e.advance(160);};const enc=(n,steps)=>{e.input({t:'enc',e:n,steps});e.advance(160);};const pad=(p,v)=>{e.input({t:'pad',p,v});e.advance(100);};const key=(k,down)=>{e.input({t:'key',k,down});e.advance(100);};
 function bank(){e.input({t:'btn',b:0,down:true});e.input({t:'btn',b:1,down:true});e.advance(80);e.input({t:'btn',b:0,down:false});e.input({t:'btn',b:1,down:false});e.advance(160);}
