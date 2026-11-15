@@ -62,6 +62,13 @@ def check(site):
             if 'docs/' in link and link.endswith('.md') and not link.endswith('.en.md'):
                 dependency(page, link[:-3] + '.en.md')
 
+    # Archived 1.2.0 must keep working for interrupted installations.
+    legacy = site / 'install/legacy-1-2-0/index.html'
+    parser = Links()
+    parser.feed(legacy.read_text())
+    for link in parser.links:
+        dependency(legacy, link)
+
     parser = Links()
     elite = site / 'install-elite/index.html'
     parser.feed(elite.read_text())
