@@ -57,6 +57,10 @@ def check(site):
             assert parser.meta['twitter:card']=='summary_large_image'
             card=(site/'assets/smksynth-social-v2.png').read_bytes()
             assert card[:8]==b'\x89PNG\r\n\x1a\n' and int.from_bytes(card[16:20],'big')==1200 and int.from_bytes(card[20:24],'big')==630
+        if folder == '':
+            embeds = re.findall(r'youtube(?:-nocookie)?\.com/embed/([A-Za-z0-9_-]+)', html)
+            watches = re.findall(r'youtube\.com/watch\?v=([A-Za-z0-9_-]+)', html)
+            assert embeds and watches and set(watches) <= set(embeds), 'Demo video link differs from embedded video'
         for link in parser.links:
             dependency(page, link)
             if 'docs/' in link and link.endswith('.md') and not link.endswith('.en.md'):
