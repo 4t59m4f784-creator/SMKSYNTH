@@ -3,3 +3,6 @@
 
 /* Installation guidance: visible safeguards, with the existing instrument palette. */
 h3{font-size:1rem;margin:22px 0 8px;color:#dce5f1}.notice{border:1px solid #c65065;border-left:4px solid #ee4b64;border-radius:8px;background:#28151e;padding:4px 18px;margin:16px 0}.notice h3{margin-top:14px;color:#fff}.notice li{font-weight:600}.download-links{line-height:2;overflow-wrap:anywhere}.project-notice{border-top:1px solid #35405a;margin-top:20px;padding-top:18px;color:#b6c1d3;line-height:1.7}
+
+/* Shared installer structure: native disclosure boxes are closed by default. */
+.release-summary{border-color:#4b6588}.release-name{font-size:1.2rem;font-weight:750;color:#f5f7fc;margin:8px 0 16px}.guide-box{border:1px solid #25334b;border-radius:12px;margin:22px 0;background:#0e1625}.guide-box>summary{cursor:pointer;padding:20px 24px;font-size:1.15rem;font-weight:700;color:#fafbff}.guide-box>summary:hover{background:#152137;border-radius:12px}.guide-box>summary:focus-visible{outline:3px solid #8abfff;outline-offset:4px}.guide-box[open]>summary{border-bottom:1px solid #25334b;border-radius:12px 12px 0 0}.guide-content{padding:0 24px 20px}.guide-content>h3:first-child{margin-top:20px}@media(max-width:540px){.guide-box>summary{padding:16px}.guide-content{padding:0 16px 16px}}

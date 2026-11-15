@@ -24,6 +24,35 @@ class Links(HTMLParser):
             self.meta[a.get('property',a.get('name'))]=a.get('content')
 
 
+class InstallerLayout(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.boxes = []
+        self.summaries = []
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == 'section' or 'guide-box' in a.get('class', '').split() or a.get('id') in {'novidades-versao', 'preparacao', 'instalar', 'depois-instalacao', 'recuperacao'}:
+            self.boxes.append((a.get('id'), tag, 'open' in a))
+        if tag == 'summary':
+            self.summaries.append(a)
+
+
+def check_installer_layout(html, release):
+    layout = InstallerLayout()
+    layout.feed(html)
+    assert layout.boxes == [
+        ('novidades-versao', 'section', False),
+        ('preparacao', 'details', False),
+        ('instalar', 'section', False),
+        ('depois-instalacao', 'details', False),
+        ('recuperacao', 'details', False),
+    ], 'Installer order, fixed boxes or default-collapsed sections changed; see AGENTS.md'
+    assert all(a.get('data-pt') and a.get('data-en') for a in layout.summaries[:3]), 'Guide summaries need PT/EN labels'
+    highlights = re.search(r'<section[^>]*id="novidades-versao".*?</section>', html, re.S).group()
+    assert release['version'] in highlights and release['edition'] in highlights, 'Release box must show current version and edition'
+
+
 def check(site):
     site = site.resolve()
     release = json.loads((ROOT / 'RELEASE.json').read_text())
@@ -47,6 +76,8 @@ def check(site):
         assert page.read_bytes() == source.read_bytes(), f'Stale public page: {folder or "home"}'
         html = page.read_text()
         assert 'i18n.js' in html, f'Missing language support: {page}'
+        if folder == 'install':
+            check_installer_layout(html, release)
         parser = Links()
         parser.feed(html)
         if folder in ('', 'install'):
