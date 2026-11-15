@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {Updater} from './protocol.js';
 import {productOf,logicalImage,filesOk} from './package.js';
-export const PINS=Object.freeze({"pro.update": {"name": "Instalar ML1 · Pro", "product": "SMK-37 Pro_19650", "url": "./SMKSYNTH-1.2.0-ml1-SMK37-Pro.fwsc", "size": 651819, "sha": "e909d425652f5abd08172ac27a17ed7d27f14ad5913f40ca230405660df735dc"}, "pro.release": {"name": "Retornar à oficial 1.2.0 · Pro", "product": "SMK-37 Pro_19649", "url": "./SMKSYNTH-1.2.0-return-SMK37-Pro.fwsc", "size": 651819, "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"}, "elite.update": {"name": "Instalar ML1 · Elite", "product": "SMK-37 Elite_19650", "url": "./SMKSYNTH-1.2.0-ml1-SMK37-Elite.fwsc", "size": 651819, "sha": "20442418d7647c55c43ba83c108d584cd6597abd227e6e346e53d1d586e0c952"}, "elite.release": {"name": "Retornar à oficial 1.2.0 · Elite", "product": "SMK-37 Elite_19649", "url": "./SMKSYNTH-1.2.0-return-SMK37-Elite.fwsc", "size": 651819, "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"}});
-export const PENDING='smksynth.midi.ml1.pending.v1';
+export const PINS=Object.freeze({"pro.update": {"name": "Instalar ML1a · Pro", "product": "SMK-37 Pro_19651", "url": "./SMKSYNTH-1.2.0-ml1a-SMK37-Pro.fwsc", "size": 651819, "sha": "99695155c4c27b0b07df8addc621066804680f52de9990aedc795c2ee9c658e9"}, "pro.release": {"name": "Retornar à oficial 1.2.0 · Pro", "product": "SMK-37 Pro_19649", "url": "./SMKSYNTH-1.2.0-return-SMK37-Pro.fwsc", "size": 651819, "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"}, "elite.update": {"name": "Instalar ML1a · Elite", "product": "SMK-37 Elite_19651", "url": "./SMKSYNTH-1.2.0-ml1a-SMK37-Elite.fwsc", "size": 651819, "sha": "59673457f5192fd2d1d10407fcdccd836920f1a74a31a6a9437419232ecbd897"}, "elite.release": {"name": "Retornar à oficial 1.2.0 · Elite", "product": "SMK-37 Elite_19649", "url": "./SMKSYNTH-1.2.0-return-SMK37-Elite.fwsc", "size": 651819, "sha": "f7b87830f61b2b23b62d497bcbebc8ed5519a16a3396e3c7ae595d164ece1fde"}});
+export const PENDING='smksynth.midi.ml1a.pending.v1';
 export function modelKey(id){const m=id?.model?.replace(/^ota-/,'');if(m==='SMK-37 Pro')return 'pro';if(m==='SMK-37 Elite')return 'elite';throw Error('Modelo recusado. Esta experimental aceita somente SMK-37 Pro ou Elite.');}
 export const pinKey=(kind,id)=>modelKey(id)+'.'+kind;
 export async function validate(raw,kind){
@@ -16,7 +16,7 @@ export async function validate(raw,kind){
  return {raw,image,product,sha};
 }
 
-const sourceAllowed=(kind,text)=>{const m=/^(SMK-37 Pro|SMK-37 Elite)_(\d+)$/.exec(text||'');if(!m)return false;const v=Number(m[2]);return m[1]==='SMK-37 Pro'?v>=19618&&v<=19650&&v!==19629:[19618,19629,19634,...Array.from({length:16},(_,i)=>19635+i)].includes(v);};
+const sourceAllowed=(kind,text)=>{const m=/^(SMK-37 Pro|SMK-37 Elite)_(\d+)$/.exec(text||'');if(!m)return false;const v=Number(m[2]);return m[1]==='SMK-37 Pro'?v>=19618&&v<=19651&&v!==19629:[19618,19629,19634,...Array.from({length:17},(_,i)=>19635+i)].includes(v);};
 export function readPending(storage,id){try{const p=JSON.parse(storage.getItem(PENDING+'.'+modelKey(id)));return p&&p.model===modelKey(id)&&PINS[p.model+'.'+p.kind]?.sha===p.sha?p:null}catch{return null;}}
 export function modeFor(kind,id,pending){
  if(!['update','release'].includes(kind))throw Error('Operação inválida.');const model=modelKey(id),pin=PINS[model+'.'+kind],name=model==='pro'?'SMK-37 Pro':'SMK-37 Elite';

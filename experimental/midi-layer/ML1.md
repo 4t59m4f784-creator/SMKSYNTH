@@ -1,4 +1,4 @@
-# SMKSYNTH ML1 /19650 — MIDI Layers
+# SMKSYNTH ML1a /19651 — MIDI Layers
 
 Experimental sobre a oficial 1.2.0, para Pro e Elite. Banco B: pads 1–16 selecionam os canais do teclado. Segure um e acrescente outros para formar um layer; soltar mantém a seleção; novo gesto com um único pad substitui o layer. Troca de bancos mantém a seleção. Entrada no MIDI MODE e troca de mapa voltam ao canal principal; a seleção de canais é temporária.
 
@@ -12,4 +12,10 @@ O banco do synth, seus programas, ENDLESS, tema e registros MIDI existentes são
 
 Testes nativos com AddressSanitizer/UndefinedBehaviorSanitizer: seleção, ausência de notas/CCs mapeados no B, 37 teclas x 16 canais, trocas com notas mantidas, mesmo pitch por duas teclas, sustain em canais antigos/novos, bend de 14 bits, CC1, fila bloqueada, retrigger, Panic e retorno ao synth. Testes WASM exercitam os controles reais e geram as imagens da interface. Os testes automatizados não medem o timing real da saída TRS; teste no hardware antes de promover.
 
-Build: `python3 tools/build.py --board smk37 --model pro --release 1.2.0-ml1 --experimental-id 19650 --voice-hardware --sdk /path/to/sdk`. Elite: `--model elite`. Não use --first-install. Simulador: `SIM_VERSION=1.2.0-ml1 sh tools/build_controls_sim.sh`.
+Build: `python3 tools/build.py --board smk37 --model pro --release 1.2.0-ml1a --experimental-id 19651 --voice-hardware --sdk /path/to/sdk`. Elite: `--model elite`. Não use --first-install. Simulador: `SIM_VERSION=1.2.0-ml1a sh tools/build_controls_sim.sh`.
+
+## Correção ML1a /19651
+
+Reproduzido em teste nativo com as filas reais: um host USB configurado que não lê MIDI pode encher a fila e bloquear também a TRS, inclusive em um só canal. A TRS agora depende somente da disponibilidade de sua UART. Se o USB exceder sua fila, ao retomar a leitura descarta eventos antigos e envia sustain off, all notes off e all sound off nos 16 canais antes de aceitar novos gestos. Notas mantidas durante essa retomada precisam ser tocadas novamente no receptor USB; a TRS continua normalmente. Não altera os mapas, programas ou a versão pública 1.2.0.
+
+Validação de hardware pendente: os testes automatizados cobrem a falha e a recuperação, mas não substituem o teste físico do cabo.

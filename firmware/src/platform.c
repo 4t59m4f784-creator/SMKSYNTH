@@ -387,21 +387,7 @@ static int midi_get(uint8_t *st, uint8_t *d1, uint8_t *d2)   /* 1: a message (st
     *d2 = (uint8_t)(pk >> 24);
     return 1;
 }
-static int midi_send_ready(void) {
-#if BOARD_SMK37
- return smk_tx_ready() && (!usb.config || mo_w-mo_r<MQ);
-#else
- return usb.config && mo_w-mo_r<MQ;
-#endif
-}
-static void midi_send(uint32_t st, uint32_t d1, uint32_t d2)   /* from the main loop only */
-{
-#if BOARD_SMK37
-    if(!midi_send_ready())return;
-    smk_tx_message(st,d1,d2);
-#endif
-    midi_out_event((st >> 4) | st << 8 | (d1 & 0x7Fu) << 16 | (d2 & 0x7Fu) << 24);
-}
+#include "smk_midi_output.h"
 
 /* ---- the timer: 10 kHz key scan, milliseconds, USB at 2 kHz. It outranks the audio ISR; nested in a
  * render it only scans, counts and feeds the USB audio stream (as sloopDX main.c) */
