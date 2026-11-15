@@ -140,7 +140,7 @@ static void mui_live_draw(unsigned parts){
  for(unsigned band=0;band<3;band++){if(!(parts>>band&1u))continue;
   unsigned y=band==0?0:band==1?120:183,h=band==0?120:band==1?63:57;
   cv_begin(240,h,C_PANEL);cv_oy=-(int)y;
-  zm_text(8,2,"MIDI MODE",24,C_CREAM);zm_text(176,8,"USB/TRS",16,C_AMBER);zm_text(8,27,status,16,status==meta?C_AMBER:mui_eq(mm_status,"SAVED")?C_CREAM:C_RED);cv_rect(8,45,224,2,C_RED);
+  zm_text(8,2,"MIDI MODE",24,C_CREAM);zm_text(146,8,"USB/TRS",16,C_AMBER);smk_battery_icon(209,9);zm_text(8,27,status,16,status==meta?C_AMBER:mui_eq(mm_status,"SAVED")?C_CREAM:C_RED);cv_rect(8,45,224,2,C_RED);
   unsigned size=24;while(size>16&&zm_width(name,size)>120)size-=2;zm_text(8,51,name,size,C_CREAM);zm_text(8,78,desc,16,C_AMBER);
   size=slen(value)>3u?32:40;zm_text(232-(int)zm_width(value,size),49,value,size,C_RED);mm_ui_bars();
   cv_rect(8,123,224,1,C_RULE);zm_text(8,127,mm_pbank?"CHANNELS":"PADS A",16,C_AMBER);zm_text(232-(int)zm_width(pad,16),127,pad,16,C_CREAM);

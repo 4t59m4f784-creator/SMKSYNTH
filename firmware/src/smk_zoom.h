@@ -70,6 +70,7 @@ static void zm_head(const char*title,const char*sub,unsigned part){
  if(part>='A'&&part<='D'&&slen(sub)>=4u&&sub[0]>='0'&&sub[0]<='9'&&sub[1]>='0'&&sub[1]<='9'&&sub[2]>='0'&&sub[2]<='9'&&sub[3]==' '){
   char prog[4];memcpy(prog,sub,3);prog[3]=0;zm_text(8,31,prog,16,c);zm_text(8+(int)zm_width(prog,16),31,sub+3,16,C_DIMT);
  }else zm_text(8,31,sub,16,C_DIMT);
+ smk_battery_icon(181,34);
  cv_rect(8,50,224,2,c);
 }
 static void zm_focus_named(const char*l,const char*v){if(!(zm_zoom||zm_scope_active())||is_seq_page(page)||layer)return;zm_focus_knob=0;zm_copy(zm_focus_label,l,sizeof zm_focus_label);zm_copy(zm_focus_value,v,sizeof zm_focus_value);zm_focus_t=fm1_ms;zm_focus_on=1;}
@@ -108,7 +109,7 @@ static void zm_grid(const char*title,const knob_view_t*k){
  if(obv_drums_selected()&&(page==PG_DKIT||page==PG_DSOUND)){head=DRUM_NAME[drum_ui_lane[seq_trk%NTRK]%8u];zm_copy(sub,page==PG_DKIT?"DRUM KIT":"DRUM SOUND",sizeof sub);}
  for(unsigned y=0;y<240;y+=120){mui_begin(y);
   if(zm_scope_active()){
-   zm_center(120,8,"SMKSYNTH",32,C_CREAM);cv_stripes(26,2,2,48,192,1);cv_rect(8,49,224,2,C_RED);
+   zm_center(120,8,"SMKSYNTH",32,C_CREAM);cv_stripes(26,2,2,48,192,1);cv_rect(8,49,224,2,C_RED);smk_battery_icon(209,34);
   }else{
    zm_head(page==PG_PERFORM&&!layer?name:head,page==PG_PERFORM&&!layer?"":sub,'A'+seq_trk%NTRK);
    ui_pattern_badge(208,31);
@@ -122,4 +123,4 @@ static void zm_grid(const char*title,const knob_view_t*k){
  }
  if(zm_scope_active()){zm_scope_plot();zm_activity();}
 }
-static void zm_theme_draw(void){for(unsigned y=0;y<240;y+=120){mui_begin(y);zm_head("THEME","GLOBAL / DISPLAY",'G');zm_center(120,65,"K1 THEME",24,C_AMBER);mui_knob(120,126,23,zm_zoom,1,C_AMBER,0);zm_center(120,171,zm_zoom?"ZOOM":"OBERVAVE",32,C_CREAM);zm_text(8,222,zm_theme_pending==2?"SAVE FAILED / RETRY":zm_theme_pending?"WAIT: STOP / RELEASE":"GLOBE NEXT",16,C_DIMT);mui_end(y);}}
+static void zm_theme_draw(void){for(unsigned y=0;y<240;y+=120){mui_begin(y);zm_head("THEME",SMK_RELEASE_LABEL,'G');zm_center(120,65,"K1 THEME",24,C_AMBER);mui_knob(120,126,23,zm_zoom,1,C_AMBER,0);zm_center(120,171,zm_zoom?"ZOOM":"OBERVAVE",32,C_CREAM);zm_text(8,222,zm_theme_pending==2?"SAVE FAILED / RETRY":zm_theme_pending?"WAIT: STOP / RELEASE":APP_VER,16,C_DIMT);mui_end(y);}}

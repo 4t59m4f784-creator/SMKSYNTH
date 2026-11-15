@@ -1,14 +1,15 @@
 {
-  "version": "1.2.0-ml1a",
-  "identity": 19651,
+  "edition": "Endless MIDI A",
+  "version": "1.2.0-ema",
+  "identity": 19652,
   "official_base": "1.2.0 /19649",
   "native_asan_ubsan": "passed",
   "max_tested_keys": 37,
   "max_tested_channels": 16,
-  "static_ram_bytes": 95648,
+  "static_ram_bytes": 95664,
   "static_ram_limit": 98304,
   "pool_bytes": 328368,
   "pool_limit": 344064,
-  "wasm_sha256": "f9a9a7e7510b1c372632a9ae663f44f42611defc7011aa5842d66fdbd84f83fd",
+  "wasm_sha256": "613b68abb564ea6009ca280f70832d10ab64a06115683cb3a45423b1fd0a79ad",
   "hardware_tested": false
 }

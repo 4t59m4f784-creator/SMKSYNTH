@@ -1,4 +1,4 @@
-name: MIDI Layers ML1
+name: Endless MIDI A
 on:
   push:
     branches: [experimental/midi-layer-ml1]
@@ -19,6 +19,7 @@ jobs:
           sh tests/run_physical_controls_tests.sh
           cc -O1 -g -fsanitize=address,undefined -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/ml1/layer-asan tests/midi_layer_test.c
           ASAN_OPTIONS=detect_leaks=0 build/ml1/layer-asan
+          node tests/battery_release_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm
           node tests/midi_layer_installer_test.mjs
           python3 tests/midi_layer_packages_test.py
           node tests/midi_layer_wasm_test.mjs experimental/midi-layer/simulator/obervave-voice.wasm

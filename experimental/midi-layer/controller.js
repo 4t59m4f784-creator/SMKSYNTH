@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {InstallService,PINS,validate,modeFor,readPending,pinKey,modelKey} from './service.js?v=ml1a';
+import {InstallService,PINS,validate,modeFor,readPending,pinKey,modelKey} from './service.js?v=ema';
 const $=id=>document.getElementById(id);
 const buffers={};
 let service=null,device=null,busy=false,choice=null;
@@ -16,7 +16,7 @@ async function fetchPackages(){try{
   const r=await fetch(PINS[kind].url,{cache:'no-store'});if(!r.ok)throw Error('Download indisponível: '+kind);
   const raw=new Uint8Array(await r.arrayBuffer());await validate(raw,kind);buffers[kind]=raw;
  }
- status('packageStatus','ML1a /19651 e retornos oficiais Pro/Elite verificados: SHA-256, identidade e CRCs aprovados.');
+ status('packageStatus','Endless MIDI A /19652 e retornos oficiais Pro/Elite verificados: SHA-256, identidade e CRCs aprovados.');
 }catch(e){for(const kind of Object.keys(buffers))delete buffers[kind];status('packageStatus','Pacotes bloqueados: '+e.message);log(e.message)}refresh()}
 $('connect').addEventListener('click',async()=>{
  if(busy)return;device=null;service=null;refresh();$('connect').disabled=true;status('deviceStatus','Solicitando acesso USB-MIDI e consultando identidade…');
@@ -32,7 +32,7 @@ $('connect').addEventListener('click',async()=>{
 function prepare(kind){
  if(busy||Object.keys(buffers).length!==Object.keys(PINS).length||!service||!mode(kind))return;choice=kind;
  $('confirmTitle').textContent=(mode(kind)==='resume'?'Retomar: ':'')+PINS[pinKey(kind,device)].name;
- $('confirmDetails').textContent='Origem: '+device.text+'. Destino: '+PINS[pinKey(kind,device)].product+'. '+(kind==='update'?'Instala ML1a /19651: banco B seleciona os canais do teclado; pads simultâneos formam layers. Preserva banco, programas, tema e mapas MIDI. Exporte um backup antes do teste.':'Retorna à oficial 1.2.0 /19649 preservando banco, tema e mapas MIDI.')+' Se houver restauração pendente, conclua-a com o mesmo arquivo antes de atualizar.';
+ $('confirmDetails').textContent='Origem: '+device.text+'. Destino: '+PINS[pinKey(kind,device)].product+'. '+(kind==='update'?'Instala Endless MIDI A /19652: banco B seleciona os canais do teclado; pads simultâneos formam layers. Preserva banco, programas, tema e mapas MIDI. Exporte um backup antes do teste.':'Retorna à oficial 1.2.0 /19649 preservando banco, tema e mapas MIDI.')+' Se houver restauração pendente, conclua-a com o mesmo arquivo antes de atualizar.';
  $('confirmWrite').textContent='Confirmar firmware';$('confirmation').showModal();
 }
 for(const kind of ['update','release'])$(kind).addEventListener('click',()=>prepare(kind));
@@ -53,5 +53,5 @@ $('confirmation').addEventListener('close',async()=>{
  finally{busy=false;refresh()}
 });
 window.addEventListener('beforeunload',e=>{if(busy){e.preventDefault();e.returnValue=''}});
-$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-ml1a-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+$('downloadLog').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([lines.join('\n')+'\n'],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='smksynth-ema-installer-log.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 refresh();fetchPackages();

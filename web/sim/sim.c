@@ -348,3 +348,6 @@ EXPORT uint32_t sim_midi_key_channels(void){return mm_key_channels;}
 EXPORT uint32_t sim_midi_channel_held(void){return mm_channel_held;}
 EXPORT uint32_t sim_midi_pad_bank(void){return mm_pbank;}
 EXPORT uint32_t sim_midi_key_sent(uint32_t k){return k<37?mm_key_sent[k]:0;}
+
+EXPORT void sim_battery_raw(uint32_t raw){fm1_in.batt=(uint16_t)raw;}
+EXPORT uint32_t sim_battery_level(void){return smk_battery_level;}

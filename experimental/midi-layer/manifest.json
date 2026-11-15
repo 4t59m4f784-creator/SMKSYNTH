@@ -1,10 +1,10 @@
 {
   "pro.update": {
-    "name": "Instalar ML1a \u00b7 Pro",
-    "product": "SMK-37 Pro_19651",
-    "url": "./SMKSYNTH-1.2.0-ml1a-SMK37-Pro.fwsc",
+    "name": "Instalar Endless MIDI A \u00b7 Pro",
+    "product": "SMK-37 Pro_19652",
+    "url": "./SMKSYNTH-1.2.0-ema-SMK37-Pro.fwsc",
     "size": 651819,
-    "sha": "99695155c4c27b0b07df8addc621066804680f52de9990aedc795c2ee9c658e9"
+    "sha": "c01428929ac647e840b96b93983ad1d9167be583e494979ffba1f3624bd9ef54"
   },
   "pro.release": {
     "name": "Retornar \u00e0 oficial 1.2.0 \u00b7 Pro",
@@ -14,11 +14,11 @@
     "sha": "ae19658ed7160a12046db99fc2d3570aa10b653f7d1d9f17a3fa6dbf7ff1295c"
   },
   "elite.update": {
-    "name": "Instalar ML1a \u00b7 Elite",
-    "product": "SMK-37 Elite_19651",
-    "url": "./SMKSYNTH-1.2.0-ml1a-SMK37-Elite.fwsc",
+    "name": "Instalar Endless MIDI A \u00b7 Elite",
+    "product": "SMK-37 Elite_19652",
+    "url": "./SMKSYNTH-1.2.0-ema-SMK37-Elite.fwsc",
     "size": 651819,
-    "sha": "59673457f5192fd2d1d10407fcdccd836920f1a74a31a6a9437419232ecbd897"
+    "sha": "c034edeac5dc0a7292936b9e9834b95acb7f0f8dcc67b98a92e61b54823f3fe4"
   },
   "elite.release": {
     "name": "Retornar \u00e0 oficial 1.2.0 \u00b7 Elite",
