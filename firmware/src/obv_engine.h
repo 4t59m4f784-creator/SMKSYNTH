@@ -889,18 +889,15 @@ static super_state_t super_state[NV];
 static super_plain_state_t super_plain_state[NV];
 
 /* ---- the samples of one voice: oscillators -> mix -> drive -> filter -> amp -> pan */
-static void voice_render(voice_t *v, int32_t *out)
+static void voice_render_state(voice_t *v, const part_t *g, super_state_t *ss, super_plain_state_t *ps, int32_t *out)
 {
     uint32_t i, inc1 = v->inc1, inc2 = v->inc2, pw1 = v->pw1, pw2 = v->pw2, d1 = inc1 >> 15, d2 = inc2 >> 15;
     int32_t amp0 = v->amp0, da = v->amp1 - v->amp0, gl = v->gl, gr = v->gr, o2n = v->o2.prev;
-    const part_t *g = &pt[v->part];
     int32_t l1 = g->lvl1, l2 = g->lvl2, ln = g->lvln, drv = g->drive_q12, morph_q = g->morph_q;
     uint32_t ft = g->ftype, xq = g->xmod_q, sy = g->sync_on, ww1 = g->w1, ww2 = g->w2;
     int32_t hw1 = (ww1 & OSC_SAW ? -65536 : 0) + (ww1 & OSC_PLS ? -65536 : 0);
     int32_t hw2 = (ww2 & OSC_SAW ? -65536 : 0) + (ww2 & OSC_PLS ? -65536 : 0);
     int32_t super_buf[2][CTL];
-    super_state_t *ss = &super_state[v - vc];
-    super_plain_state_t *ps = &super_plain_state[v - vc];
     uint32_t has_super = ww1 == W_SUPER;
     uint32_t buffered1 = ww1 == W_SUPER || (has_super && ww1 == W_SAW);
     uint32_t buffered2 = has_super && ww2 == W_SAW;
@@ -946,6 +943,12 @@ static void voice_render(voice_t *v, int32_t *out)
     (void)o2n;
 }
 
+static void voice_render(voice_t *v,int32_t *out)
+{
+    unsigned card=(unsigned)(v-vc);
+    voice_render_state(v,&pt[v->part],&super_state[card],&super_plain_state[card],out);
+}
+
 #include "obv_drums.h"
 #include "smk_dual_core.h"
 
@@ -982,26 +985,32 @@ static void engine_audio(int32_t *out, uint32_t n)
         }
         for (p = 0; p < NPART; p++) { lfo_tick(&pt[p]); block_globals(&pt[p]); }
         dp_end(DP_CTRL);
-        uint32_t dc_mask = dc_begin();
-        for (v = 0; v < NV; v++) {
-            if (vc[v].ae.stage == E_IDLE && !vc[v].gate) {
-                if (ui_vlevel[v]) { ui_vlevel[v] = 0; vc[v].amp0 = vc[v].amp1 = 0; }
+        /* All voice control stays on CPU0, before rendering starts. Neither
+         * events nor part globals change until the private worker is joined. */
+        uint32_t active=0;
+        for(v=0;v<NV;v++){
+            if(vc[v].ae.stage==E_IDLE&&!vc[v].gate){
+                if(ui_vlevel[v]){ui_vlevel[v]=0;vc[v].amp0=vc[v].amp1=0;}
                 continue;
             }
-            p = vc[v].part % NPART;
-            used |= 1u << p;
-            unsigned dp_slot=super_voice(v)?DP_SUPER:DP_ANALOG;
-            dp_begin(dp_slot);
-            voice_block(&vc[v], v);
-            if (obv_engines[obv_voice_engine[v]]->render)
-                obv_engines[obv_voice_engine[v]]->render(&vc[v], bus[p] + 2u * b);
-            else voice_render(&vc[v], bus[p] + 2u * b);
-            dp_end(dp_slot);
+            active|=1u<<v;used|=1u<<(vc[v].part%NPART);
+            unsigned slot=super_voice(v)?DP_SUPER:DP_ANALOG;
+            dp_begin(slot);voice_block(&vc[v],v);dp_end(slot);
+        }
+        uint32_t dc_mask=dc_begin(active);
+        for(v=0;v<NV;v++)if((active&~dc_mask)&(1u<<v)){
+            p=vc[v].part%NPART;
+            unsigned slot=super_voice(v)?DP_SUPER:DP_ANALOG;
+            dp_begin(slot);
+            if(obv_engines[obv_voice_engine[v]]->render)
+                obv_engines[obv_voice_engine[v]]->render(&vc[v],bus[p]+2u*b);
+            else voice_render(&vc[v],bus[p]+2u*b);
+            dp_end(slot);
         }
         dp_begin(DP_DRUM);
         for (p = 0; p < NPART; p++) {
             const obv_engine_ops_t *ops = obv_engines[obv_engine_track[p].active];
-            if (!(dc_mask & (1u << p)) && ops->track_render && ops->track_render(p, bus[p] + 2u * b)) used |= 1u << p;
+            if (ops->track_render && ops->track_render(p, bus[p] + 2u * b)) used |= 1u << p;
         }
         dp_end(DP_DRUM);
         used |= dc_finish(dc_mask, bus, b);

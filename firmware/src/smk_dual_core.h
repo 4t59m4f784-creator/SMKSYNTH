@@ -1,12 +1,13 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* DC1: transactional DRUM-X worker. CPU0 alone owns events, patches, MIDI,
- * voices, mixer and FX. CPU1 renders snapshots into private buffers. Commit
- * only after successful completion; a rejected/failed job is re-rendered from
- * the untouched original on CPU0. No extra block latency or DSP changes. */
+/* DC3: transactional melodic sample rendering. CPU0 owns events, envelopes,
+ * UI, allocation, drums, mixing and FX. Part globals/patches are immutable
+ * from dispatch to join: main loop is suspended and Timer5 only queues input.
+ * CPU1 writes private voice/oscillator states and output. A failed job commits
+ * nothing and CPU0 renders from the untouched prepared original. */
 #if OBV_DUAL_CORE
 #ifdef OBV_HOST
 #ifdef DC_TEST_BACKEND
-static int dc_host_run(void (*fn)(uint32_t), uint32_t arg);
+static int dc_host_run(void (*fn)(uint32_t),uint32_t arg);
 static int dc_host_wait(void);
 #define DC_RUN(f,a) dc_host_run(f,a)
 #define DC_WAIT() dc_host_wait()
@@ -28,20 +29,21 @@ static int dc_sync_run(void (*fn)(uint32_t),uint32_t arg){fn(arg);return 1;}
 static volatile uint8_t dc_enabled=1;
 static volatile uint32_t dc_jobs,dc_fallbacks,dc_worker_peak_ticks,dc_wait_peak_ticks;
 static struct {
-    obv_dhit_t hits[NPART][8];
-    uint8_t params[NPART][(NPARAM+3u)&~3u] __attribute__((aligned(4)));
-    uint16_t peaks[NPART][8];
-    int32_t out[NPART][2u*CTL];
-    uint32_t used,ticks;
+    voice_t voice[NV];
+    super_state_t super[NV];
+    super_plain_state_t plain[NV];
+    int32_t out[NV][2u*CTL];
+    uint32_t ticks;
 } dc_work DC_POOL;
 static void dc_worker(uint32_t mask)
 {
-    uint32_t t0=DC_TICKS(),used=0;
-    for(unsigned p=0;p<NPART;p++)if(mask&(1u<<p)){
-        memset(dc_work.out[p],0,sizeof dc_work.out[p]);
-        if(drums_render_state(dc_work.hits[p],dc_work.params[p],dc_work.peaks[p],dc_work.out[p]))used|=1u<<p;
+    uint32_t t0=DC_TICKS();
+    for(unsigned v=0;v<NV;v++)if(mask&(1u<<v)){
+        memset(dc_work.out[v],0,sizeof dc_work.out[v]);
+        voice_render_state(&dc_work.voice[v],&pt[dc_work.voice[v].part],
+            &dc_work.super[v],&dc_work.plain[v],dc_work.out[v]);
     }
-    dc_work.used=used;dc_work.ticks=DC_TICKS()-t0;
+    dc_work.ticks=DC_TICKS()-t0;
 }
 /* may_alias allows aligned word copies of object representations without
  * strict-aliasing UB. Unaligned ends safely use the original byte path. */
@@ -58,55 +60,65 @@ static __attribute__((noinline)) void dc_copy(void *dst,const void *src,unsigned
     }
     while(n--)*d++=*s++;
 }
-static uint32_t dc_begin(void)
+/* Match the renderer itself, including a fading voice during engine switch. */
+static unsigned dc_super(unsigned v){return pt[vc[v].part].w1==W_SUPER;}
+static uint32_t dc_begin(uint32_t active)
 {
-    uint32_t mask=0;
     if(!dc_enabled||!DC_READY())return 0;
-    /* One busiest kit on CPU1; CPU0 can concurrently render the remaining
-     * kits as well as melodic cards. Never serialize all drum tracks on CPU1. */
-    unsigned pick=NPART,best=0;
-    for(unsigned p=0;p<NPART;p++)if(obv_engine_track[p].active==OBV_DRUMS){
-        unsigned cost=0;
-        for(unsigned l=0;l<8;l++)cost+=!!(drum_hit[p][l].core.active||drum_hit[p][l].core.trig);
-        if(cost>best){best=cost;pick=p;}
-    }
+    unsigned total=0,selected=0;uint32_t mask=0;
+    for(unsigned v=0;v<NV;v++)if((active&(1u<<v))&&!obv_engines[obv_voice_engine[v]]->render)
+        total+=dc_super(v)?3u:2u;
+    /* Approximate half the sample cost; prefer SUPER, but normal voices also
+     * offload when no SUPER is used. Keep a single active voice on CPU0. */
+    if(total<4u)return 0;
+    for(unsigned pass=0;pass<2;pass++)for(unsigned v=0;v<NV;v++)
+        if((active&(1u<<v))&&!obv_engines[obv_voice_engine[v]]->render&&!!dc_super(v)==!pass){
+            unsigned cost=dc_super(v)?3u:2u;
+            if(selected+cost>total/2u)continue;
+            selected+=cost;mask|=1u<<v;
+        }
+    if(!mask)return 0;
     dp_begin(DP_COPY);
-    if(pick<NPART){mask=1u<<pick;
-        dc_copy(dc_work.hits[pick],drum_hit[pick],sizeof drum_hit[pick]);
-        dc_copy(dc_work.params[pick],live_p[pick].v,NPARAM);
+    for(unsigned v=0;v<NV;v++)if(mask&(1u<<v)){
+        dc_copy(&dc_work.voice[v],&vc[v],sizeof vc[v]);
+        /* Normal render only clears SUPER.active; no stale SUPER fields are
+         * read or committed. Avoid copying the unused side-oscillator bank. */
+        if(dc_super(v)){
+            dc_copy(&dc_work.super[v],&super_state[v],sizeof super_state[v]);
+            dc_copy(&dc_work.plain[v],&super_plain_state[v],sizeof super_plain_state[v]);
+        }
     }
     dp_end(DP_COPY);
-    if(!mask)return 0;
     if(!DC_RUN(dc_worker,mask)){if(DP_RECORD)dc_fallbacks++;return 0;}
     if(DP_RECORD)dc_jobs++;return mask;
 }
 static uint32_t dc_finish(uint32_t mask,int32_t buses[NPART][2u*HALF_FRAMES],uint32_t b)
 {
-    uint32_t used=0,t0;
-    if(!mask)return 0;
-    t0=DC_TICKS();
-    dp_begin(DP_WAIT);
+    uint32_t t0;if(!mask)return 0;
+    t0=DC_TICKS();dp_begin(DP_WAIT);
     if(DC_WAIT()!=0){
-        dp_end(DP_WAIT);dp_begin(DP_DRUM);
-        if(DP_RECORD)dc_fallbacks++;
-        for(unsigned p=0;p<NPART;p++)if(mask&(1u<<p))
-            if(drums_render(p,buses[p]+2u*b))used|=1u<<p;
-        dp_end(DP_DRUM);return used;
+        dp_end(DP_WAIT);if(DP_RECORD)dc_fallbacks++;
+        for(unsigned v=0;v<NV;v++)if(mask&(1u<<v)){
+            unsigned slot=dc_super(v)?DP_SUPER:DP_ANALOG;
+            dp_begin(slot);voice_render(&vc[v],buses[vc[v].part]+2u*b);dp_end(slot);
+        }
+        return 0;
     }
-    dp_end(DP_WAIT);
-    uint32_t wait=DC_TICKS()-t0;
+    dp_end(DP_WAIT);uint32_t wait=DC_TICKS()-t0;
     if(DP_RECORD&&wait>dc_wait_peak_ticks)dc_wait_peak_ticks=wait;
     if(DP_RECORD&&dc_work.ticks>dc_worker_peak_ticks)dc_worker_peak_ticks=dc_work.ticks;
     dp_begin(DP_COPY);
-    for(unsigned p=0;p<NPART;p++)if(mask&(1u<<p)){
-        dc_copy(drum_hit[p],dc_work.hits[p],sizeof drum_hit[p]);
-        for(unsigned l=0;l<8;l++)drum_peak[p][l]=dc_work.peaks[p][l];
-        for(unsigned i=0;i<2u*CTL;i++)buses[p][2u*b+i]+=dc_work.out[p][i];
+    for(unsigned v=0;v<NV;v++)if(mask&(1u<<v)){
+        dc_copy(&vc[v],&dc_work.voice[v],sizeof vc[v]);
+        if(dc_super(v)){
+            dc_copy(&super_state[v],&dc_work.super[v],sizeof super_state[v]);
+            dc_copy(&super_plain_state[v],&dc_work.plain[v],sizeof super_plain_state[v]);
+        }else super_state[v].active=0;
+        for(unsigned i=0;i<2u*CTL;i++)buses[vc[v].part][2u*b+i]+=dc_work.out[v][i];
     }
-    dp_end(DP_COPY);
-    return dc_work.used;
+    dp_end(DP_COPY);return 0;
 }
 #else
-#define dc_begin() 0u
+#define dc_begin(active) 0u
 #define dc_finish(mask,buses,b) 0u
 #endif
