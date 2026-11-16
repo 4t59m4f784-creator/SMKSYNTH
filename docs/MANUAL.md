@@ -1,8 +1,8 @@
-# SMKSYNTH 1.2.1 - Endless MIDI - Manual completo
+# SMKSYNTH 1.2.2 - Endless MIDI - Manual completo
 
-[PDF](pdf/SMKSYNTH-1.2.1-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.2.2-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Referência: firmware 1.2.1, SMK-37 Pro_19653 / SMK-37 Elite_19653.
+Referência: firmware 1.2.2, SMK-37 Pro_19655 / SMK-37 Elite_19655.
 
 ## Índice
 
@@ -41,7 +41,7 @@ Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os 
 
 ## 1. Visão geral e navegação
 
-Firmware 1.2.1 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
+Firmware 1.2.2 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
 
 ![knobs](diagrams/knobs-pt.svg)
 
@@ -119,7 +119,7 @@ Performance com valores é a tela padrão. PATCH curto abre a tela de logo, osci
 
 ## Bateria e identificação da versão
 
-Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.2.1. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
+Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.2.2. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
 
 O medidor discreto de bateria aparece nos cabeçalhos Obervave e Zoom, no osciloscópio, na tela ENDLESS e na performance do MODO MIDI. Usa a leitura existente do instrumento, filtrada para evitar oscilações. Não altera o áudio nem grava configurações.
 
@@ -430,7 +430,7 @@ Salvamento manual: uma edição na tela não é uma escrita em flash. Pare o tra
 1. Para primeira instalação, parta do firmware oficial M-VAVE V016 do seu modelo Pro ou Elite. Use o M-UPGRADE oficial para retornar a essa versão.
 2. Exporte seu .smksynth antes de retornar ao oficial. A primeira instalação inicializa/substitui o banco.
 3. Use Chrome/Edge no computador, HTTPS, cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
-4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19653 / SMK-37 Elite_19653.
+4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19655 / SMK-37 Elite_19655.
 5. Se interromper, retome no mesmo navegador/site com o mesmo pacote. Não troque de instalador no meio.
 
 Backup: pare PLAY/REC, solte controles/notas e conecte a ferramenta. Exporte o banco atual nesta sessão antes de restaurar. Escolha o arquivo, revise e digite RESTAURAR (também na interface inglesa). Restauração substitui o banco inteiro; não mescla. Ao concluir, reinicie e confira seus sons.
@@ -510,7 +510,7 @@ Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program 
 
 Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
 
-A 1.2.1 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
+A 1.2.2 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Apêndice MIDI / 1
 
@@ -604,7 +604,7 @@ Constantes: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. Para cada 
 
 ## Atualização e áudio USB
 
-Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até Endless MIDI A são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19653 / SMK-37 Elite_19653.
+Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até Endless MIDI A são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19655 / SMK-37 Elite_19655.
 
 Áudio USB estéreo de 16 bits, 44,1/48 kHz: testado no Mac e no iPhone com AudioShare. Problema conhecido: vídeos gravados no iPhone com áudio USB podem conter cliques ou cortes.
 

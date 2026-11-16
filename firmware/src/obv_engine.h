@@ -648,7 +648,18 @@ static void engine_events(void)
     if (ctl_panic) {
         uint32_t hard = ctl_panic > 1u;
         ctl_panic = 0;
-        if (hard) { nq_r = nq_w; memset(vc, 0, sizeof vc); memset(guard_left,0,sizeof guard_left); memset(guard_tail,0,sizeof guard_tail); }
+        if (hard) {
+            nq_r = nq_w;
+            for (uint32_t v = 0; v < NV; v++) {
+                /* xorshift's zero state is absorbing: clearing the PRNG makes
+                 * Vintage drift down continuously and silences oscillator noise.
+                 * Kill the voice, but keep its independent nonzero random stream. */
+                uint32_t noise = vc[v].noise;
+                memset(&vc[v], 0, sizeof vc[v]);
+                vc[v].noise = noise ? noise : 0x12345678u * (v + 1u) + 0x9E3779B9u;
+            }
+            memset(guard_left,0,sizeof guard_left); memset(guard_tail,0,sizeof guard_tail);
+        }
         for (p = 0; p < NPART; p++) {
             obv_pending_n[p]=0;
             parts_off(p);

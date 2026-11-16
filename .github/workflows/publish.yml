@@ -22,7 +22,9 @@ jobs:
       - name: Verify release and website
         run: |
           python3 tests/release_factory_test.py
-          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.2.1-first-install-SMK37-Pro.fwsc
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.2.2-first-install-SMK37-Pro.fwsc
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/tuning tests/midi_return_tuning_test.c -lm
+          /tmp/tuning
           node tests/release_110_installer_test.mjs
           python3 tests/release_110_packages_test.py
           sh tests/run_physical_controls_tests.sh
@@ -34,7 +36,7 @@ jobs:
           node tests/release_i18n_test.mjs
           mkdir -p build/mo1 build/zm1 build/zm3
           node tests/midi_overview_wasm_test.mjs web/simulator/obervave-voice.wasm
-          node tests/battery_release_wasm_test.mjs web/simulator/obervave-voice.wasm 1.2.1
+          node tests/battery_release_wasm_test.mjs web/simulator/obervave-voice.wasm 1.2.2
           node tests/midi_layer_wasm_test.mjs web/simulator/obervave-voice.wasm
           node tests/midi_backpressure_wasm_test.mjs web/simulator/obervave-voice.wasm
           node tests/endless_wasm_test.mjs web/simulator/obervave-voice.wasm
@@ -47,7 +49,7 @@ jobs:
           python3 tools/package_release.py build/audit-site
           python3 tools/check_public_web.py build/audit-site
           node tests/simulator_midi_test.mjs
-          cd releases/1.2.1 && sha256sum -c SHA256SUMS.txt
+          cd releases/1.2.2 && sha256sum -c SHA256SUMS.txt
   release:
     needs: verify
     runs-on: ubuntu-latest
@@ -60,13 +62,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 tools/package_release.py build/release-site
-          if ! gh release view v1.2.1 >/dev/null 2>&1; then
-            gh release create v1.2.1 releases/1.2.1/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.2.1 — Endless MIDI' --notes-file docs/RELEASE-1.2.1.md
+          if ! gh release view v1.2.2 >/dev/null 2>&1; then
+            gh release create v1.2.2 releases/1.2.2/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.2.2 — Endless MIDI' --notes-file docs/RELEASE-1.2.2.md
           else
-            echo 'Release v1.2.1 already exists; immutable downloads left unchanged.'
+            echo 'Release v1.2.2 already exists; immutable downloads left unchanged.'
           fi
-          gh release upload v1.2.1 releases/1.2.1/SMKSYNTH-1.2.1-source.zip releases/1.2.1/SHA256SUMS.txt docs/pdf/SMKSYNTH-1.2.1-*.pdf --clobber
-          gh release edit v1.2.1 --notes-file docs/RELEASE-1.2.1.md
+          gh release upload v1.2.2 releases/1.2.2/SMKSYNTH-1.2.2-source.zip releases/1.2.2/SHA256SUMS.txt docs/pdf/SMKSYNTH-1.2.2-*.pdf --clobber
+          gh release edit v1.2.2 --notes-file docs/RELEASE-1.2.2.md
   pages:
     needs: verify
     runs-on: ubuntu-latest

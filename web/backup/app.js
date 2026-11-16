@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {canRestore,supportedIdentity} from './compatibility.js?v=release-121';
-import {Updater} from '../install/protocol.js?v=release-121';
-import {BankClient,digest} from './client.js?v=release-121';
-import {inventory} from './bank.js?v=release-121';
-import {parseFile} from './file.js?v=release-121';
+import {canRestore,supportedIdentity} from './compatibility.js?v=release-122';
+import {Updater} from '../install/protocol.js?v=release-122';
+import {BankClient,digest} from './client.js?v=release-122';
+import {inventory} from './bank.js?v=release-122';
+import {parseFile} from './file.js?v=release-122';
 const $=id=>document.getElementById(id);let client,device,deviceModel,state,file,busy=false,cancel=false,backupMade=false;
 function status(s){$('status').textContent=s;}
 function refresh(){const b2=canRestore(device,deviceModel);$('connect').disabled=busy;$('export').disabled=busy||!client||state?.pending;$('restore').disabled=busy||!b2||!file||!(backupMade||state?.pending);$('file').disabled=busy;$('reboot').disabled=busy||!b2||!state?.complete;$('cancel').disabled=!busy;}

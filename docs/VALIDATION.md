@@ -14,3 +14,8 @@ Hashes: [RELEASE.json](../RELEASE.json). Downloads: `releases/1.2.1/SHA256SUMS.t
 ## Endless MIDI 1.2.1
 
 Edição oficial: Endless MIDI, identidade 19653 para Pro e Elite. Inclui ENDLESS com MIDI USB/TRS por parte, seleção e layers de canais do teclado pelo banco B do MODO MIDI, rodas e sustain, bateria e identificação da versão. Pads A, encoders e faders mantêm os canais de seus mapas. Consulte o [manual atual](MANUAL.md) e as [notas da versão](RELEASE-1.2.1.md) para o fluxo completo. ML1 /19650, ML1a /19651 e Endless MIDI A /19652 atualizam diretamente, preservando os dados salvos.
+
+
+## 1.2.2 — Endless MIDI
+
+TF1 /19654 tuning fix validated on hardware by a user. Ten MIDI returns and ten hard PANIC resets preserve pitch with Vintage 0/32/80/127 and patch bytes. Model-specific 1.2.2 packages use identity 19655; only build version/identity changes relative to the validated fix. Factory bank and flash protection layout remain unchanged.

@@ -36,3 +36,8 @@ Host and simulated-flash checks do not measure physical CPU time. Hardware sound
 ## Endless MIDI 1.2.1
 
 Official edition: Endless MIDI, identity 19653 for Pro and Elite. Includes ENDLESS per-part USB/TRS MIDI, controller bank B channel selection/layers for the keyboard, wheels and sustain, plus battery and release identification. Bank A pads and encoders/faders retain map channels. See the [current manual](MANUAL.en.md) and [release notes](RELEASE-1.2.1.en.md) for the complete workflow. ML1 /19650, ML1a /19651 and Endless MIDI A /19652 can update directly while preserving saved data.
+
+
+## 1.2.2 — Endless MIDI
+
+TF1 /19654 tuning fix validated on hardware by a user. Ten MIDI returns and ten hard PANIC resets preserve pitch with Vintage 0/32/80/127 and patch bytes. Model-specific 1.2.2 packages use identity 19655; only build version/identity changes relative to the validated fix. Factory bank and flash protection layout remain unchanged.

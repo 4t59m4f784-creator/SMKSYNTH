@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.2 — Endless MIDI — 2026-11-15
+
+- **Correção mínima:** corrigida a falha de afinação em timbres com Vintage/Detune ao retornar do MODO MIDI. A mesma correção se aplica ao MIDI PANIC (GLOBE + PLAY).
+- **Minor fix:** fixed unintended tuning drift in Vintage/Detune patches after returning from MIDI MODE or using MIDI PANIC (GLOBE + PLAY).
+
+Mantidos os recursos da Endless MIDI e os dados salvos. Atualização direta da oficial 1.2.1 e da TF1 validada. Identidades: Pro_19655 / Elite_19655.
+
+[Notas](docs/RELEASE-1.2.2.md) · [English](docs/RELEASE-1.2.2.en.md)
+
 ## 1.2.1 — Endless MIDI — 2026-11-15
 
 - **ENDLESS:** sequências de notas/acordes em quatro partes, com comprimentos independentes e MIDI USB/TRS por parte. PARA ativa/desativa sem apagar; REC grava; segurar REC apaga a parte. C4 mantém a afinação original. Abrir a página não inicia a execução.

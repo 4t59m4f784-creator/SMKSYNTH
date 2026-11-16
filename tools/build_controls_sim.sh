@@ -3,7 +3,7 @@
 # Build the release simulator with physical fader behavior.
 set -eu
 cd "$(dirname "$0")/.."
-SIM_VERSION="${SIM_VERSION:-1.2.1}"
+SIM_VERSION="${SIM_VERSION:-1.2.2}"
 SIM_OUT="${SIM_OUT:-build/controls}"
 mkdir -p "$SIM_OUT"
 "${ZIG:-zig}" cc --target=wasm32-freestanding -mcpu=generic+bulk_memory -O2 \

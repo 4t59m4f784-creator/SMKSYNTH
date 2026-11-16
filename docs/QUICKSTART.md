@@ -1,8 +1,8 @@
-# SMKSYNTH 1.2.1 - Endless MIDI - Guia rápido
+# SMKSYNTH 1.2.2 - Endless MIDI - Guia rápido
 
-[PDF](pdf/SMKSYNTH-1.2.1-Quick-Start-PT.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.2.2-Quick-Start-PT.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Referência: firmware 1.2.1, SMK-37 Pro_19653 / SMK-37 Elite_19653.
+Referência: firmware 1.2.2, SMK-37 Pro_19655 / SMK-37 Elite_19655.
 
 ## Índice
 
@@ -24,7 +24,7 @@ Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os 
 
 ## Quick start / 1. Primeiros passos
 
-SMKSYNTH 1.2.1 - M-VAVE SMK-37 Pro / Elite. Use este guia depois de instalar. Para primeira instalação, use somente o firmware oficial V016; a instalação substitui o banco. Salve e exporte seu trabalho antes de retornar ao firmware oficial.
+SMKSYNTH 1.2.2 - M-VAVE SMK-37 Pro / Elite. Use este guia depois de instalar. Para primeira instalação, use somente o firmware oficial V016; a instalação substitui o banco. Salve e exporte seu trabalho antes de retornar ao firmware oficial.
 
 1. Ajuste K8/master para um volume adequado e aperte PLAY.
 2. K6 seleciona A-D; K7 troca o preset da parte.
@@ -100,7 +100,7 @@ Performance com valores é a tela padrão. PATCH curto abre a tela de logo, osci
 
 ## Bateria e identificação da versão
 
-Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.2.1. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
+Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.2.2. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
 
 O medidor discreto de bateria aparece nos cabeçalhos Obervave e Zoom, no osciloscópio, na tela ENDLESS e na performance do MODO MIDI. Usa a leitura existente do instrumento, filtrada para evitar oscilações. Não altera o áudio nem grava configurações.
 
@@ -209,7 +209,7 @@ Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program 
 
 Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
 
-A 1.2.1 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
+A 1.2.2 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Links
 
