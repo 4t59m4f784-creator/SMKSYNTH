@@ -27,6 +27,7 @@ def package(destination,reuse_release=False):
  for source,name in [(ROOT/'web/install','install'),(ROOT/'web/install-elite','install-elite'),(ROOT/'web/backup','backup'),(ROOT/'web/simulator','simulator'),(ROOT/'docs','docs'),(ROOT/'docs/images','assets'),(out,'downloads')]:shutil.copytree(source,dest/name,dirs_exist_ok=True)
  if (ROOT/'experimental/tuning-tf1').exists():shutil.copytree(ROOT/'experimental/tuning-tf1',dest/'experimental/tuning-tf1',dirs_exist_ok=True)
  if (ROOT/'experimental/dual-core-dc1').exists():shutil.copytree(ROOT/'experimental/dual-core-dc1',dest/'experimental/dual-core-dc1',dirs_exist_ok=True)
+ if (ROOT/'experimental/dual-core-dc2').exists():shutil.copytree(ROOT/'experimental/dual-core-dc2',dest/'experimental/dual-core-dc2',dirs_exist_ok=True)
  for name in ['README.md','LICENSE','LICENSING.md','CREDITS.md','CHANGELOG.md','RELEASE.json']:shutil.copy2(ROOT/name,dest/name)
  print(json.dumps(dict(destination=str(dest),version=version,source_sha256=sha(archive))))
 if __name__=='__main__':
