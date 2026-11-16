@@ -43,11 +43,12 @@ static void app_audio(int32_t *out, uint32_t n)
     uint32_t t0 = fm1_ticks();
 #endif
 #if OBV_VOICE_HW && !defined(OBV_HOST)
-    if(b2_latched){memset(out,0,n*2u*sizeof *out);return;}
+    if(b2_latched){dp_window_tick(0);memset(out,0,n*2u*sizeof *out);return;}
 #endif
 #if BOARD_SMK37
-    if(mm_on){memset(out,0,n*2u*sizeof *out);return;}
+    if(mm_on){dp_window_tick(0);memset(out,0,n*2u*sizeof *out);return;}
 #endif
+    dp_window_tick(ctl_seq_run);
     engine_audio(out, n);
 #ifndef OBV_HOST
     ui_render_us = (fm1_ticks() - t0) / FM1_TICKS_PER_US;

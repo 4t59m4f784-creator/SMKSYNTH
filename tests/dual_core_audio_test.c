@@ -51,6 +51,9 @@ int main(int argc,char **argv)
 {
  fail_mode=argc>1?(unsigned)atoi(argv[1]):0;
  pthread_create(&thread,0,worker,0);
+#if OBV_DUAL_CORE
+ dp_state=DP_RUNNING;dp_capture=1;
+#endif
  engine_init();for(unsigned p=0;p<NPART;p++)trk_load(p,0);
  set.m_vol=100;set.m_dj=64;set.tempo=120;fx_sync();mix_apply();pat_init(&pat);pf_init();
  for(unsigned b=0;b<1800;b++){

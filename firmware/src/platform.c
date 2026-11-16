@@ -45,12 +45,14 @@ enum { ENC_SELECT = 0, ENC_ALGORITHM = 1, ENC_KNOB1 = 2, ENC_KNOB2 = 3, ENC_KNOB
 #define FELUCCA_DUAL_CORE OBV_DUAL_CORE
 #ifdef OBV_HOST
 #include "../../tests/host.c"                  /* on a computer: a fake FM-1 (tests/host.c) */
+#include "smk_audio_profile.h"
 #else
 #include <stdint.h>
 #include "fm1_time.h"
 #include "fm1_sys.h"
 #include "fm1_irq.h"
 #include "fm1_guard.h"
+#include "smk_audio_profile.h"
 #if OBV_DUAL_CORE
 #include "fm1_multicore.h"
 #endif
@@ -436,6 +438,9 @@ void fm1_timer5_irq(void)
     if (in_audio) {
         if (usb_due)
             UAC_ONLY(uac_service());
+#if OBV_DUAL_CORE
+        dp_nested+=fm1_ticks()-t0;
+#endif
         return;
     }
     if (owed & 1u)
@@ -461,7 +466,7 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
 {
     uint8_t p;
 #if OBV_DUAL_CORE
-    uint32_t dc_t0=fm1_ticks();
+    uint32_t dc_t0=fm1_ticks(),dc_n0=dp_nested;
 #endif
     in_audio = 1;
     p = fm1_audio_pending();
@@ -481,7 +486,7 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
         for (i = 0; i < HALF_WORDS; i++) {
             int32_t v = (o[i] * master_q12) >> 12;
 #if OBV_DUAL_CORE
-            if(v>32767||v< -32767)dc_clips++;
+            if(DP_RECORD&&(v>32767||v< -32767))dc_clips++;
 #endif
             o[i] = v > 32767 ? 32767 : v < -32767 ? -32767 : v;
         }
@@ -494,7 +499,8 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
 #endif
     }
 #if OBV_DUAL_CORE
-    if(p&FM1_AUDIO_HALF){uint32_t dt=fm1_ticks()-dc_t0;
+    if((p&FM1_AUDIO_HALF)&&DP_RECORD){uint32_t dt=fm1_ticks()-dc_t0;
+        dp_half(dt,dp_nested-dc_n0);
         if(dt>dc_irq_peak_ticks)dc_irq_peak_ticks=dt;
         if(dt>HALF_FRAMES*544u)dc_irq_overruns++;
     }

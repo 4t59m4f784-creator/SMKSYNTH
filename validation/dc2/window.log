@@ -1,0 +1,1 @@
+PASS: arm waits for PLAY; 30-second wall-clock window freezes; nested IRQ subtraction; residual IO; reset; timer wrap; early transport stop.

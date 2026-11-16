@@ -960,12 +960,15 @@ static void engine_audio(int32_t *out, uint32_t n)
     uint32_t b, v, i, p, used = 0;
     static int32_t sc_prev;
     static uint32_t sc_i, sc_sub;
+    dp_begin(DP_CTRL);
     fx_block(&live, quarter_len());
     vol_q12 = (int32_t)((ctl_cc7 * ctl_cc7) >> 2);
     for (p = 0; p < NPART; p++)
         for (i = 0; i < 2u * n; i++) bus[p][i] = 0;
     for (i = 0; i < n; i++) snd_c[i] = snd_d[i] = snd_r[i] = snd_v[i] = 0;
+    dp_end(DP_CTRL);
     for (b = 0; b < n; b += CTL) {
+        dp_begin(DP_CTRL);
         for(p=0;p<NPART;p++)obv_engine_check_patch(p);
         engine_events();
         eng_t += CTL;
@@ -978,6 +981,7 @@ static void engine_audio(int32_t *out, uint32_t n)
           bus[gp][2u*(b+gi)+c]+=(int32_t)((int64_t)guard_tail[gp][c]*guard_left[gp]/STEAL_FADE);
         }
         for (p = 0; p < NPART; p++) { lfo_tick(&pt[p]); block_globals(&pt[p]); }
+        dp_end(DP_CTRL);
         uint32_t dc_mask = dc_begin();
         for (v = 0; v < NV; v++) {
             if (vc[v].ae.stage == E_IDLE && !vc[v].gate) {
@@ -986,17 +990,23 @@ static void engine_audio(int32_t *out, uint32_t n)
             }
             p = vc[v].part % NPART;
             used |= 1u << p;
+            unsigned dp_slot=super_voice(v)?DP_SUPER:DP_ANALOG;
+            dp_begin(dp_slot);
             voice_block(&vc[v], v);
             if (obv_engines[obv_voice_engine[v]]->render)
                 obv_engines[obv_voice_engine[v]]->render(&vc[v], bus[p] + 2u * b);
             else voice_render(&vc[v], bus[p] + 2u * b);
+            dp_end(dp_slot);
         }
+        dp_begin(DP_DRUM);
         for (p = 0; p < NPART; p++) {
             const obv_engine_ops_t *ops = obv_engines[obv_engine_track[p].active];
             if (!(dc_mask & (1u << p)) && ops->track_render && ops->track_render(p, bus[p] + 2u * b)) used |= 1u << p;
         }
+        dp_end(DP_DRUM);
         used |= dc_finish(dc_mask, bus, b);
     }
+    dp_begin(DP_MIX);
     /* Fade the dry track before all sends; effects' existing tails may finish.
      * READY takes no multiply: default ANALOG remains bit-identical. */
     for (p = 0; p < NPART; p++) {
@@ -1086,9 +1096,11 @@ static void engine_audio(int32_t *out, uint32_t n)
         snd_r[i] = sat16((clampi(snd_r[i], -262144, 262143) >> 2) * vol_q12 >> 10);
         snd_v[i] = sat16((clampi(snd_v[i], -262144, 262143) >> 2) * vol_q12 >> 10);
     }
+    dp_end(DP_MIX);dp_begin(DP_FX);
     fx_process(out, snd_c, snd_d, snd_r, n);
     drive_process(out, snd_v, n);
     master_process(out, n);
+    dp_end(DP_FX);
     for (i = 0; i < n && click_amp; i++) {     /* the click: after the effects, never recorded */
         int32_t c;
         click_ph += click_inc;
