@@ -1,0 +1,50 @@
+{
+  "version": "1.2.2-dc1",
+  "identity": 19656,
+  "base_commit": "9433886228f2c24bd3cac1621ae8de274e3c6fdd",
+  "upstream_obervave_commit": "a1f660c4439583d33f72941bd184a7e187d11835",
+  "jiant_transport_commit": "da8baa1eed7c4e75f1ed9bcf433797b3aeace107",
+  "hardware_tested": false,
+  "audio_equivalence_host": true,
+  "voice_limits_changed": false,
+  "dsp_algorithms_changed": false,
+  "buffer_size_changed": false,
+  "clock_changed": false,
+  "worker_private_bytes": 3524,
+  "cpu1_stack_bytes": 7168,
+  "static_ram_bytes": 95904,
+  "pool_plus_cpu1_stack_bytes": 339104,
+  "worker_policy": "one busiest active DRUM-X kit; other kits and melodic rendering overlap on CPU0",
+  "build_flags": "OBV_DEFS=-DOBV_DUAL_CORE=1",
+  "toolchain": "jieli-linux-toolchains-20260730.1",
+  "packages": {
+    "pro.update": {
+      "name": "Instalar DC1 \u00b7 Pro",
+      "product": "SMK-37 Pro_19656",
+      "url": "./SMKSYNTH-1.2.2-DC1-Pro.fwsc",
+      "size": 651876,
+      "sha": "879e10f289d6dc4005283c38d54a71b7ed034fd0960e6dbbdc62f0d3c9a58915"
+    },
+    "pro.release": {
+      "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Pro",
+      "product": "SMK-37 Pro_19655",
+      "url": "./SMKSYNTH-1.2.2-oficial-Pro.fwsc",
+      "size": 651819,
+      "sha": "57dfa2f9f733fc4a901da2d4161031774fc528ffa4d3f22dbeaa756a0df576f7"
+    },
+    "elite.update": {
+      "name": "Instalar DC1 \u00b7 Elite",
+      "product": "SMK-37 Elite_19656",
+      "url": "./SMKSYNTH-1.2.2-DC1-Elite.fwsc",
+      "size": 651880,
+      "sha": "eac73cb55fddaf2ee2fd74a319600a54c0901f41b84c9fbe3dd83536818a70a4"
+    },
+    "elite.release": {
+      "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Elite",
+      "product": "SMK-37 Elite_19655",
+      "url": "./SMKSYNTH-1.2.2-oficial-Elite.fwsc",
+      "size": 651819,
+      "sha": "de43999c81f039d29b185237102ee32c392e530d5b3b7201795fa54b6d81f2c9"
+    }
+  }
+}

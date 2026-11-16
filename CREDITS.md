@@ -28,3 +28,5 @@ SMKSYNTH was developed using AI. Marcus Padrini defined the goals and performanc
 ## MIDI TRS/USB — 1.1.0
 
 SMK-37 UART1 TX hardware driver adapted from `nzimas/tonitor-smk37/firmware/hal/smk_uart_tx.h` (blob `90497ba274eedf4985eeae2d8b46684d8b91903b`), credited there to M. Geisler (genkigenki/makkuro), from the SLOOP SMK37 branch. GPL-3.0-only. MIDI part routing, ownership ledger and transport integration are SMKSYNTH adaptations.
+
+DC1 experimental dual-core transport: Juan Ignacio Antonucci (JIANT), GPL-3.0-only, pinned `da8baa1eed7c4e75f1ed9bcf433797b3aeace107`. The transport's startup/fault containment builds on Melodee (keremimo) and fm1-x0x (charlesvestal). DRUM-X transactional snapshots, scheduling and diagnostics are SMKSYNTH adaptations. No clock change or Jazzy load governor is included.

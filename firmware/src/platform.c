@@ -39,6 +39,10 @@ enum { ENC_SELECT = 0, ENC_ALGORITHM = 1, ENC_KNOB1 = 2, ENC_KNOB2 = 3, ENC_KNOB
 #define KEY_LED(k) (14u + (k))
 #endif
 
+#ifndef OBV_DUAL_CORE
+#define OBV_DUAL_CORE 0
+#endif
+#define FELUCCA_DUAL_CORE OBV_DUAL_CORE
 #ifdef OBV_HOST
 #include "../../tests/host.c"                  /* on a computer: a fake FM-1 (tests/host.c) */
 #else
@@ -47,6 +51,9 @@ enum { ENC_SELECT = 0, ENC_ALGORITHM = 1, ENC_KNOB1 = 2, ENC_KNOB2 = 3, ENC_KNOB
 #include "fm1_sys.h"
 #include "fm1_irq.h"
 #include "fm1_guard.h"
+#if OBV_DUAL_CORE
+#include "fm1_multicore.h"
+#endif
 #if BOARD_SMK37
 #include "smk_input.h"                          /* keys with velocity, buttons, 8 encoders, LEDs, pads, faders, wheels */
 static void fm1_led_key_glow(uint32_t id, int on) { (void)id; (void)on; }   /* (no key LEDs: the pads glow) */
@@ -447,9 +454,15 @@ static volatile int32_t master_q12 = 2048;
 static void app_audio(int32_t *out, uint32_t n);
 static void app_main(void);
 
+#if OBV_DUAL_CORE
+static volatile uint32_t dc_irq_peak_ticks,dc_irq_overruns,dc_clips;
+#endif
 void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) */
 {
     uint8_t p;
+#if OBV_DUAL_CORE
+    uint32_t dc_t0=fm1_ticks();
+#endif
     in_audio = 1;
     p = fm1_audio_pending();
     fm1_audio_ack_aux(p);
@@ -467,6 +480,9 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
         app_audio(o, HALF_FRAMES);
         for (i = 0; i < HALF_WORDS; i++) {
             int32_t v = (o[i] * master_q12) >> 12;
+#if OBV_DUAL_CORE
+            if(v>32767||v< -32767)dc_clips++;
+#endif
             o[i] = v > 32767 ? 32767 : v < -32767 ? -32767 : v;
         }
         for (b = 0; b < HALF_FRAMES; b += 32u)
@@ -477,6 +493,12 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
         fm1_audio_ack_half();
 #endif
     }
+#if OBV_DUAL_CORE
+    if(p&FM1_AUDIO_HALF){uint32_t dt=fm1_ticks()-dc_t0;
+        if(dt>dc_irq_peak_ticks)dc_irq_peak_ticks=dt;
+        if(dt>HALF_FRAMES*544u)dc_irq_overruns++;
+    }
+#endif
     in_audio = 0;
 }
 extern void isr_alnk0(void);
@@ -548,7 +570,9 @@ void fm1_cstart(void)
 {
     extern uint32_t _data_start[], _data_end[], _data_load[], _bss_start[], _bss_end[];
     extern uint32_t _pool_start[], _pool_end[], _rt_start[], _rt_end[], _rt_load[];
+    extern uint32_t _c1t_start[], _c1t_end[], _c1t_load[];
     uint32_t *s, *d, p3, boot_mode;
+    fm1_core1_stop();
     fm1_time_init();
     fm1_reset_reason();
     p3 = fm1_boot.p3_rst;
@@ -564,6 +588,7 @@ void fm1_cstart(void)
     for (d = _pool_start; d < _pool_end; d++) *d = 0;
     for (s = _data_load, d = _data_start; d < _data_end; s++, d++) *d = *s;
     for (s = _rt_load, d = _rt_start; d < _rt_end; s++, d++) *d = *s;
+    for (s = _c1t_load, d = _c1t_start; d < _c1t_end; s++, d++) *d = *s;
     fm1_mailbox_clear();
     fm1_guard_enable(FM1_GUARD_STACK | FM1_GUARD_WRITE | FM1_GUARD_BUS | FM1_GUARD_PC);
     fm1_boot.p3_rst = (uint8_t)p3;
@@ -603,6 +628,14 @@ void fm1_cstart(void)
     uart_midi_init();                           /* before TIMER5: PORTH read-modify-write */
 #endif
     fm1_timer5_start(isr_timer5, 4);
+#if OBV_DUAL_CORE
+    if (fm1_mc_bar.magic != FM1_MC_BAR_MAGIC || ((p3 & 1u) && !(p3 & (4u | 0x40u)))) {
+        fm1_mc_bar.magic = FM1_MC_BAR_MAGIC; fm1_mc_bar.barred = 0;
+    }
+    if ((p3 & 4u) && (fm1_mc_bar.barred & 2u)) fm1_mc_bar_set();
+    fm1_mc_bar.barred &= ~2u;
+    if (!boot_mode && !fm1_mc_barred()) fm1_mc_start();
+#endif
     fm1_guard_lock_top();
     fm1_irq_enable_all();
 #if OBV_VOICE_HW

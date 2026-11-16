@@ -947,6 +947,7 @@ static void voice_render(voice_t *v, int32_t *out)
 }
 
 #include "obv_drums.h"
+#include "smk_dual_core.h"
 
 /* the mixer: each sound into its own bus, then by its level and pan to the output, and by its three sends into the
  * effects (VIBE: chorus, delay, reverb side by side, as return tracks; their MIX = the return's level) */
@@ -977,6 +978,7 @@ static void engine_audio(int32_t *out, uint32_t n)
           bus[gp][2u*(b+gi)+c]+=(int32_t)((int64_t)guard_tail[gp][c]*guard_left[gp]/STEAL_FADE);
         }
         for (p = 0; p < NPART; p++) { lfo_tick(&pt[p]); block_globals(&pt[p]); }
+        uint32_t dc_mask = dc_begin();
         for (v = 0; v < NV; v++) {
             if (vc[v].ae.stage == E_IDLE && !vc[v].gate) {
                 if (ui_vlevel[v]) { ui_vlevel[v] = 0; vc[v].amp0 = vc[v].amp1 = 0; }
@@ -991,8 +993,9 @@ static void engine_audio(int32_t *out, uint32_t n)
         }
         for (p = 0; p < NPART; p++) {
             const obv_engine_ops_t *ops = obv_engines[obv_engine_track[p].active];
-            if (ops->track_render && ops->track_render(p, bus[p] + 2u * b)) used |= 1u << p;
+            if (!(dc_mask & (1u << p)) && ops->track_render && ops->track_render(p, bus[p] + 2u * b)) used |= 1u << p;
         }
+        used |= dc_finish(dc_mask, bus, b);
     }
     /* Fade the dry track before all sends; effects' existing tails may finish.
      * READY takes no multiply: default ANALOG remains bit-identical. */

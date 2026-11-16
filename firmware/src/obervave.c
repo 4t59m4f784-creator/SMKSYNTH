@@ -2668,6 +2668,9 @@ static void panel_encoders(void)
 
 }
 
+#if OBV_DUAL_CORE && !defined(OBV_HOST)
+#include "smk_dual_core_ui.h"
+#endif
 static void app_main(void)
 {
     uint32_t k, i, t_led = 0, t_scope = 0, t_page = 0, t_hdr = 0, leds_q = 1;
@@ -2815,6 +2818,9 @@ static void app_main(void)
         b = fm1_input_edges(&rel);
 #if BOARD_SMK37
         b = smk_panic_buttons(b, &rel);
+#if OBV_DUAL_CORE && !defined(OBV_HOST)
+        if(dc_diag_poll(b,rel)){rec_down=0;continue;}
+#endif
         if(pb_confirm&&(b>>BTN_HOME&1u)){pb_cancel();b&=~(1u<<BTN_HOME);}
         b=save_button_poll(b,rel);
         b=pf_home_poll(b,rel);
