@@ -1,0 +1,49 @@
+name: Publish isolated TF1 test installer
+on:
+  push:
+    branches: [fix/midi-return-tuning]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: smksynth-publication
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare corresponding source and frozen official downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v1.2.1 --dir releases/1.2.1 --clobber
+          git archive --format=zip HEAD -o experimental/tuning-tf1/source.zip
+      - name: Validate tuning correction and test installer
+        run: |
+          mkdir -p build
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o build/tuning tests/midi_return_tuning_test.c -lm
+          build/tuning
+          node tests/tf1_online_installer_test.mjs
+      - name: Assemble unchanged official release plus isolated test page
+        run: |
+          python3 tools/package_release.py build/public-site --reuse-release
+          python3 tools/check_public_web.py build/public-site
+          mkdir -p build/public-site/experimental/tuning-tf1
+          cp -a experimental/tuning-tf1/. build/public-site/experimental/tuning-tf1/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/public-site
+      - uses: actions/deploy-pages@v4
+        id: deployment

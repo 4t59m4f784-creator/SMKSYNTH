@@ -1,0 +1,30 @@
+{
+  "pro.update": {
+    "name": "Instalar TF1 · Pro",
+    "product": "SMK-37 Pro_19654",
+    "url": "./SMKSYNTH-1.2.1-TF1-Pro.fwsc",
+    "size": 651819,
+    "sha": "99a070e20fb6d5fd34ce48593afd4b8385000d27722e910cc15829e67ba6b8c8"
+  },
+  "pro.release": {
+    "name": "Retornar à oficial 1.2.1 · Pro",
+    "product": "SMK-37 Pro_19653",
+    "url": "./SMKSYNTH-1.2.1-oficial-Pro.fwsc",
+    "size": 651819,
+    "sha": "523c780a70945e5524d6574006eff81b9c08c54ff0a7578c2cabe4a33187e5ac"
+  },
+  "elite.update": {
+    "name": "Instalar TF1 · Elite",
+    "product": "SMK-37 Elite_19654",
+    "url": "./SMKSYNTH-1.2.1-TF1-Elite.fwsc",
+    "size": 651819,
+    "sha": "f5875688a214aa6e6c98daf271e83e9ab12fd990515309114eda45cdfa933556"
+  },
+  "elite.release": {
+    "name": "Retornar à oficial 1.2.1 · Elite",
+    "product": "SMK-37 Elite_19653",
+    "url": "./SMKSYNTH-1.2.1-oficial-Elite.fwsc",
+    "size": 651819,
+    "sha": "80da2382396bfc8a58841520ad56151016265d68de8db8838a9bb0ff902e6cc4"
+  }
+}
