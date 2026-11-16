@@ -2,6 +2,9 @@ name: Publish SMKSYNTH
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - .github/workflows/tuning-test.yml
+      - .github/workflows/publish.yml
   workflow_dispatch:
 concurrency:
   group: smksynth-publication
