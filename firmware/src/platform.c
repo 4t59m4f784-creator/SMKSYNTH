@@ -466,7 +466,7 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
 {
     uint8_t p;
 #if OBV_DUAL_CORE
-    uint32_t dc_t0=fm1_ticks(),dc_n0=dp_nested;
+    uint32_t dc_t0,dc_n0;dp_stamp(&dc_t0,&dc_n0);
 #endif
     in_audio = 1;
     p = fm1_audio_pending();
@@ -499,8 +499,9 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
 #endif
     }
 #if OBV_DUAL_CORE
-    if((p&FM1_AUDIO_HALF)&&DP_RECORD){uint32_t dt=fm1_ticks()-dc_t0;
-        dp_half(dt,dp_nested-dc_n0);
+    if((p&FM1_AUDIO_HALF)&&DP_RECORD){uint32_t end,nested;dp_stamp(&end,&nested);
+        uint32_t dt=end-dc_t0;
+        dp_half(dt,nested-dc_n0);
         if(dt>dc_irq_peak_ticks)dc_irq_peak_ticks=dt;
         if(dt>HALF_FRAMES*544u)dc_irq_overruns++;
     }

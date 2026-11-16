@@ -1,0 +1,30 @@
+{
+  "pro.update": {
+    "name": "Instalar DC2a \u00b7 Pro",
+    "product": "SMK-37 Pro_19658",
+    "url": "./SMKSYNTH-1.2.2-DC2a-Pro.fwsc",
+    "size": 651876,
+    "sha": "d3e0357110b99d607b6b2453b2be725d30d6fb7e9e86705126ba2c55c39b0657"
+  },
+  "pro.release": {
+    "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Pro",
+    "product": "SMK-37 Pro_19655",
+    "url": "./SMKSYNTH-1.2.2-oficial-Pro.fwsc",
+    "size": 651819,
+    "sha": "57dfa2f9f733fc4a901da2d4161031774fc528ffa4d3f22dbeaa756a0df576f7"
+  },
+  "elite.update": {
+    "name": "Instalar DC2a \u00b7 Elite",
+    "product": "SMK-37 Elite_19658",
+    "url": "./SMKSYNTH-1.2.2-DC2a-Elite.fwsc",
+    "size": 651880,
+    "sha": "9f9234b469ffe7382e694baa953323b7db7bf31cbf0496f189c2b50d14dc6691"
+  },
+  "elite.release": {
+    "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Elite",
+    "product": "SMK-37 Elite_19655",
+    "url": "./SMKSYNTH-1.2.2-oficial-Elite.fwsc",
+    "size": 651819,
+    "sha": "de43999c81f039d29b185237102ee32c392e530d5b3b7201795fa54b6d81f2c9"
+  }
+}

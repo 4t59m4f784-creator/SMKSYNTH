@@ -9,3 +9,6 @@ cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/ge
 build/dc1/ui-window
 node tests/dc2_installer_test.mjs
 python3 tests/dc2_packages_test.py
+
+node tests/dc2a_installer_test.mjs
+python3 tests/dc2a_packages_test.py

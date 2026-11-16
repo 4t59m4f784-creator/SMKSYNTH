@@ -34,10 +34,23 @@ static void dp_window_tick(unsigned run)
     dp_capture=dp_state==DP_RUNNING;
     for(unsigned i=0;i<DP_N;i++)dp_cur[i]=0;
 }
+/* A higher-priority TIMER5 may land between the clock and nested counter.
+ * Retry that pair instead of subtracting a future interrupt from an old time. */
+static inline void dp_stamp(uint32_t *time,uint32_t *nested)
+{
+    uint32_t before,after,now;
+    do {before=dp_nested;now=DP_CLOCK();after=dp_nested;} while(before!=after);
+    *time=now;*nested=after;
+}
 static inline void dp_begin(unsigned s)
-{if(dp_capture){dp_t[s]=DP_CLOCK();dp_nt[s]=dp_nested;}}
+{if(dp_capture)dp_stamp(&dp_t[s],&dp_nt[s]);}
 static inline void dp_end(unsigned s)
-{if(dp_capture)dp_cur[s]+=DP_CLOCK()-dp_t[s]-(dp_nested-dp_nt[s]);}
+{
+    if(dp_capture){uint32_t t,n;dp_stamp(&t,&n);
+        uint32_t wall=t-dp_t[s],irq=n-dp_nt[s];
+        dp_cur[s]+=wall>=irq?wall-irq:0;
+    }
+}
 static void dp_half(uint32_t elapsed,uint32_t nested)
 {
     if(!dp_capture)return;
