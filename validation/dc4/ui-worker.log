@@ -1,0 +1,2 @@
+PASS: GLOBE+SCALE, K1, K2 arm, PATCH exit, PLAY start, automatic freeze, page browse, stopped-only rearm; 1C then 2C.
+PASS: idle-envelope and engine-transition SUPER waveform retains exact private render/commit states.

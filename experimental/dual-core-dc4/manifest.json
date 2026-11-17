@@ -1,0 +1,44 @@
+{
+  "pro.update": {
+    "name": "Instalar DC4 \u00b7 Pro",
+    "product": "SMK-37 Pro_19660",
+    "url": "./SMKSYNTH-1.2.2-DC4-Pro.fwsc",
+    "size": 651876,
+    "sha": "ec2434b488bce7d2537a047060ad8383de4731de7a81db000fe495e51e926351"
+  },
+  "pro.baseline": {
+    "name": "Retornar \u00e0 DC3 \u00b7 Pro",
+    "product": "SMK-37 Pro_19659",
+    "url": "./SMKSYNTH-1.2.2-DC3-Pro.fwsc",
+    "size": 651876,
+    "sha": "b8dbc09ca9eb9d9773a802c20d52a33d5df0b757665c5fbb10650dd46c3e2146"
+  },
+  "pro.release": {
+    "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Pro",
+    "product": "SMK-37 Pro_19655",
+    "url": "./SMKSYNTH-1.2.2-oficial-Pro.fwsc",
+    "size": 651819,
+    "sha": "57dfa2f9f733fc4a901da2d4161031774fc528ffa4d3f22dbeaa756a0df576f7"
+  },
+  "elite.update": {
+    "name": "Instalar DC4 \u00b7 Elite",
+    "product": "SMK-37 Elite_19660",
+    "url": "./SMKSYNTH-1.2.2-DC4-Elite.fwsc",
+    "size": 651880,
+    "sha": "a90ea7cb87d5584984bb5e4c06bfad81612cb6a5fe3a637c0a434f06d2a2f608"
+  },
+  "elite.baseline": {
+    "name": "Retornar \u00e0 DC3 \u00b7 Elite",
+    "product": "SMK-37 Elite_19659",
+    "url": "./SMKSYNTH-1.2.2-DC3-Elite.fwsc",
+    "size": 651880,
+    "sha": "6fed278faeec709fbf49706fb175963939b42885b02e8d555a0f6125cd39aee0"
+  },
+  "elite.release": {
+    "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Elite",
+    "product": "SMK-37 Elite_19655",
+    "url": "./SMKSYNTH-1.2.2-oficial-Elite.fwsc",
+    "size": 651819,
+    "sha": "de43999c81f039d29b185237102ee32c392e530d5b3b7201795fa54b6d81f2c9"
+  }
+}

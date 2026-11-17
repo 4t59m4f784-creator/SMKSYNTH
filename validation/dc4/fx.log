@@ -1,0 +1,6 @@
+PASS: FX/full-rate tails, stereo, drive types, master filter/compressor/limiter, parameter sweeps, sizes0..256, state equality fixture; CPU 0.146s
+PASS: FX/full-rate tails, stereo, drive types, master filter/compressor/limiter, parameter sweeps, sizes0..256, state equality fixture; CPU 0.135s
+736df305f2ef0b0568e7e1f9f1c0bb59c25d42a280b83cf29ce0c3ef47ed4825  build/dc4/fx-0.pcm
+736df305f2ef0b0568e7e1f9f1c0bb59c25d42a280b83cf29ce0c3ef47ed4825  build/dc4/fx-1.pcm
+736df305f2ef0b0568e7e1f9f1c0bb59c25d42a280b83cf29ce0c3ef47ed4825  build/dc4/fx-dc3.pcm
+PASS: FX/full-rate tails, stereo, drive types, master filter/compressor/limiter, parameter sweeps, sizes0..256, state equality fixture; CPU 0.194s

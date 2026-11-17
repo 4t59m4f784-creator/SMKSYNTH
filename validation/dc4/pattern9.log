@@ -1,0 +1,12 @@
+EXACT COEFFICIENT CACHE: calculated=1613481 reused=3786567
+PASS: externally supplied pattern; 174 seconds audio; peak melodic=8 SUPER=5 drum hits=4
+EXACT COEFFICIENT CACHE: calculated=1613481 reused=3786567
+PASS: externally supplied pattern; 174 seconds audio; peak melodic=8 SUPER=5 drum hits=4
+EXACT COEFFICIENT CACHE: calculated=1613481 reused=3786567
+PASS: externally supplied pattern; 174 seconds audio; peak melodic=8 SUPER=0 drum hits=4
+EXACT COEFFICIENT CACHE: calculated=1613481 reused=3786567
+PASS: externally supplied pattern; 174 seconds audio; peak melodic=8 SUPER=0 drum hits=4
+7444ece921c6acbd453977a2e32d9e0676e38eb942eb135ae2f223aba5c17b9b  build/dc4/p9-0-0.pcm
+7444ece921c6acbd453977a2e32d9e0676e38eb942eb135ae2f223aba5c17b9b  build/dc4/p9-0-1.pcm
+f262a4d94eb1bf50388f7f5fe4b93e0c71d9c9ad049c634840fcc90ecaa0bb82  build/dc4/p9-1-0.pcm
+f262a4d94eb1bf50388f7f5fe4b93e0c71d9c9ad049c634840fcc90ecaa0bb82  build/dc4/p9-1-1.pcm

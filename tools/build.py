@@ -182,7 +182,8 @@ def build_app():
             ("cc", "-c", FW / "hal" / "fm1_isr.S", "-o", OUT / "fm1_isr.o"),
             ("cc", *flags, "-c", FW / "src" / "obervave.c", "-o", OUT / "obervave.o"),
             # DSP-only speed optimization: never change the USB/main -Os profile.
-            ("cc", "-O2", *flags[1:], "-c", FW / "src" / "obv_supersaw.c", "-o", OUT / "obv_supersaw.o")]
+            ("cc", "-O2", *flags[1:], "-c", FW / "src" / "obv_supersaw.c", "-o", OUT / "obv_supersaw.o"),
+            ("cc", "-O2", "-fwrapv", *flags[1:], "-c", FW / "src" / "obv_fx.c", "-o", OUT / "obv_fx.o")]
     tc_all(*cmds)
     elf = OUT / "obervave.elf"
     ld = FW / "app.ld"
@@ -193,7 +194,7 @@ def build_app():
         ld = OUT / "app.ld"
         ld.write_text(txt.replace("LENGTH = 0x8DFBC", f"LENGTH = {APP_SLOT:#X}".replace("0X", "0x")))
     tc("pi32v2/bin/ld", "--gc-sections", "-e", "_start", "-T", ld, OUT / "crt0.o", OUT / "fm1_vec.o",
-       OUT / "fm1_isr.o", OUT / "obervave.o", OUT / "obv_supersaw.o", "-o", elf)
+       OUT / "fm1_isr.o", OUT / "obervave.o", OUT / "obv_supersaw.o", OUT / "obv_fx.o", "-o", elf)
     for sect in ("text.bin", "data.bin", "ramtext.bin", "c1text.bin"):
         (OUT / sect).unlink(missing_ok=True)
     *_, syms, dis, rt = tc_all(("common/bin/objcopy", "-O", "binary", "-j", ".text", elf, OUT / "text.bin"),

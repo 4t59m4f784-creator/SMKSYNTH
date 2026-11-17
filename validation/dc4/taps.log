@@ -1,0 +1,1 @@
+PASS: every chorus write index/tap offset and fractional boundaries; all delay offsets at wrap boundaries plus 1M random fractional taps, exactly equal to DC3 interpolation.

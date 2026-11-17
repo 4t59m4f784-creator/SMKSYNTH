@@ -1,0 +1,2 @@
+PASS: 100k clamped cutoff/resonance/type transitions and voice clears, exact original coefficients; calls=86805 skipped=29835
+PASS: note starts and hard panic invalidate CPU0-only coefficient cache; voice and snapshot sizes unchanged.

@@ -64,6 +64,41 @@ typedef struct { uint8_t lvl[NPART], cho[NPART], dly[NPART], rev[NPART], drv[NPA
 static mxq_t mx_q;
 static volatile uint32_t ctl_mx_swap;
 static voice_t vc[NV];
+#ifndef OBV_COEF_CACHE
+#define OBV_COEF_CACHE 1
+#endif
+#if OBV_COEF_CACHE
+/* CPU0-only memoization: never changes envelopes or filter sample states,
+ * and never travels with CPU1 snapshots. Reset whenever a card is cleared
+ * or started. The key is the exact clamped cutoff and current damping. */
+static struct {int32_t cut1,cut2;uint32_t valid;} coef_cache[NV];
+#endif
+#ifdef OBV_COEF_CACHE_STATS
+static uint32_t coef_calls,coef_skips;
+#define COEF_CALL() (coef_calls++)
+#define COEF_SKIP() (coef_skips++)
+#else
+#define COEF_CALL() ((void)0)
+#define COEF_SKIP() ((void)0)
+#endif
+static void voice_coefficients(voice_t*v,unsigned card,int32_t cut,int32_t k,unsigned type)
+{
+#if OBV_COEF_CACHE
+    cut=clampi(cut,0,136<<8);
+    if(!(coef_cache[card].valid&1u)||coef_cache[card].cut1!=cut||v->c1.k!=k){
+        svf_coef(&v->c1,cut,k);coef_cache[card].cut1=cut;coef_cache[card].valid|=1u;COEF_CALL();
+    }else COEF_SKIP();
+    if(type==F_LP24){
+        if(!(coef_cache[card].valid&2u)||coef_cache[card].cut2!=cut){
+            svf_coef(&v->c2,cut,5793);coef_cache[card].cut2=cut;coef_cache[card].valid|=2u;COEF_CALL();
+        }else COEF_SKIP();
+    }
+#else
+    (void)card;svf_coef(&v->c1,cut,k);COEF_CALL();
+    if(type==F_LP24){svf_coef(&v->c2,cut,5793);COEF_CALL();}
+#endif
+}
+
 static uint32_t vseq, rr;                       /* allocation counter, round-robin pointer */
 
 /* main loop -> ISR: note events */
@@ -231,6 +266,9 @@ static void super_retire(unsigned n){voice_t*v=&vc[n];unsigned p=v->part%NPART;
 static void voice_start(voice_t *v, uint32_t part, uint32_t note, uint32_t vel, int32_t det8, int32_t pan)
 {
     const uint8_t *pv = pt[part].p->v;
+#if OBV_COEF_CACHE
+    coef_cache[v-vc].valid=0;
+#endif
     if(super_part(part)&&super_count()>=SUPER_LIMIT&&super_voice((unsigned)(v-vc)))super_retire((unsigned)(v-vc));
     v->seq_owned = seq_note_source;v->key_combined=seq_note_source?0:keyboard_source;
     v->part = (uint8_t)part;
@@ -656,6 +694,9 @@ static void engine_events(void)
                  * Kill the voice, but keep its independent nonzero random stream. */
                 uint32_t noise = vc[v].noise;
                 memset(&vc[v], 0, sizeof vc[v]);
+#if OBV_COEF_CACHE
+                coef_cache[v].valid=0;
+#endif
                 vc[v].noise = noise ? noise : 0x12345678u * (v + 1u) + 0x9E3779B9u;
             }
             memset(guard_left,0,sizeof guard_left); memset(guard_tail,0,sizeof guard_tail);
@@ -870,8 +911,7 @@ static void voice_block(voice_t *v, uint32_t card)
     cut = g->cut_sm + 8 * 256 + ((fenv * g->fenv_amt * 390) >> 15)
         + (played_note - 60) * g->keytrk * 2 + (((int32_t)v->vel - 64) * g->velflt >> 1)
         + ((lfo * g->lfo_fd * 97) >> 15) + ((lfo * g->wheel_q * 48) >> 15) + ((VINT_CUT8[card % NCARD] * vint) >> 7);
-    svf_coef(&v->c1, cut, g->reso_k);
-    if (g->ftype == F_LP24) svf_coef(&v->c2, cut, 5793);
+    voice_coefficients(v,card,cut,g->reso_k,g->ftype);
     /* amp */
     velg = 32767 - ((((127 - (int32_t)v->vel) * (int32_t)pv[P_VEL_AMP]) >> 7) * 258);
     trem = 32767 - (((32767 - lfo) * g->lfo_ad) >> 8);
@@ -1144,6 +1184,9 @@ static void engine_init(void)
     obv_engines[OBV_DRUMS] = &obv_drums_ops;
     for(v=0;v<NPART;v++)drums_reset(v);
     for (v = 0; v < NV; v++) {
+#if OBV_COEF_CACHE
+        coef_cache[v].valid=0;
+#endif
         vc[v].seq_owned=0;
         obv_voice_engine[v] = OBV_ANALOG;
         vc[v].noise = 0x12345678u * (v + 1u) + 0x9E3779B9u;

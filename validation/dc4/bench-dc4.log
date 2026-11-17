@@ -1,0 +1,1 @@
+PASS: FX/full-rate tails, stereo, drive types, master filter/compressor/limiter, parameter sweeps, sizes0..256, state equality fixture; CPU 1.159s BENCH HOST ONLY

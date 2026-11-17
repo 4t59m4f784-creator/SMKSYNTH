@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* DC3: K2 arms a fixed transport-started window. K3 chooses frozen results. */
+/* DC4: K2 arms a fixed transport-started window. K3 chooses frozen results. */
 static void dc_diag_line(unsigned y,const char *name,uint32_t v)
 {
     char s[48];s[0]=0;scat(s,name);fmt_u(s+slen(s),v);
@@ -37,7 +37,7 @@ static int dc_diag_poll(uint32_t b,uint32_t rel)
     if(shown&&fm1_ms-shown<500u)return 1;
     shown=fm1_ms?fm1_ms:1;
     lcd_fill(0,0,240,240,C_BLACK);
-    char title[40];title[0]=0;scat(title,"DC3 ");
+    char title[40];title[0]=0;scat(title,"DC4 ");
     scat(title,dp_state==DP_ARMED?record_mode?"ARMED 2C PATCH > PLAY":"ARMED 1C PATCH > PLAY":dp_state==DP_RUNNING?"RECORDING":dp_state==DP_DONE?"FROZEN":"STOP PLAY / K2 ARM");
     if(dp_state==DP_DONE)scat(title,record_mode?" 2C":" 1C");
     draw_text_box(0,3,240,&FONT_S,title,C_WHITE,1);

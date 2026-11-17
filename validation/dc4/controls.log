@@ -1,0 +1,1 @@
+PASS: separate DSP object linked into midi_return_tuning, midi_mode_transition, sustain_panic, smk_scene_recall, live_parameter_release; all five native executables exited successfully.

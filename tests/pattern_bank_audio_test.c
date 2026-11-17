@@ -20,6 +20,9 @@ int main(int argc,char **argv){
   if(v>maxv)maxv=v;if(s>maxs)maxs=s;if(d>maxd)maxd=d;
  }
  assert(fwrite(drum_hit,sizeof drum_hit,1,stdout)==1);
+#ifdef OBV_COEF_CACHE_STATS
+ fprintf(stderr,"EXACT COEFFICIENT CACHE: calculated=%u reused=%u\n",coef_calls,coef_skips);
+#endif
  fprintf(stderr,"PASS: externally supplied pattern; 174 seconds audio; peak melodic=%u SUPER=%u drum hits=%u\n",maxv,maxs,maxd);
  return 0;
 }
