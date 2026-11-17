@@ -30,6 +30,7 @@ def package(destination,reuse_release=False):
  if (ROOT/'experimental/dual-core-dc2').exists():shutil.copytree(ROOT/'experimental/dual-core-dc2',dest/'experimental/dual-core-dc2',dirs_exist_ok=True)
  if (ROOT/'experimental/dual-core-dc2a').exists():shutil.copytree(ROOT/'experimental/dual-core-dc2a',dest/'experimental/dual-core-dc2a',dirs_exist_ok=True)
  if (ROOT/'experimental/dual-core-dc3').exists():shutil.copytree(ROOT/'experimental/dual-core-dc3',dest/'experimental/dual-core-dc3',dirs_exist_ok=True)
+ if (ROOT/'experimental/dual-core-dc4').exists():shutil.copytree(ROOT/'experimental/dual-core-dc4',dest/'experimental/dual-core-dc4',dirs_exist_ok=True)
  for name in ['README.md','LICENSE','LICENSING.md','CREDITS.md','CHANGELOG.md','RELEASE.json']:shutil.copy2(ROOT/name,dest/name)
  print(json.dumps(dict(destination=str(dest),version=version,source_sha256=sha(archive))))
 if __name__=='__main__':
