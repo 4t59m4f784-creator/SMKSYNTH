@@ -24,6 +24,9 @@ typedef struct { uint32_t stage; int32_t level; } env_t;   /* level Q24 */
 
 typedef struct {
     osc_t o1, o2;
+    osc_t sub;
+    uint32_t sub_inc,sub_mode;
+    int32_t sub_gain; /* Q8 oscillator level; copied with this voice by DC3 */
     int32_t guard_l,guard_r;
     uint32_t guard_in;
     uint32_t noise;
@@ -162,6 +165,7 @@ typedef struct {
 #endif
     int32_t fenv_amt, keytrk, velflt, lfo_pd, lfo_fd, lfo_pwd, lfo_ad, wheel_q, bend8, env_o2, det_fine8;
     int32_t lvl1, lvl2, lvln, drive_q12, reso_k, vint, sus_f, sus_a, gain_q12, morph_q;
+    uint32_t sub_mode,sub_key; int32_t sub_level,sub_norm;
     int32_t cut_sm, reso_sm;                    /* CUTOFF and RESO slewed (Q8), ~25 ms: a CC sweep in semitone steps glides */
     uint32_t pw1_base, pw2_base, w1, w2, ftype, sync_on, xmod_q, glide_k;
 } part_t;
@@ -767,6 +771,8 @@ static int32_t vol_q12;                         /* the output stage: CC 7 (each 
 static void block_globals(part_t *g)            /* a sound's derived numbers, once per block */
 {
     const uint8_t *pv = g->p->v;
+    if(patch_sub_valid(g->p)){g->sub_mode=(pv[76]>>7)|((pv[77]>>7)<<1);g->sub_level=(int32_t)(pv[78]*127u*256u/100u);}
+    else {g->sub_mode=0;g->sub_level=0;}
     int32_t d;
     g->fenv_amt = (int32_t)pv[P_FENV_AMT] - 64;
     g->keytrk = pv[P_KEYTRK];
@@ -787,6 +793,9 @@ static void block_globals(part_t *g)            /* a sound's derived numbers, on
     d = pv[P_O1_LVL]; g->lvl1 = (d * d) >> 7;
     d = pv[P_O2_LVL]; g->lvl2 = (d * d) >> 7;
     d = pv[P_NOISE]; g->lvln = (d * d) >> 7;
+    uint32_t sub_budget=(uint32_t)(g->lvl1+g->lvl2+g->lvln);if(!sub_budget)sub_budget=127;
+    uint32_t sub_key=(sub_budget<<16)|(uint32_t)g->sub_level;
+    if(sub_key!=g->sub_key){g->sub_key=sub_key;g->sub_norm=(int32_t)((sub_budget*4096u)/(sub_budget+((uint32_t)g->sub_level>>8)));}
     d = pv[P_DRIVE]; g->drive_q12 = d ? 4096 + (d * d * 7 * 4096 / 16129) : 0;
     g->cut_sm += ((pv[P_CUTOFF] << 8) - g->cut_sm) >> 6;   /* tau = 64 blocks = 23 ms */
     g->reso_sm += ((pv[P_RESO] << 8) - g->reso_sm) >> 6;
@@ -862,6 +871,8 @@ static void voice_block(voice_t *v, uint32_t card)
     p2 = p8 + (pv[P_LFO_PITCH_TO] != TO_O1 ? lfo_to : 0) + ((int32_t)pv[P_O2_SEMI] - 24) * 256 + g->det_fine8
        + ((fenv * g->env_o2 * 97) >> 15);
     v->inc1 = pitch_inc(p1);
+    /* OSC1 fundamental before card/group detune; never SUPER side steps/FM. */
+    v->sub_inc=(g->sub_level||v->sub_gain)&&v->det8?pitch_inc(p1-v->det8):v->inc1;
     v->inc2 = pitch_inc(p2);
     tmp = (lfo * g->lfo_pwd);
     v->pw1 = pw_mod(g->pw1_base, pv[P_LFO_PWM_TO] != TO_O2 ? tmp : 0);
@@ -889,7 +900,7 @@ static super_state_t super_state[NV];
 static super_plain_state_t super_plain_state[NV];
 
 /* ---- the samples of one voice: oscillators -> mix -> drive -> filter -> amp -> pan */
-static void voice_render_state(voice_t *v, const part_t *g, super_state_t *ss, super_plain_state_t *ps, int32_t *out)
+static inline __attribute__((always_inline)) void voice_render_inner(voice_t *v, const part_t *g, super_state_t *ss, super_plain_state_t *ps, int32_t *out,unsigned do_sub)
 {
     uint32_t i, inc1 = v->inc1, inc2 = v->inc2, pw1 = v->pw1, pw2 = v->pw2, d1 = inc1 >> 15, d2 = inc2 >> 15;
     int32_t amp0 = v->amp0, da = v->amp1 - v->amp0, gl = v->gl, gr = v->gr, o2n = v->o2.prev;
@@ -905,6 +916,25 @@ static void voice_render_state(voice_t *v, const part_t *g, super_state_t *ss, s
     if (ww1 == W_SUPER) super_render_call(ss, &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
     else {ss->active = 0;if(buffered1)super_plain_call(ps,&v->o1,inc1,l1?super_buf[0]:0,CTL);}
     if(buffered2)super_plain_call(ps,&v->o2,inc2,l2?super_buf[1]:0,CTL);
+    int32_t sg0=0,sg1=0,sn0=4096,sn1=4096;uint32_t substep=0,subwave=0;
+    if(do_sub){
+    sg0=v->sub_gain;sg1=sg0;int32_t st=g->sub_mode==v->sub_mode?g->sub_level:0;
+    if(st>sg1)sg1+=st-sg1>2048?2048:st-sg1;
+    if(st<sg1)sg1-=sg1-st>2048?2048:sg1-st;
+    if(!sg0){
+        v->sub_mode=g->sub_mode;
+        v->sub.prev=osc_naive(v->sub.ph,0x80000000u,(v->sub_mode&1u)?OSC_SAW:OSC_PLS);
+    }
+    substep=v->sub_inc>>(1u+((v->sub_mode>>1)&1u));
+    subwave=(v->sub_mode&1u)?OSC_SAW:OSC_PLS;
+    /* Normalize the additional oscillator into the existing oscillator gain
+     * budget, rather than forcing more energy into the filter/clamp. SUB=0
+     * bypasses all mix changes. Q12 products stay inside signed 32-bit. */
+    int32_t budget=l1+l2+ln;if(!budget)budget=127;
+
+    if(sg0||sg1){if(sg0==g->sub_level&&sg1==g->sub_level)sn0=sn1=g->sub_norm;
+        else {sn0=(budget*4096)/(budget+(sg0>>8));sn1=(budget*4096)/(budget+(sg1>>8));}}
+    }
     for (i = 0; i < CTL; i++) {
         int32_t s1, s2, mix, lp, bp, hp, y, amp, rt = -1;
         uint32_t ie = inc1;
@@ -922,6 +952,11 @@ static void voice_render_state(voice_t *v, const part_t *g, super_state_t *ss, s
         mix = s1 * l1 + s2 * l2;
         if (ln) mix += ((int32_t)(xorshift(&v->noise) >> 16) - 32768) * ln;
         mix >>= 7;
+        if(do_sub){
+            int32_t sub=osc_step(&v->sub,substep,substep>>15,0x80000000u,subwave,-65536,-1);
+            int32_t gain=sg0+((sg1-sg0)*(int32_t)i>>4),norm=sn0+((sn1-sn0)*(int32_t)i>>4);
+            mix=(mix*norm>>12)+((sub*gain>>15)*norm>>12);
+        }
         if (drv) mix = softclip(((mix >> 3) * drv) >> 9);
         else mix = clampi(mix, -65535, 65535);
         svf_step(&v->c1, &v->f1, mix, &lp, &bp, &hp);
@@ -940,7 +975,16 @@ static void voice_render_state(voice_t *v, const part_t *g, super_state_t *ss, s
         v->guard_l=(y*gl)>>12;v->guard_r=(y*gr)>>12;
         out[2u*i]+=v->guard_l;out[2u*i+1]+=v->guard_r;
     }
+    if(do_sub)v->sub_gain=sg1;
     (void)o2n;
+}
+
+/* Two constant-specialized paths: SUB=0 has the original sample loop, with
+ * no per-sample SUB branch or oscillator work. No dispatch/worker change. */
+static void voice_render_state(voice_t*v,const part_t*g,super_state_t*ss,super_plain_state_t*ps,int32_t*out)
+{
+ if(g->sub_level||v->sub_gain)voice_render_inner(v,g,ss,ps,out,1);
+ else {v->sub.ph+=(v->sub_inc>>(1u+((g->sub_mode>>1)&1u)))*CTL;voice_render_inner(v,g,ss,ps,out,0);}
 }
 
 static void voice_render(voice_t *v,int32_t *out)

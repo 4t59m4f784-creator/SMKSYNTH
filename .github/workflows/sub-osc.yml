@@ -1,0 +1,30 @@
+name: Validate SUB OSC SU1
+on:
+  push:
+    branches: [experimental/sub-osc-su1]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          mkdir -p build/su1 build/supersaw
+          cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -fno-sanitize-recover=all -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/sub_osc_test.c -lm -o build/su1/sub
+          ASAN_OPTIONS=detect_leaks=0 build/su1/sub
+          sh tests/run_sub_audio_tests.sh
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/sub_stress_test.c -lm -o build/su1/stress
+          build/su1/stress
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/sub_split_layer_test.c -lm -o build/su1/split
+          build/su1/split
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/sub_super_test.c -lm -o build/su1/super
+          build/su1/super
+          node tests/sub_installer_test.mjs
+          python3 tests/sub_packages_test.py
+          cc -O2 -o build/backup_server tests/backup_server.c
+          node tests/sub_backup_test.mjs --protocol
+          node tests/sub_bank_test.mjs

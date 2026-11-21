@@ -1,0 +1,30 @@
+{
+  "pro.update": {
+    "name": "Instalar SU1 · SUB OSC · Pro",
+    "product": "SMK-37 Pro_19661",
+    "url": "./SMKSYNTH-1.2.2-SU1-Pro.fwsc",
+    "size": 651876,
+    "sha": "f9552b68be136b8c38430f76057257b7101f4fa7873503a8206f2bcfbe0427b8"
+  },
+  "pro.release": {
+    "name": "Retornar à oficial 1.2.2 · Pro",
+    "product": "SMK-37 Pro_19655",
+    "url": "./SMKSYNTH-1.2.2-oficial-Pro.fwsc",
+    "size": 651819,
+    "sha": "57dfa2f9f733fc4a901da2d4161031774fc528ffa4d3f22dbeaa756a0df576f7"
+  },
+  "elite.update": {
+    "name": "Instalar SU1 · SUB OSC · Elite",
+    "product": "SMK-37 Elite_19661",
+    "url": "./SMKSYNTH-1.2.2-SU1-Elite.fwsc",
+    "size": 651880,
+    "sha": "f0b2b7b00c83d11662934b3f327683595fb6e915d9319052834c9ba1c8c4cd5f"
+  },
+  "elite.release": {
+    "name": "Retornar à oficial 1.2.2 · Elite",
+    "product": "SMK-37 Elite_19655",
+    "url": "./SMKSYNTH-1.2.2-oficial-Elite.fwsc",
+    "size": 651819,
+    "sha": "de43999c81f039d29b185237102ee32c392e530d5b3b7201795fa54b6d81f2c9"
+  }
+}

@@ -4,7 +4,7 @@ static void zm_mark_dirty(void){dirty_page=1;}
 static void zm_focus_capture(unsigned k,int p){
  if(!(zm_zoom||zm_scope_active())||layer||is_seq_page(page)||page==PG_THEME||page==PG_KEYBOARD||page==PG_MIDI||page==PG_CONTROLS)return;
  int numeric=p>=0&&(PDEF[p].kind==K_NUM||PDEF[p].kind==K_BIP||PDEF[p].kind==K_SEMI||PDEF[p].kind>=K_MS);
- if(page==PG_MIXER)numeric=1;if(page==PG_DRIVE)numeric=k!=0;if(page==PG_SUPER)numeric=k<2;
+ if(page==PG_MIXER)numeric=1;if(page==PG_DRIVE)numeric=k!=0;if(page==PG_SUPER)numeric=k<2;if(page==PG_SUB)numeric=k==2;
  if(obv_drums_selected()&&page==PG_DSOUND)numeric=k!=0;
  if(numeric){zm_focus_knob=k+1;zm_focus_on=1;zm_focus_t=fm1_ms;}
 }

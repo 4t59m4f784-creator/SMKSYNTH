@@ -1,0 +1,10 @@
+PASS mode=0 jobs=22416 fallbacks=0 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=1 jobs=19214 fallbacks=3202 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=3 jobs=11168 fallbacks=0 private=3780 bytes normal=104 SUPER=24430 plain_only=0
+PASS mode=0 jobs=22416 fallbacks=0 private=3780 bytes normal=57379 SUPER=0 plain_only=1
+PASS mode=1 jobs=19214 fallbacks=3202 private=3780 bytes normal=57379 SUPER=0 plain_only=1
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=57379 SUPER=0 plain_only=1
+PASS mode=3 jobs=11168 fallbacks=0 private=3780 bytes normal=28834 SUPER=0 plain_only=1
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=146 SUPER=48622 plain_only=0

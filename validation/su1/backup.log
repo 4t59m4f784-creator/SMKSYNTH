@@ -1,0 +1,3 @@
+PASS: stable/SS/UI/ENDLESS/SP1 identities and files; B2 signature, unknown identity, model, layout and SHA guards before restore writes
+PASS: SMK-37 Pro_19661 full export, CRC retry, interrupted restore/resume and exact bank readback
+PASS: SMK-37 Elite_19661 full export, CRC retry, interrupted restore/resume and exact bank readback

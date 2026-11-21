@@ -39,6 +39,17 @@ static void patch_keyboard_octave_set(patch_t*p,int oct){p->v[PATCH_KBO_AT]=(uin
  * NPARAM, name, octave, PATCH_BYTES and every MIDI CC retain their offsets.
  * Unknown/absent extension -> MIX 64. DRUM-X keeps its OVE tag unchanged.
  * Readers never rewrite legacy bytes. Checksum is committed last by setter. */
+/* SU1: same six bytes, no schema/offset change. Two 7-bit SUPER mixes,
+ * wave/oct in their high bits, level 0..100 and checksum. Legacy SS/OVE and
+ * arbitrary old padding never enable SUB. DRUM-X tags remain untouched. */
+static int patch_sub_valid(const patch_t *p)
+{
+ const uint8_t *t=p->v+OBV_ENGINE_TAG_AT;
+ return t[0]=='S'&&t[1]=='U'&&t[4]<=100u&&t[5]==(uint8_t)(0x6Du^t[2]^t[3]^t[4]);
+}
+static unsigned patch_sub_wave(const patch_t*p){return patch_sub_valid(p)?p->v[76]>>7:0;}
+static unsigned patch_sub_oct(const patch_t*p){return patch_sub_valid(p)?p->v[77]>>7:0;}
+static unsigned patch_sub_level(const patch_t*p){return patch_sub_valid(p)?p->v[78]:0;}
 static int patch_super_valid(const patch_t *p)
 {
     const uint8_t *t = p->v + OBV_ENGINE_TAG_AT;
@@ -47,7 +58,7 @@ static int patch_super_valid(const patch_t *p)
 }
 static uint32_t patch_super_mix(const patch_t *p, uint32_t osc)
 {
-    return patch_super_valid(p) ? p->v[OBV_ENGINE_TAG_AT+3u+(osc&1u)] : 64u;
+    return patch_sub_valid(p) ? (p->v[76u+(osc&1u)]&127u) : patch_super_valid(p) ? p->v[OBV_ENGINE_TAG_AT+3u+(osc&1u)] : 64u;
 }
 static void patch_super_mix_set(patch_t *p, uint32_t osc, uint32_t value)
 {
@@ -59,8 +70,23 @@ static void patch_super_mix_set(patch_t *p, uint32_t osc, uint32_t value)
 #ifndef OBV_HOST
     uint32_t irq=fm1__lock();
 #endif
-    t[0]='S';t[1]='S';t[2]=1;t[3]=a;t[4]=b;t[5]=(uint8_t)(0xA5u^a^b);
+    if(patch_sub_valid(p)){t[2]=(t[2]&128u)|a;t[3]=(t[3]&128u)|b;t[5]=(uint8_t)(0x6Du^t[2]^t[3]^t[4]);}
+    else {t[0]='S';t[1]='S';t[2]=1;t[3]=a;t[4]=b;t[5]=(uint8_t)(0xA5u^a^b);}
 #ifndef OBV_HOST
     fm1__unlock(irq);
+#endif
+}
+
+static void patch_sub_set(patch_t*p,unsigned wave,unsigned oct,unsigned level)
+{
+ if(obv_patch_engine(p)!=OBV_ANALOG)return;
+ uint8_t a=(uint8_t)patch_super_mix(p,0),b=(uint8_t)patch_super_mix(p,1);
+#ifndef OBV_HOST
+ uint32_t irq=fm1__lock();
+#endif
+ uint8_t*t=p->v+OBV_ENGINE_TAG_AT;
+ t[0]='S';t[1]='U';t[2]=a|((wave&1u)<<7);t[3]=b|((oct&1u)<<7);t[4]=(uint8_t)(level>100u?100u:level);t[5]=(uint8_t)(0x6Du^t[2]^t[3]^t[4]);
+#ifndef OBV_HOST
+ fm1__unlock(irq);
 #endif
 }
