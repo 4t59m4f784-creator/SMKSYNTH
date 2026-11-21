@@ -1,0 +1,79 @@
+name: Publish isolated SUB OSC SU1
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/tuning-test.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: smksynth-publication
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 333251c33c29cb077bd1745e3ddc45129cf482dd
+          path: public
+      - uses: actions/checkout@v4
+        with:
+          ref: 01aab5142bad261937bb0e55471a701f66360386
+          path: su1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate isolated SUB installer and backup
+        working-directory: su1
+        run: |
+          mkdir -p build/su1
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/sub_osc_test.c -lm -o build/su1/sub
+          build/su1/sub
+          cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/sub_stress_test.c -lm -o build/su1/stress
+          build/su1/stress
+          node tests/sub_installer_test.mjs
+          python3 tests/sub_packages_test.py
+          cc -O2 -o build/backup_server tests/backup_server.c
+          node tests/sub_backup_test.mjs --protocol
+          node tests/sub_bank_test.mjs
+      - name: Assemble frozen public site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v1.2.2 --repo 4t59m4f784-creator/SMKSYNTH --pattern 'SMKSYNTH-1.2.2-source.zip' --pattern 'SHA256SUMS.txt' --dir public/releases/1.2.2 --clobber
+          python3 public/tools/package_release.py build/public-site --reuse-release
+          python3 public/tools/check_public_web.py build/public-site
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          r=Path('build/public-site')
+          assert not (r/'experimental/sub-osc-su1').exists()
+          manifest={str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in r.rglob('*') if p.is_file()}
+          Path('build/frozen-public.json').write_text(json.dumps(manifest))
+          PY
+      - name: Add only the isolated SU1 directory
+        run: |
+          mkdir -p build/public-site/experimental/sub-osc-su1
+          cp -a su1/experimental/sub-osc-su1/. build/public-site/experimental/sub-osc-su1/
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          r=Path('build/public-site')
+          for n,h in json.loads(Path('build/frozen-public.json').read_text()).items():
+              assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+          print('PASS: every pre-existing public file preserved byte-for-byte; only SU1 added.')
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/public-site
+      - uses: actions/deploy-pages@v4
+        id: deployment
