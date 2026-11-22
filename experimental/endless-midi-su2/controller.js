@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {InstallService,PINS,validate,modeFor,readPending,pinKey,modelKey} from './service.js?v=su2';
+import {InstallService,PINS,validate,modeFor,readPending,pinKey,modelKey} from './service.js?v=su2-final2';
 const $=id=>document.getElementById(id);
 const buffers={};
 let service=null,device=null,busy=false,choice=null;

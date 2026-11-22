@@ -2,7 +2,7 @@
   "pro.update": {
     "name": "Instalar SU2 · Endless MIDI · Pro",
     "product": "SMK-37 Pro_19662",
-    "url": "./SMKSYNTH-1.2.2-SU2-Pro.fwsc",
+    "url": "./SMKSYNTH-1.2.2-SU2-Pro-d05ae6ff.fwsc",
     "size": 651876,
     "sha": "d05ae6ff6a0e756fcc6270b1ab7f8f7f25ab8d6c9b804c927e28ff2b218d3913"
   },
@@ -16,7 +16,7 @@
   "elite.update": {
     "name": "Instalar SU2 · Endless MIDI · Elite",
     "product": "SMK-37 Elite_19662",
-    "url": "./SMKSYNTH-1.2.2-SU2-Elite.fwsc",
+    "url": "./SMKSYNTH-1.2.2-SU2-Elite-e8535d02.fwsc",
     "size": 651880,
     "sha": "e8535d024a39ad24cface92f92c0841f4bc9207e92c436f0d0e0fae22b3879d8"
   },
