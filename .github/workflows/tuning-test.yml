@@ -1,4 +1,4 @@
-name: Publish isolated Endless MIDI SU2
+name: Publish isolated Endless MIDI SU3
 on:
   push:
     branches: [main]
@@ -32,24 +32,23 @@ jobs:
         with:
           ref: 785365d8612a43b4f9ee4525a43e057f218cfabb
           path: su2
+      - uses: actions/checkout@v4
+        with:
+          ref: fc4ac62a03f9438bc7f16653c45f8ca97e0c10e0
+          path: su3
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate SU2 installer, cache-independent pins and backup
-        working-directory: su2
+      - name: Validate isolated SU3
+        working-directory: su3
         run: |
-          mkdir -p build/su1
-          node tests/su2_installer_test.mjs
-          python3 tests/su2_packages_test.py
-          cc -O2 -o build/backup_server tests/backup_server.c
-          node tests/su2_backup_test.mjs --protocol
-          node tests/su2_bank_test.mjs
+          sh tests/run_su3_tests.sh
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
-          for n,h in json.loads(Path('validation/su2/SOURCE.json').read_text()).items():
+          for n,h in json.loads(Path('validation/su3/SOURCE.json').read_text()).items():
               assert hashlib.sha256(Path(n).read_bytes()).hexdigest()==h,n
-          print('PASS: firmware sources match the fully validated final SU2 builds; this deployment changes cache paths only.')
+          print('PASS: sources match the final native SU3 builds.')
           PY
       - name: Assemble frozen public site
         env:
@@ -60,26 +59,29 @@ jobs:
           python3 public/tools/check_public_web.py build/public-site
           mkdir -p build/public-site/experimental/sub-osc-su1
           cp -a su1/experimental/sub-osc-su1/. build/public-site/experimental/sub-osc-su1/
-          python3 - <<'PY'
-          import hashlib,json
-          from pathlib import Path
-          r=Path('build/public-site')
-          assert (r/'experimental/sub-osc-su1').exists()
-          assert not (r/'experimental/endless-midi-su2').exists()
-          manifest={str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in r.rglob('*') if p.is_file()}
-          Path('build/frozen-public.json').write_text(json.dumps(manifest))
-          PY
-      - name: Add only the isolated SU2 directory
-        run: |
           mkdir -p build/public-site/experimental/endless-midi-su2
           cp -a su2/experimental/endless-midi-su2/. build/public-site/experimental/endless-midi-su2/
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
           r=Path('build/public-site')
+          assert (r/'experimental/sub-osc-su1').exists()
+          assert (r/'experimental/endless-midi-su2').exists()
+          assert not (r/'experimental/endless-midi-su3').exists()
+          manifest={str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in r.rglob('*') if p.is_file()}
+          Path('build/frozen-public.json').write_text(json.dumps(manifest))
+          PY
+      - name: Add only the isolated SU3 directory
+        run: |
+          mkdir -p build/public-site/experimental/endless-midi-su3
+          cp -a su3/experimental/endless-midi-su3/. build/public-site/experimental/endless-midi-su3/
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          r=Path('build/public-site')
           for n,h in json.loads(Path('build/frozen-public.json').read_text()).items():
               assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
-          print('PASS: every pre-existing public file preserved byte-for-byte; including SU1 preserved; only SU2 added.')
+          print('PASS: every pre-existing public file preserved byte-for-byte; including SU1 and SU2; only SU3 added.')
           PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
