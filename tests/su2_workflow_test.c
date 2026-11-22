@@ -25,6 +25,8 @@ int main(){
  char status[32];end_mode=0;assert(!su2_end_status(status));endless_mark_tracks();end_mode=1;ctl_seq_run=0;assert(su2_end_status(status)==1&&!strcmp(status,"ENDLESS READY"));
  ctl_seq_run=1;ui_seq_pos[0]=4;assert(su2_end_status(status)==1&&!strcmp(status,"ENDLESS 5/16"));end_record=1;assert(su2_end_status(status)==2&&!strcmp(status,"ENDLESS REC"));end_record=0;
  for(unsigned th=0;th<2;th++)for(unsigned scope_view=0;scope_view<2;scope_view++){zm_zoom=th;zm_scope=scope_view;page=PG_PERFORM;layer=0;draw_page();if(!th&&!scope_view){draw_header();draw_scope();draw_leds();}char n[40];snprintf(n,sizeof n,"status-%u-%u",th,scope_view);snap(n);}zm_scope=0;
+ /* DRUM-X footer follows hits and retains percussion silhouettes, not voice meters. */
+ patch_t keep=live_p[0];obv_drums_preset(&live_p[0],0);page=PG_PERFORM;zm_zoom=1;zm_scope=0;eng_t=100;drum_stamp[0][0]=100;draw_page();snap("drums-status");unsigned drum_pixels=0;for(unsigned y=203;y<213;y++)for(unsigned x=138;x<147;x++)drum_pixels+=fb[y*240+x]==C_RED;assert(drum_pixels>0);live_p[0]=keep;
  /* REC overlay appears over a real edit page; release-before-threshold never clears. */
  page=PG_OSC1;zm_zoom=1;draw_page();su2_clear_t=0;rec_down=1;rec_down_t=fm1_ms-700;su2_ui_t=0;su2_ui_poll();assert(su2_overlay_was);snap("rec-hold");rec_down=0;fm1_ms+=60;su2_ui_poll();assert(!su2_overlay_was);
  trk_clear();assert(su2_clear_t&&su2_clear_part==0);fm1_ms+=60;su2_ui_poll();assert(su2_overlay_was);snap("rec-cleared");fm1_ms+=1200;su2_ui_poll();assert(!su2_overlay_was);

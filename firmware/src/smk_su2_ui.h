@@ -16,8 +16,22 @@ static const char*su2_pad_name(void){switch(pf_bank()){
  case 3:return "PADS: SPLIT/LAYER";case 4:return "PADS: DRUM-X";
  default:return "PADS: PARTS/FAV";}}
 static void su2_dots(int x,int step,int y,int radius){
- for(unsigned i=0;i<NCARD;i++){int32_t level=0;for(unsigned v=i;v<NV;v+=NCARD)if(ui_vlevel[v]>level)level=ui_vlevel[v];
- uint16_t c=blend565(C_RED_DIM,RGB(255,70,40),(unsigned)clampi(level>>7,0,255));cv_disc(x+(int)i*step,y,radius,0,c);}
+ for(unsigned i=0;i<NCARD;i++){
+  int cx=x+(int)i*step;
+  if(obv_drums_selected()){
+   unsigned hit=drum_stamp[seq_trk%NTRK][i]&&eng_t+1u-drum_stamp[seq_trk%NTRK][i]<FS/8u;
+   uint16_t c=hit?C_RED:C_KNOB_HI;int r=radius,half=r/2?r/2:1;
+   /* Compact versions of the existing percussion silhouettes, never voice
+    * meters: kicks/toms, snare, clap, hats, rim and bell follow drum stamps. */
+   if(i==0||i==5){cv_disc(cx,y,r,1,c);cv_line(cx-half,y+r,cx-r,y+r+1,c);cv_line(cx+half,y+r,cx+r,y+r+1,c);}
+   else if(i==1){mui_border(cx-r,y-half,2*r,2*half,c);cv_line(cx-r+1,y,cx+r-1,y,c);}
+   else if(i==2){cv_line(cx-r,y-r,cx-half,y+r,c);cv_line(cx,y-r,cx+half,y+r,c);cv_line(cx+half,y-r,cx+r,y+r,c);}
+   else if(i==3||i==4){cv_line(cx-r,y,cx+r,y,c);cv_line(cx,y-r,cx,y+r,c);if(i==4)cv_line(cx-r+1,y-half,cx+r-1,y-half,c);}
+   else if(i==6){cv_disc(cx,y,r,1,c);cv_line(cx-r,y-r,cx+r,y+r,c);}
+   else{cv_line(cx,y-r,cx-r,y+r,c);cv_line(cx-r,y+r,cx+r,y+r,c);cv_line(cx+r,y+r,cx,y-r,c);}
+  }else{int32_t level=0;for(unsigned v=i;v<NV;v+=NCARD)if(ui_vlevel[v]>level)level=ui_vlevel[v];
+   uint16_t c=blend565(C_RED_DIM,RGB(255,70,40),(unsigned)clampi(level>>7,0,255));cv_disc(cx,y,radius,0,c);}
+ }
 }
 /* Called inside either a full-screen canvas or a y=200 footer strip. */
 static int su2_footer_body(void){
