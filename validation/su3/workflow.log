@@ -1,0 +1,3 @@
+ 13180 ms  pattern slot 0 saved (14476 + 380 B)
+ 13180 ms  pattern slot 0 saved (13416 + 380 B)
+PASS SU3: tempo metadata/save/copy; MASTER/PATTERN audio-boundary recall; legacy fallback; K5 on every synth page; init auto return; keyboard footer preservation; SUB/SUPER voices; Endless cache invalidation. PASS SU2: master real controls; six colored mixer pages; SINGLE actual-part identity; levels/octaves; Endless READY/play/REC; REC progress/abort/ack; init cancel/busy/target-change/execution; parts and manual flash preservation; INIT + basic DRUM-X, 16 empty steps per track.

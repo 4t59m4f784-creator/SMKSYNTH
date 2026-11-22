@@ -1,0 +1,54 @@
+{
+  "version": "1.2.2-su3",
+  "identity": 19663,
+  "base": "SU2 785365d8612a43b4f9ee4525a43e057f218cfabb / DC3 dual-core",
+  "public_unchanged": "1.2.2 /19655",
+  "toolchain": "jieli 20260730.1",
+  "sdk": "AC79NN_SDK_V1.2.1_2023-12-13",
+  "defines": "OBV_DUAL_CORE=1; explicit --voice-hardware; no factory seed",
+  "ram_static": 96352,
+  "ram_limit": 98304,
+  "pool": 332180,
+  "cpu1_stack_top": 339360,
+  "pool_limit": 344064,
+  "voice_bytes": 184,
+  "part_host_bytes": 168,
+  "worker_private_bytes": 3780,
+  "app_bytes": {
+    "pro": 246760,
+    "elite": 246764
+  },
+  "packages": {
+    "pro.update": {
+      "name": "Instalar SU3 \u00b7 Endless MIDI \u00b7 Pro",
+      "product": "SMK-37 Pro_19663",
+      "url": "./SMKSYNTH-1.2.2-SU3-Pro-099d573a.fwsc",
+      "size": 651876,
+      "sha": "099d573aea25f8d6de349d77f5396236e9b3e404e41512004d3388058fae8797"
+    },
+    "pro.release": {
+      "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Pro",
+      "product": "SMK-37 Pro_19655",
+      "url": "./SMKSYNTH-1.2.2-oficial-Pro.fwsc",
+      "size": 651819,
+      "sha": "57dfa2f9f733fc4a901da2d4161031774fc528ffa4d3f22dbeaa756a0df576f7"
+    },
+    "elite.update": {
+      "name": "Instalar SU3 \u00b7 Endless MIDI \u00b7 Elite",
+      "product": "SMK-37 Elite_19663",
+      "url": "./SMKSYNTH-1.2.2-SU3-Elite-1e8c8a67.fwsc",
+      "size": 651880,
+      "sha": "1e8c8a67ac1e2be1d525e4f093cbe034076ff7e0ccab93199c1238cfe09d9faf"
+    },
+    "elite.release": {
+      "name": "Retornar \u00e0 oficial 1.2.2 \u00b7 Elite",
+      "product": "SMK-37 Elite_19655",
+      "url": "./SMKSYNTH-1.2.2-oficial-Elite.fwsc",
+      "size": 651819,
+      "sha": "de43999c81f039d29b185237102ee32c392e530d5b3b7201795fa54b6d81f2c9"
+    }
+  },
+  "physical_validation": "pending user tests",
+  "persistent_layouts": "unchanged",
+  "sub_gain_ceiling": "64/127 of one full simple oscillator; additive, no normalization of OSC1/OSC2"
+}

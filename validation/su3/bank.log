@@ -1,0 +1,1 @@
+PASS: SUB + 137 BPM pattern bank exports/restores byte-identically via B2, including CRC retry and interrupted restore, for Pro/Elite.

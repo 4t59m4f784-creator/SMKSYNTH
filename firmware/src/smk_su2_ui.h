@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * SU2: isolated UI additions. No new persisted fields or audio allocations. */
 #pragma once
-static uint32_t su2_clear_t,su2_clear_part,su2_overlay_was,su2_ui_t,su2_init_swallow,su2_init_seen,su2_init_fingerprint;
-static void su2_redraw(void){dirty_hdr=dirty_tags=dirty_page=dirty_steps=1;hints_key=0xFFFFFFFFu;scope_state=1;zm_footer_hash=0;}
+static uint32_t su2_clear_t,su2_clear_part,su2_overlay_was,su2_ui_t,su2_init_swallow,su2_init_seen,su2_init_fingerprint,su2_init_done_t;
+static void su2_redraw(void){end_ui_seen=0;dirty_hdr=dirty_tags=dirty_page=dirty_steps=1;hints_key=0xFFFFFFFFu;scope_state=1;zm_footer_hash=0;}
 static unsigned su2_end_status(char*s){
  unsigned t=seq_trk%NTRK,len=pat.trk[t].len;s[0]=0;
  if(!end_mode||!endless_enabled(&pat.trk[t]))return 0;
@@ -35,20 +35,20 @@ static void su2_dots(int x,int step,int y,int radius){
 }
 /* Called inside either a full-screen canvas or a y=200 footer strip. */
 static int su2_footer_body(void){
- if(mm_on||layer||save_ui_active()||is_seq_page(page)||page==PG_INITIALIZE||page==PG_THEME||(page==PG_KEYBOARD&&zm_zoom))return 0;
- if(page!=PG_PERFORM&&page!=PG_MIXER&&page!=PG_KEYBOARD)return 0;
+ if(mm_on||layer||save_ui_active()||is_seq_page(page)||page==PG_INITIALIZE||page==PG_THEME||page==PG_TEMPO||(page==PG_KEYBOARD&&zm_zoom))return 0;
+ if(page!=PG_PERFORM&&page!=PG_MIXER&&page!=PG_KEYBOARD&&page!=PG_ARP)return 0;
  if(!zm_zoom&&page==PG_MIXER&&!zm_scope_active())return 0;
- if(page==PG_KEYBOARD){cv_rect(0,200,240,40,C_PANEL);su2_dots(22,28,207,3);cv_rect(8,219,224,1,C_RULE);zm_text(8,223,su2_pad_name(),16,C_CREAM);char ctx[8]={'E',(char)('1'+kb_edit_row),'/','P',(char)('1'+pat.keyboard_selected),0};zm_text(232-(int)zm_width(ctx,16),223,ctx,16,C_DIMT);return 1;}
+ if(page==PG_KEYBOARD){cv_rect(0,200,240,40,C_PANEL);su2_dots(22,28,207,3);cv_rect(8,219,224,1,C_RULE);zm_text(8,223,su2_pad_name(),16,C_CREAM);su3_bpm_draw(232,223);return 1;}
  char status[32];unsigned active=su2_end_status(status);
  cv_rect(0,200,240,40,C_PANEL);
  if(zm_scope_active()){
   if(active){char line[36]={(char)('A'+seq_trk%NTRK),' ',0};scat(line,status);zm_text(8,200,line,16,active==2?C_RED:C_AMBER);su2_dots(22,28,231,6);}
-  else su2_dots(22,28,224,6);
+  else su2_dots(22,28,224,6);su3_bpm_draw(232,200);
   return 1;
  }
  if(active){zm_text(8,200,status,16,active==2?C_RED:C_AMBER);su2_dots(142,12,207,3);}
  else su2_dots(22,28,207,3);
- cv_rect(8,219,224,1,C_RULE);zm_text(8,223,su2_pad_name(),16,C_CREAM);return 1;
+ cv_rect(8,219,224,1,C_RULE);zm_text(8,223,su2_pad_name(),16,C_CREAM);su3_bpm_draw(232,223);return 1;
 }
 static void su2_mixer_colors(void){
  for(unsigned i=0;i<4;i++){int x=4+(i%2)*120,y=54+(i/2)*76;char l[2]={(char)('A'+i),0};
@@ -78,7 +78,7 @@ static void su2_keyboard_draw(void){
    else{zm_text(92,yy+28,kl,16,C_DIMT);v[0]=0;if(kb_edit_oct)fmt_s(v,k->octave[i]);else{fmt_u(v,k->level[i]);scat(v,"%");}zm_text(174,yy+22,v,24,k->mode==KB_SINGLE?C_DIMT:C_CREAM);}
   }
   zm_text(8,175,"K4 SPLIT",16,C_DIMT);fmt_note(v,k->split);zm_text(152,166,v,32,k->mode==KB_SPLIT?C_CREAM:C_DIMT);
-  zm_text(8,202,"K5 LEVEL / OCT",16,C_AMBER);cv_rect(8,220,224,1,C_RULE);zm_text(8,223,su2_pad_name(),16,C_CREAM);mui_end(y);
+  zm_text(8,202,"K5 TEMPO  < > LVL/OCT",16,C_AMBER);cv_rect(8,220,224,1,C_RULE);zm_text(8,223,su2_pad_name(),16,C_CREAM);su3_bpm_draw(232,223);mui_end(y);
  }
 }
 static void su2_cleared(void){su2_clear_t=fm1_ms|1u;su2_clear_part=seq_trk%NTRK;}
@@ -113,8 +113,9 @@ static void su2_init_execute(void){
  }
  pat_edited=1;pat_edit_t=fm1_ms|1u;set_dirty=1;set_t=fm1_ms;snd_capture(set.pat);
  /* No prog_put, pattern_slot_save, save request or favourite mutation. */
- su2_init_stage=3;su2_redraw();
+ su2_init_stage=3;su2_init_done_t=fm1_ms;su2_redraw();
 }
+static void su2_to_perform(void){su2_init_stage=su2_init_choice=su2_init_seen=0;page=PG_PERFORM;layer=0;zm_scope=zm_focus_on=0;su2_redraw();}
 static uint32_t su2_init_buttons(uint32_t b,uint32_t*rel){
  const uint32_t mask=(1u<<BTN_PLAY)|(1u<<BTN_HOME);
  uint32_t blocked=su2_init_swallow;su2_init_swallow&=~*rel;*rel&=~blocked;b&=~blocked;
@@ -123,7 +124,7 @@ static uint32_t su2_init_buttons(uint32_t b,uint32_t*rel){
  if(su2_init_stage==1u&&!su2_init_target&&su2_init_fingerprint!=zm_hash(&live_p[su2_init_part],sizeof(patch_t))){su2_init_stage=su2_init_choice=0;su2_redraw();}
  if(su2_init_stage&&((su2_init_part!=seq_trk%NTRK&&!su2_init_target)||su2_init_pattern!=set.pat)){su2_init_stage=su2_init_choice=0;su2_init_part=seq_trk%NTRK;su2_init_pattern=set.pat;su2_redraw();}
  uint32_t used=b&mask;su2_init_swallow|=used;
- if(b>>BTN_HOME&1u){if(su2_init_stage==2u){/* already authorized; finish first */}else if(su2_init_stage){su2_init_stage=su2_init_choice=0;su2_redraw();}else{page=PG_GLOBAL;su2_init_seen=0;su2_redraw();}}
+ if(b>>BTN_HOME&1u){if(su2_init_stage==3u){su2_to_perform();}else if(su2_init_stage==2u){/* already authorized; finish first */}else if(su2_init_stage){su2_init_stage=su2_init_choice=0;su2_redraw();}else{page=PG_GLOBAL;su2_init_seen=0;su2_redraw();}}
  else if(b>>BTN_PLAY&1u){
   if(!su2_init_stage){su2_init_part=seq_trk%NTRK;su2_init_pattern=set.pat;su2_init_stage=1;su2_init_choice=0;su2_init_fingerprint=zm_hash(&live_p[su2_init_part],sizeof(patch_t));}
   else if(su2_init_stage==1u){
@@ -131,7 +132,7 @@ static uint32_t su2_init_buttons(uint32_t b,uint32_t*rel){
    else if(su2_init_busy())say("FINISH RECORD / SAVE FIRST");
    else if(su2_init_target){smk_panel_panic();su2_init_stage=2;}
    else su2_init_execute();
-  }else if(su2_init_stage==3u){su2_init_stage=0;su2_init_choice=0;}
+  }else if(su2_init_stage==3u){su2_to_perform();}
   su2_redraw();
  }
  /* Other buttons cancel the confirmation before retaining their normal action. */
@@ -149,15 +150,16 @@ static void su2_init_draw(void){
    else{line[0]=0;scat(line,"PART ");unsigned n=slen(line);line[n]=(char)('A'+t);line[n+1]=0;zm_center(120,91,line,32,C_TRKC[t]);zm_name(name,&live_p[t]);zm_center(120,132,name,24,C_CREAM);mui_u3(num,trk_prog[t]+1u);zm_center(120,161,num,16,C_TRKC[t]);}
    zm_center(120,188,su2_init_stage?(su2_init_choice?"K1 INITIALIZE":"K1 CANCEL"):"K1 TARGET",16,su2_init_stage&&su2_init_choice?C_RED:C_AMBER);
   }
-  zm_center(120,205,su2_init_stage==2?"PLEASE WAIT":su2_init_stage==3?"PLAY: BACK":su2_init_stage?"PLAY: CONFIRM":"PLAY: CONTINUE",16,C_CREAM);zm_center(120,223,su2_init_stage==2?"":su2_init_stage==3?"PATCH: BACK":su2_init_stage?"PATCH: CANCEL":"PATCH: EXIT",16,C_DIMT);mui_end(y);
+  zm_center(120,205,su2_init_stage==2?"PLEASE WAIT":su2_init_stage==3?"RETURNING TO PERFORM":su2_init_stage?"PLAY: CONFIRM":"PLAY: CONTINUE",16,C_CREAM);zm_center(120,223,su2_init_stage==2?"":su2_init_stage==3?"PATCH: PERFORM":su2_init_stage?"PATCH: CANCEL":"PATCH: EXIT",16,C_DIMT);mui_end(y);
  }
 }
 static void su2_ui_poll(void){
+ if(su2_init_stage==3u&&page==PG_INITIALIZE&&fm1_ms-su2_init_done_t>=2200u)su2_to_perform();
  if(su2_init_stage==2u&&page==PG_INITIALIZE&&!ctl_panic&&engine_quiet()&&!notes_down&&!fm1_in.keys)su2_init_execute();
  if(fm1_ms-su2_ui_t<50u)return;su2_ui_t=fm1_ms;
  if(page==PG_INITIALIZE&&!layer)return;
- if(zm_zoom&&!layer&&!save_ui_active()&&(page==PG_PERFORM||page==PG_MIXER))zm_activity();
- if(!zm_zoom&&(page==PG_PERFORM||page==PG_KEYBOARD)&&!layer&&!save_ui_active()){cv_begin(240,40,C_PANEL);cv_oy=-200;su2_footer_body();cv_oy=0;cv_blit(0,200);}
+ if(zm_zoom&&!layer&&!save_ui_active()&&(page==PG_PERFORM||page==PG_MIXER||page==PG_ARP))zm_activity();
+ if(!zm_zoom&&(page==PG_PERFORM||page==PG_KEYBOARD||page==PG_ARP)&&!layer&&!save_ui_active()){cv_begin(240,40,C_PANEL);cv_oy=-200;su2_footer_body();cv_oy=0;cv_blit(0,200);}
  if(!zm_zoom&&page==PG_MIXER&&!layer&&!save_ui_active()){
   char s[32];unsigned en=su2_end_status(s);if(en){cv_begin(148,18,C_PANEL);cv_text(0,0,&FONT_S,s,en==2?C_RED:C_AMBER);cv_blit(54,22);}
  }
@@ -170,6 +172,6 @@ static void su2_ui_poll(void){
   char l[16]="PART ";l[5]=(char)('A'+t);l[6]=0;zm_center(112,6,l,24,C_TRKC[t]);zm_center(112,39,cleared?"SEQ CLEARED":"HOLD REC",24,cleared?C_CREAM:C_RED);
   if(!cleared){zm_center(112,71,"TO CLEAR SEQUENCE",16,C_DIMT);cv_rect(12,96,200,5,C_RULE);cv_rect(12,96,(int)clampi(held,0,1200)*200/1200,5,C_RED);}
   cv_blit(8,65);
- }else if(su2_overlay_was){lcd_fill(0,0,240,240,C_PANEL);su2_redraw();if(is_seq_page(page))dirty_steps=1;else draw_page();}
+ }else if(su2_overlay_was){lcd_fill(0,0,240,240,C_PANEL);end_ui_seen=0;su2_redraw();if(is_seq_page(page))dirty_steps=1;else draw_page();}
  su2_overlay_was=overlay;
 }

@@ -67,7 +67,12 @@ static void keyboard_second_init(pattern_t*p){p->keyboard2_magic=KEYBOARD2_MAGIC
 static volatile uint32_t seq_trk; /* UI/live focus, restored atomically with a pattern. */
 /* FCS1 uses previously reserved bytes; old patterns have no tag and select A. */
 static unsigned pattern_focus(const pattern_t*p){return p->keyboard_pad[0]==0xA3u&&p->keyboard_pad[1]<NTRK?p->keyboard_pad[1]:0u;}
-static void pattern_focus_set(pattern_t*p,unsigned t){p->keyboard_pad[0]=0xA3u;p->keyboard_pad[1]=(uint8_t)(t%NTRK);p->keyboard_pad[2]=0;}
+static void pattern_focus_set(pattern_t*p,unsigned t){if(p->keyboard_pad[0]!=0xA3u)p->keyboard_pad[2]=0;p->keyboard_pad[0]=0xA3u;p->keyboard_pad[1]=(uint8_t)(t%NTRK);}
+/* SU3: the last FCS1 reserved byte stores 40..240 BPM. Zero/legacy = absent.
+ * No prefix, patch, scene, bank size or flash address changes. */
+static volatile unsigned ctl_pattern_tempo;
+static unsigned pattern_tempo(const pattern_t*p){return p->keyboard2_magic==KEYBOARD2_MAGIC&&p->keyboard_pad[0]==0xA3u&&p->keyboard_pad[2]>=40u&&p->keyboard_pad[2]<=240u?p->keyboard_pad[2]:0u;}
+static void pattern_tempo_set(pattern_t*p,unsigned bpm){if(bpm<40u||bpm>240u)return;pattern_focus_set(p,pattern_focus(p));p->keyboard_pad[2]=(uint8_t)bpm;}
 static void keyboard_pattern_init(pattern_t*p){p->keyboard_magic=KEYBOARD_MAGIC;keyboard_defaults(&p->keyboard);keyboard_second_init(p);}
 static keyboard_cfg_t*keyboard_row(pattern_t*p,unsigned row){return row?&p->keyboard_alt:&p->keyboard;}
 static const keyboard_cfg_t*keyboard_live(const pattern_t*p){return p->keyboard_selected?&p->keyboard_alt:&p->keyboard;}
@@ -363,7 +368,7 @@ static void seq_tick(void)
                 if (ctl_pat_keep) pat_old = pat;
                 keyboard_pattern_epoch++;
                 end_global_transpose=0;end_pending=end_clock_valid=0;end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
-                pat = pat_q;seq_trk=pattern_focus(&pat);end_held=0;endless_pattern_state(&pat);
+                pat = pat_q;if(ctl_pattern_tempo&&pattern_tempo(&pat)){ctl_tempo=pattern_tempo(&pat);q=quarter_len();}seq_trk=pattern_focus(&pat);end_held=0;endless_pattern_state(&pat);
                 keyboard_pattern_gains(&pat);
                 if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) { snd_old[t] = live_p[t]; live_p[t] = snd_q[t]; } ctl_snd_swap = 0; ui_snd_swapped = 1; }
                 mx_swap_in();                   /* (its mixer, drive and master on the same downbeat) */
