@@ -81,6 +81,7 @@ static void zm_focus_draw(void){
  zm_value(27,125,zm_focus_value,186,C_CREAM);
 }
 static void zm_activity_body(void){
+ if(su2_footer_body())return;
  uint16_t accent=C_RED;
  if(zm_transpose_active()){zm_text(8,222,"DRUM-X FIXED",16,C_AMBER);return;}
  if(page==PG_KEYBOARD&&!zm_scope_active()){zm_text(8,222,"K5 LEVEL / OCT",16,C_AMBER);return;}
@@ -94,7 +95,7 @@ static void zm_activity_body(void){
   for(unsigned i=0;i<NCARD;i++){int32_t level=0;for(unsigned v=i;v<NV;v+=NCARD)if(ui_vlevel[v]>level)level=ui_vlevel[v];unsigned bright=clampi(level>>7,0,255);int x=22+(int)i*28;uint16_t c=blend565(blend565(C_PANEL,accent,45),accent,bright);if(bright>8)cv_disc(x,224,9,0,blend565(C_PANEL,c,64));cv_disc(x,224,6,0,c);cv_disc(x,224,6,1,blend565(C_PANEL,c,170));}
  }
 }
-static void zm_activity(void){cv_begin(240,33,C_PANEL);cv_oy=-207;zm_activity_body();cv_oy=0;cv_blit(0,207);}
+static void zm_activity(void){cv_begin(240,40,C_PANEL);cv_oy=-200;zm_activity_body();cv_oy=0;cv_blit(0,200);}
 static void zm_scope_plot(void){
  for(unsigned y=60;y<198;y+=69){cv_begin(240,69,C_PANEL);cv_oy=-(int)y;cv_rect(8,60,224,138,C_SCOPE_BG);cv_line(8,129,231,129,C_SCOPE_MID);for(int x=64;x<232;x+=56)cv_line(x,60,x,197,C_SCOPE_MID);
   for(unsigned i=1;i<224;i++){int a=clampi(scope[(i-1u)*SCOPE_N/224u]>>8,-65,65),b=clampi(scope[i*SCOPE_N/224u]>>8,-65,65);cv_line((int)i+7,129-a,(int)i+8,129-b,C_AMBER);}

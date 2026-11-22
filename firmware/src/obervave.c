@@ -380,6 +380,9 @@ static void mix_apply(void)
     }
     ctl_mix_off = solo ? ~solo & ((1u << NTRK) - 1u) : set.mix_mute & ((1u << NTRK) - 1u);
     ctl_dv_type = set.dv_type; ctl_dv_amt = set.dv_amt; ctl_dv_tone = set.dv_tone; ctl_dv_mix = set.dv_mix;   /* (VIBE) */
+    fm1_irq_off();
+    ctl_m_vol=set.m_vol;ctl_m_dj=set.m_dj;ctl_m_drive=set.m_drive;ctl_m_comp=set.m_comp;
+    fm1_irq_on();
 }
 static uint32_t trk_silent(uint32_t t) { return ctl_mix_off >> (t % NTRK) & 1u; }
 
@@ -991,6 +994,15 @@ static uint32_t perf_header_slot(void);
 static uint32_t perf_pattern_bank(void);
 static uint32_t perf_drum_bank(void);
 #if BOARD_SMK37
+#if BOARD_SMK37
+static int su2_footer_body(void);
+static void su2_keyboard_draw(void);
+static void su2_mixer_colors(void);
+static void su2_init_draw(void);
+static void su2_init_turn(int e);
+static void su2_cleared(void);
+static unsigned su2_init_target,su2_init_stage,su2_init_choice,su2_init_part,su2_init_pattern;
+#endif
 #include "smk_zoom.h"
 #endif
 
@@ -1150,6 +1162,8 @@ static void draw_keyboard_scope(void){
 static void draw_page(void)
 {
 #if BOARD_SMK37
+    if(page==PG_INITIALIZE&&!layer){su2_init_draw();return;}
+    if(page==PG_KEYBOARD&&!layer&&zm_zoom){su2_keyboard_draw();return;}
     if(page==PG_THEME&&!layer){zm_theme_draw();return;}
     if(page==PG_MIDI&&!layer){mui_entry_draw();return;}
     if(page==PG_CONTROLS&&!layer){mui_controls_draw(smk_fader_jump());return;}
@@ -1290,7 +1304,7 @@ static void draw_page(void)
 #endif
             scat(cpu, set.sync_int ? " INT" : ctl_ext_quarter ? " CLK" : " AUTO");
             #if BOARD_SMK37
-            if(zm_grid_active()||zm_scope_active())zm_grid(t,k);else
+            if(zm_grid_active()||zm_scope_active()){zm_grid(t,k);if(page==PG_MIXER&&mix_row<6u)su2_mixer_colors();}else
 #endif
             ui_page(t, k, page==PG_KEYBOARD&&!layer?0:save_armed ? "SAVE?" : seq_shown() && pat_edited ? "EDITED" : (page == PG_GLOBAL || page == PG_SUPER) && !layer ? cpu : 0);
         }
@@ -1363,6 +1377,7 @@ static void draw_tags(void) { draw_header(); }
 static void draw_scope(void) { if(perf_drum_bank()&&!obv_drums_selected()){cv_begin(240,50,C_SCOPE_BG);cv_text(4,2,&FONT_S,"DRUM PADS INACTIVE",C_AMBER);cv_text(4,28,&FONT_S,"SELECT A DRUM-X PART",C_DIMT);cv_blit(0,146);return;}if(page==PG_KEYBOARD&&!layer)draw_keyboard_scope();else if(obv_drums_selected())ui_drum_hits(seq_trk%NTRK);else ui_scope(scope, SCOPE_N); }
 static void draw_leds(void)                     /* (32 voices: eight lights, each the loudest of its card in all four groups) */
 {
+    if((page==PG_PERFORM||page==PG_KEYBOARD)&&!layer){cv_begin(240,40,C_PANEL);cv_oy=-200;su2_footer_body();cv_oy=0;cv_blit(0,200);return;}
     static int32_t l8[NCARD];
     uint32_t v;
     for (v = 0; v < NCARD; v++) l8[v] = 0;
@@ -2423,6 +2438,7 @@ static int b1_can_begin(void){return !mm_on&&!mm_wait_release&&flash_ok&&b1_read
 #if BOARD_SMK37
 #include "smk_midi_mode_ui.h"
 #include "smk_zoom_runtime.h"
+#include "smk_su2_ui.h"
 #endif
 static void app_idle(void)                      /* lcd.c while a strip goes out, ui_page between the knobs: the notes */
 {
@@ -2528,6 +2544,7 @@ static void trk_clear(void)
     if (rec == REC_ON) { rec = ctl_seq_run ? REC_READY : REC_OFF; rec_wait = 0; }
     memset(rec_open_part, 0, sizeof rec_open_part);
     m[0] = 0; scat(m, "TRACK "); m[6] = TRK_L[seq_trk % NTRK]; m[7] = 0; scat(m, " CLEARED"); say(m);
+    su2_cleared();
     dirty_tags = dirty_steps = dirty_page = 1;
 }
 /* Shared by the device loop and host workflow regression tests. */
@@ -2636,6 +2653,8 @@ static void panel_encoders(void)
                 if (k == 0) set.dv_type = (uint8_t)clampi((int32_t)(set.dv_type % NDV) + (e > 0 ? 1 : -1), 0, NDV - 1);
                 else { uint8_t *v = k == 1 ? &set.dv_amt : k == 2 ? &set.dv_tone : &set.dv_mix; *v = (uint8_t)clampi((int32_t)*v + e * 2, 0, 127); }
                 mix_apply(); set_dirty = 1; set_t = fm1_ms;
+            } else if (page == PG_INITIALIZE && !layer) {
+                if(!k)su2_init_turn(e);
             } else if (page == PG_THEME && !layer) {
 #if BOARD_SMK37
                 if(!k){zm_theme_set(e>0);dirty_hdr=dirty_tags=dirty_steps=1;}
@@ -2836,6 +2855,7 @@ static void app_main(void)
         b = fm1_input_edges(&rel);
 #if BOARD_SMK37
         b = smk_panic_buttons(b, &rel);
+        b = su2_init_buttons(b,&rel);
 #if OBV_DUAL_CORE && !defined(OBV_HOST)
         if(dc_diag_poll(b,rel)){rec_down=0;continue;}
 #endif
@@ -2882,7 +2902,7 @@ static void app_main(void)
                         else if (LL[k] == L_EDIT && is_seq_page(page) && SV_ENTRY(seq_view)) seq_clear_cursor();
                         else if (LL[k] == L_EDIT) np = obv_drums_selected() ? (page==PG_DKIT?PG_DSOUND:PG_DKIT) : super_edit_page();
                         else if (LL[k] == L_FX) np = cycle_page(PG_CHORUS, 4);
-                        else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : (BOARD_SMK37 && page == PG_CONTROLS) ? PG_THEME : (BOARD_SMK37 && page == PG_THEME) ? PG_MIDI : PG_GLOBAL;
+                        else if (LL[k] == L_GLO) np = page == PG_GLOBAL ? PG_VOICE : page == PG_VOICE ? PG_OUTPUT : page == PG_OUTPUT ? PG_ENGINE : (BOARD_SMK37 && page == PG_ENGINE) ? PG_CONTROLS : (BOARD_SMK37 && page == PG_CONTROLS) ? PG_THEME : (BOARD_SMK37 && page == PG_THEME) ? PG_MIDI : (BOARD_SMK37 && page == PG_MIDI) ? PG_INITIALIZE : PG_GLOBAL;
 
                     }
                     layer = L_NONE;
@@ -3093,7 +3113,7 @@ static void app_main(void)
         fm1_led_key(BTN_ENV, page == PG_FENV || page == PG_AENV);
         fm1_led_key(BTN_LFO, page >= PG_LFO && page <= PG_LFO2);
         fm1_led_key(BTN_FX, page >= PG_CHORUS && page <= PG_DRIVE);
-        fm1_led_key(BTN_GLO, (page >= PG_VOICE && page <= PG_GLOBAL) || page == PG_CONTROLS || page == PG_MIDI || page == PG_THEME);
+        fm1_led_key(BTN_GLO, (page >= PG_VOICE && page <= PG_GLOBAL) || page == PG_CONTROLS || page == PG_MIDI || page == PG_THEME || page==PG_INITIALIZE);
         fm1_led_key(BTN_SAVE, preset_ui==1||preset_ui==2||preset_down);
 #if BOARD_SMK37
         smk_leds();                             /* the step pads, FADER BANK, < > */
@@ -3336,6 +3356,7 @@ static void app_main(void)
             pat_switch(n);
             dirty_page = dirty_steps = dirty_hdr = 1;
         }
+        su2_ui_poll();
     }
 }
 

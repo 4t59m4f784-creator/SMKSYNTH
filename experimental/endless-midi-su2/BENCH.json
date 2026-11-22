@@ -1,0 +1,24 @@
+{
+  "0": {
+    "seconds": [
+      0.082097,
+      0.082721,
+      0.082702,
+      0.083288,
+      0.081987
+    ],
+    "median": 0.082702
+  },
+  "100": {
+    "seconds": [
+      0.097266,
+      0.096213,
+      0.099201,
+      0.096608,
+      0.096047
+    ],
+    "median": 0.096608
+  },
+  "scope": "x86-64 -O2, 8 voices, 60000 control blocks; sample renderer only, NOT real SMK total CPU",
+  "on_vs_off_percent": 16.814587313486975
+}

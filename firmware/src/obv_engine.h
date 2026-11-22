@@ -135,7 +135,7 @@ static volatile uint32_t eng_t; /* rendered audio frames */
 static uint8_t seq_note_source; /* ISR-scoped origin, including deferred engine-switch events */
 static volatile int32_t ctl_tune8;              /* global tune, Q8 semitones */
 static volatile uint32_t ctl_tempo = 120, ctl_ext_quarter;   /* MIDI clock: frames per quarter, 0 = none */
-static volatile uint32_t ctl_arp_restart, ctl_panic;
+static volatile uint32_t ctl_arp_restart, ctl_panic, ctl_part_reset;
 
 /* ISR -> main loop */
 static volatile int32_t ui_vlevel[NV];          /* each voice's amp envelope, Q15 */
@@ -165,7 +165,7 @@ typedef struct {
 #endif
     int32_t fenv_amt, keytrk, velflt, lfo_pd, lfo_fd, lfo_pwd, lfo_ad, wheel_q, bend8, env_o2, det_fine8;
     int32_t lvl1, lvl2, lvln, drive_q12, reso_k, vint, sus_f, sus_a, gain_q12, morph_q;
-    uint32_t sub_mode,sub_key; int32_t sub_level,sub_norm;
+    uint32_t sub_mode; int32_t sub_level;
     int32_t cut_sm, reso_sm;                    /* CUTOFF and RESO slewed (Q8), ~25 ms: a CC sweep in semitone steps glides */
     uint32_t pw1_base, pw2_base, w1, w2, ftype, sync_on, xmod_q, glide_k;
 } part_t;
@@ -636,6 +636,8 @@ static void parts_off(uint32_t p)               /* a panic: its keys, its arp, i
 
 static void engine_events(void)
 {
+    uint32_t reset=ctl_part_reset;ctl_part_reset=0;
+    for(unsigned t=0;t<NPART;t++)if(reset>>t&1u)parts_off(t);
     uint32_t sus = 0, p;
 #if BOARD_SMK37
     for(unsigned t=0;t<4;t++)for(unsigned d=0;d<8;d++)if(mout_drum_due[t][d]&&(int32_t)(eng_t+1u-mout_drum_due[t][d])>=0){mout_off(t,mout_drum_note[t][d],MOUT_SEQ);mout_drum_due[t][d]=0;}
@@ -771,7 +773,7 @@ static int32_t vol_q12;                         /* the output stage: CC 7 (each 
 static void block_globals(part_t *g)            /* a sound's derived numbers, once per block */
 {
     const uint8_t *pv = g->p->v;
-    if(patch_sub_valid(g->p)){g->sub_mode=(pv[76]>>7)|((pv[77]>>7)<<1);g->sub_level=(int32_t)(pv[78]*127u*256u/100u);}
+    if(patch_sub_valid(g->p)){g->sub_mode=(pv[76]>>7)|((pv[77]>>7)<<1);g->sub_level=(int32_t)(pv[78]*64u*256u/100u);}
     else {g->sub_mode=0;g->sub_level=0;}
     int32_t d;
     g->fenv_amt = (int32_t)pv[P_FENV_AMT] - 64;
@@ -793,9 +795,6 @@ static void block_globals(part_t *g)            /* a sound's derived numbers, on
     d = pv[P_O1_LVL]; g->lvl1 = (d * d) >> 7;
     d = pv[P_O2_LVL]; g->lvl2 = (d * d) >> 7;
     d = pv[P_NOISE]; g->lvln = (d * d) >> 7;
-    uint32_t sub_budget=(uint32_t)(g->lvl1+g->lvl2+g->lvln);if(!sub_budget)sub_budget=127;
-    uint32_t sub_key=(sub_budget<<16)|(uint32_t)g->sub_level;
-    if(sub_key!=g->sub_key){g->sub_key=sub_key;g->sub_norm=(int32_t)((sub_budget*4096u)/(sub_budget+((uint32_t)g->sub_level>>8)));}
     d = pv[P_DRIVE]; g->drive_q12 = d ? 4096 + (d * d * 7 * 4096 / 16129) : 0;
     g->cut_sm += ((pv[P_CUTOFF] << 8) - g->cut_sm) >> 6;   /* tau = 64 blocks = 23 ms */
     g->reso_sm += ((pv[P_RESO] << 8) - g->reso_sm) >> 6;
@@ -916,7 +915,7 @@ static inline __attribute__((always_inline)) void voice_render_inner(voice_t *v,
     if (ww1 == W_SUPER) super_render_call(ss, &v->o1, inc1, g->p->v[P_O1_PW], patch_super_mix(g->p,0), l1 ? super_buf[0] : 0, CTL);
     else {ss->active = 0;if(buffered1)super_plain_call(ps,&v->o1,inc1,l1?super_buf[0]:0,CTL);}
     if(buffered2)super_plain_call(ps,&v->o2,inc2,l2?super_buf[1]:0,CTL);
-    int32_t sg0=0,sg1=0,sn0=4096,sn1=4096;uint32_t substep=0,subwave=0;
+    int32_t sg0=0,sg1=0;uint32_t substep=0,subwave=0;
     if(do_sub){
     sg0=v->sub_gain;sg1=sg0;int32_t st=g->sub_mode==v->sub_mode?g->sub_level:0;
     if(st>sg1)sg1+=st-sg1>2048?2048:st-sg1;
@@ -927,13 +926,7 @@ static inline __attribute__((always_inline)) void voice_render_inner(voice_t *v,
     }
     substep=v->sub_inc>>(1u+((v->sub_mode>>1)&1u));
     subwave=(v->sub_mode&1u)?OSC_SAW:OSC_PLS;
-    /* Normalize the additional oscillator into the existing oscillator gain
-     * budget, rather than forcing more energy into the filter/clamp. SUB=0
-     * bypasses all mix changes. Q12 products stay inside signed 32-bit. */
-    int32_t budget=l1+l2+ln;if(!budget)budget=127;
-
-    if(sg0||sg1){if(sg0==g->sub_level&&sg1==g->sub_level)sn0=sn1=g->sub_norm;
-        else {sn0=(budget*4096)/(budget+(sg0>>8));sn1=(budget*4096)/(budget+(sg1>>8));}}
+    /* SU2: additive SUB, capped at about half one full oscillator. */
     }
     for (i = 0; i < CTL; i++) {
         int32_t s1, s2, mix, lp, bp, hp, y, amp, rt = -1;
@@ -954,8 +947,8 @@ static inline __attribute__((always_inline)) void voice_render_inner(voice_t *v,
         mix >>= 7;
         if(do_sub){
             int32_t sub=osc_step(&v->sub,substep,substep>>15,0x80000000u,subwave,-65536,-1);
-            int32_t gain=sg0+((sg1-sg0)*(int32_t)i>>4),norm=sn0+((sn1-sn0)*(int32_t)i>>4);
-            mix=(mix*norm>>12)+((sub*gain>>15)*norm>>12);
+            int32_t gain=sg0+((sg1-sg0)*(int32_t)i>>4);
+            mix += sub*gain>>15;
         }
         if (drv) mix = softclip(((mix >> 3) * drv) >> 9);
         else mix = clampi(mix, -65535, 65535);

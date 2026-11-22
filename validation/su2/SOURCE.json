@@ -1,0 +1,7 @@
+{
+  "firmware/src/obervave.c": "aa0455e31f78fc473419636fcf0cd79985e071144bc14e0b12ac08c0e0113b73",
+  "firmware/src/obv_engine.h": "69cc47b30dd3149c509057b59062e419e3dc7c597891d0f0e8cf1307c289c6f7",
+  "firmware/src/obv_params.h": "0d1f91e154202bc10670e85118e234f46f5e4365762acfc06fa33206c6331bf9",
+  "firmware/src/smk_zoom.h": "16244348647ee499b7eb67fb21fe74681b11854e56c27bc76a5d9fe464d61f0a",
+  "firmware/src/smk_su2_ui.h": "e676a4e72bb3ebe3d5ec12a699ddd365616d23c717588a2248c2d3763f3cab7c"
+}
