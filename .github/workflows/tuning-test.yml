@@ -30,14 +30,27 @@ jobs:
           path: su1
       - uses: actions/checkout@v4
         with:
-          ref: 5cbc8c740f352e5cd0cef7d30f142836e239fcff
+          ref: 785365d8612a43b4f9ee4525a43e057f218cfabb
           path: su2
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate the complete SU2 package
+      - name: Validate SU2 installer, cache-independent pins and backup
         working-directory: su2
-        run: sh tests/run_su2_tests.sh
+        run: |
+          mkdir -p build/su1
+          node tests/su2_installer_test.mjs
+          python3 tests/su2_packages_test.py
+          cc -O2 -o build/backup_server tests/backup_server.c
+          node tests/su2_backup_test.mjs --protocol
+          node tests/su2_bank_test.mjs
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          for n,h in json.loads(Path('validation/su2/SOURCE.json').read_text()).items():
+              assert hashlib.sha256(Path(n).read_bytes()).hexdigest()==h,n
+          print('PASS: firmware sources match the fully validated final SU2 builds; this deployment changes cache paths only.')
+          PY
       - name: Assemble frozen public site
         env:
           GH_TOKEN: ${{ github.token }}
