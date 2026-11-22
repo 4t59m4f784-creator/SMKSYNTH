@@ -30,7 +30,7 @@ jobs:
           path: su1
       - uses: actions/checkout@v4
         with:
-          ref: c1738c2de5bdbe68338ae55d38cfd15326ace15c
+          ref: 5cbc8c740f352e5cd0cef7d30f142836e239fcff
           path: su2
       - uses: actions/setup-node@v4
         with:
