@@ -1,8 +1,9 @@
-name: Publish website artwork
+name: Publish website and isolated installers
 on:
   push:
     branches: [main]
     paths:
+      - experimental/endless-midi-ps1/**
       - docs/images/splash-endless-midi-130.png
       - docs/images/smksynth-social-v3.png
       - docs/images/smksynth-social-v3.svg
@@ -35,6 +36,7 @@ jobs:
         run: |
           gh release download v1.3.0 --repo 4t59m4f784-creator/SMKSYNTH --pattern 'SMKSYNTH-1.3.0-source.zip' --pattern SHA256SUMS.txt --dir releases/1.3.0 --clobber
           python3 tools/package_release.py build/public-site --reuse-release
+          cp -a experimental/endless-midi-ps1 build/public-site/experimental/endless-midi-ps1
           python3 tools/check_public_web.py build/public-site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

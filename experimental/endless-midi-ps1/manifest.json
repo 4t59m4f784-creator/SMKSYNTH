@@ -1,0 +1,30 @@
+{
+  "pro.update": {
+    "name": "Instalar PS1 · Endless MIDI · Pro",
+    "product": "SMK-37 Pro_19665",
+    "url": "./SMKSYNTH-1.3.0-PS1-Pro.fwsc",
+    "size": 651876,
+    "sha": "4421cf43dffc8f2af1ec3a36c07d83cb2244dc863d530b2b5b93ccdd088a93d7"
+  },
+  "pro.release": {
+    "name": "Retornar à oficial 1.3.0 · Pro",
+    "product": "SMK-37 Pro_19664",
+    "url": "./SMKSYNTH-1.3.0-oficial-Pro.fwsc",
+    "size": 651876,
+    "sha": "ed789dcf52e6fa7999ac6a9b121dba0c1d9e564d5fe59575cc30436dc72983b7"
+  },
+  "elite.update": {
+    "name": "Instalar PS1 · Endless MIDI · Elite",
+    "product": "SMK-37 Elite_19665",
+    "url": "./SMKSYNTH-1.3.0-PS1-Elite.fwsc",
+    "size": 651880,
+    "sha": "ce5649d42225fff93ad12e3c34a7a73cac5bbc836110230e72c704d47d2c3240"
+  },
+  "elite.release": {
+    "name": "Retornar à oficial 1.3.0 · Elite",
+    "product": "SMK-37 Elite_19664",
+    "url": "./SMKSYNTH-1.3.0-oficial-Elite.fwsc",
+    "size": 651880,
+    "sha": "c5393139a45d7c59f9751b9cc5e7b5d6659a8d9af82dc64e51d464bdcfbe2173"
+  }
+}
