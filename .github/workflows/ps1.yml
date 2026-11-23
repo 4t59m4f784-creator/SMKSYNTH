@@ -14,7 +14,7 @@ jobs:
           node-version: '22'
       - name: Pattern transition regression and existing Endless behavior
         run: |
-          mkdir -p build/ps1
+          mkdir -p build/ps1 build/su3
           for name in pattern_transition endless endless_midi seq_dp2 su3_workflow; do
             cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -fno-sanitize-recover=all -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/${name}_test.c -lm -o build/ps1/$name
             ASAN_OPTIONS=detect_leaks=0 build/ps1/$name
