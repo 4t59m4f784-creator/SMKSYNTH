@@ -5,6 +5,7 @@ on:
     paths:
       - experimental/endless-midi-ps1/**
       - experimental/endless-midi-ps2/**
+      - experimental/endless-midi-ps3/**
       - docs/images/splash-endless-midi-130.png
       - docs/images/smksynth-social-v3.png
       - docs/images/smksynth-social-v3.svg
@@ -39,6 +40,7 @@ jobs:
           python3 tools/package_release.py build/public-site --reuse-release
           cp -a experimental/endless-midi-ps1 build/public-site/experimental/endless-midi-ps1
           cp -a experimental/endless-midi-ps2 build/public-site/experimental/endless-midi-ps2
+          cp -a experimental/endless-midi-ps3 build/public-site/experimental/endless-midi-ps3
           python3 tools/check_public_web.py build/public-site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

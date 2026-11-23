@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - experimental/endless-midi-ps1/**
       - experimental/endless-midi-ps2/**
+      - experimental/endless-midi-ps3/**
       - docs/images/splash-endless-midi-130.png
       - docs/images/smksynth-social-v3.png
       - docs/images/smksynth-social-v3.svg

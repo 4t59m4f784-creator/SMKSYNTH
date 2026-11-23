@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - experimental/endless-midi-ps1/**
       - experimental/endless-midi-ps2/**
+      - experimental/endless-midi-ps3/**
       - .github/workflows/tuning-test.yml
       - .github/workflows/publish.yml
       - docs/images/splash-endless-midi-130.png
