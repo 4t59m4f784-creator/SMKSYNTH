@@ -1310,7 +1310,7 @@ static void draw_page(void)
 #endif
             scat(cpu, set.sync_int ? " INT" : ctl_ext_quarter ? " CLK" : " AUTO");
             #if BOARD_SMK37
-            if(zm_grid_active()||zm_scope_active()){zm_grid(t,k);if(page==PG_MIXER&&mix_row<6u)su2_mixer_colors();}else
+            if(zm_grid_active()||zm_scope_active()){zm_grid(t,k);}else
 #endif
             ui_page(t, k, page==PG_KEYBOARD&&!layer?0:page==PG_MIXER&&!layer?bpm_note:save_armed ? "SAVE?" : seq_shown() && pat_edited ? "EDITED" : (page == PG_GLOBAL || page == PG_SUPER) && !layer ? cpu : 0);
         }

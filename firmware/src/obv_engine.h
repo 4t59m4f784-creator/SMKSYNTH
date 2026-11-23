@@ -540,7 +540,10 @@ static void arp_tick(uint32_t p)
 #if BOARD_SMK37
         for(unsigned n=0;n<128;n++)mout_off(p,n,MOUT_KEY);
 #endif
-        voices_release_part(p); a->was_on = 1; a->pos = 0; a->cnt = 0xFFFFFFFFu; }
+        /* Only hand-played voices move into the arp. A pattern may have
+         * launched its first sequenced chord just before this activation. */
+        for(unsigned v=0;v<NV;v++)if(vc[v].part==p&&!vc[v].seq_owned)vc[v].gate=0;
+        a->was_on = 1; a->pos = 0; a->cnt = 0xFFFFFFFFu; }
     if (!nheld[p]) { arp_stop_note(p); a->pos = 0; a->cnt = 0xFFFFFFFFu; return; }
     q = quarter_len();
     a->period = q / div;

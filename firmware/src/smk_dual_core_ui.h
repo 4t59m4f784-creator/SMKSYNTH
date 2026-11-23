@@ -32,7 +32,7 @@ static int dc_diag_poll(uint32_t b,uint32_t rel)
             fm1_irq_off();record_mode=dc_enabled;dp_arm();dc_jobs=dc_fallbacks=dc_worker_peak_ticks=dc_wait_peak_ticks=0;
             dc_irq_peak_ticks=dc_irq_overruns=dc_clips=ui_render_peak_us=ui_render_overruns=0;fm1_irq_on();shown=0;
         }
-        if(e==2){view=(uint8_t)((view+(d>0?1:2))%3u);shown=0;}
+        if(e==2){view=(uint8_t)((view+(d>0?1:3))%4u);shown=0;}
     }
     if(shown&&fm1_ms-shown<500u)return 1;
     shown=fm1_ms?fm1_ms:1;
@@ -52,7 +52,7 @@ static int dc_diag_poll(uint32_t b,uint32_t rel)
         dc_diag_line(127,"CPU1 PEAK us ",dc_worker_peak_ticks/FM1_TICKS_PER_US);
         dc_diag_line(147,"WAIT PEAK us ",dc_wait_peak_ticks/FM1_TICKS_PER_US);
         dc_diag_line(167,"FALLBACKS ",dc_fallbacks);
-    }else{
+    }else if(view<3u){
         draw_text_box(0,45,240,&FONT_S,"us/HALF: AVG / PEAK",C_WHITE,1);
         if(view==1){
             dc_diag_metric(67,"ANALOG",DP_ANALOG);dc_diag_metric(87,"SUPER",DP_SUPER);
@@ -64,6 +64,20 @@ static int dc_diag_poll(uint32_t b,uint32_t rel)
             dc_diag_line(147,"AUDIO HALVES ",dp_halves);
             dc_diag_line(167,"BUDGET us ",HALF_FRAMES*544u/FM1_TICKS_PER_US);
         }
+    }
+    if(view==3u){
+        for(unsigned p=0;p<NPART;p++){
+            char s[48]={(char)('A'+p),' ',0};unsigned voices=0;
+            for(unsigned v=0;v<NV;v++)if(vc[v].part==p&&vc[v].gate)voices++;
+            fmt_u(s+slen(s),ui_seq_pos[p]+1u);scat(s,"/");fmt_u(s+slen(s),pat.trk[p].len);
+            scat(s," V");fmt_u(s+slen(s),voices);scat(s," E");fmt_u(s+slen(s),obv_engine_track[p].active);
+            scat(s," F");fmt_u(s+slen(s),obv_engine_track[p].phase);
+            draw_text_box(6,47+p*20u,228,&FONT_S,s,C_WHITE,0);
+        }
+        char s[48];s[0]=0;scat(s,"RUN ");fmt_u(s+slen(s),ctl_seq_run);scat(s," ON ");fmt_u(s+slen(s),ctl_trk_on);scat(s," MUTE ");fmt_u(s+slen(s),ctl_mix_off);
+        draw_text_box(6,127,228,&FONT_S,s,C_WHITE,0);
+        dc_diag_line(147,"LIVE PEAK us ",ui_render_peak_us);
+        dc_diag_line(167,"LIVE OVERRUNS ",ui_render_overruns);
     }
     draw_text_box(0,194,240,&FONT_S,"K1:1C/2C  K2:ARM",C_WHITE,1);
     draw_text_box(0,215,240,&FONT_S,"K3:PAGE   PATCH:EXIT",C_WHITE,1);

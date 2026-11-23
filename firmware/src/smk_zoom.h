@@ -118,6 +118,7 @@ static void zm_grid(const char*title,const knob_view_t*k){
    if(layer==L_GLO){for(unsigned i=0;i<4;i++){char l[2]={(char)('A'+i),0};zm_text(8,58+(int)i*36,l,32,C_AMBER);zm_text(48,61+(int)i*36,set.mix_mute>>i&1u?"MUTE":trk_silent(i)?"STOP":"PLAY",24,C_CREAM);}}
    else if(layer==L_SAVE){for(unsigned i=0;i<16;i++){char n[4];mui_u2(n,i+1u);int x=8+(int)(i%4)*57,yy=57+(int)(i/4)*35;cv_rect(x,yy,51,30,i==set.pat?C_RED:C_RULE);zm_center(x+26,yy+1,n,24,C_CREAM);}}
    else for(unsigned i=0;i<4;i++){zm_cell(i,&k[i]);app_idle();}
+   if(page==PG_MIXER&&mix_row<6u)su2_mixer_colors();
    zm_activity_body();if(zm_focus_visible())zm_focus_draw();
   }
   mui_end(y);
