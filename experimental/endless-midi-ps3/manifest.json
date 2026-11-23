@@ -1,0 +1,30 @@
+{
+  "pro.update": {
+    "name": "Instalar PS3 · Endless MIDI · Pro",
+    "product": "SMK-37 Pro_19667",
+    "url": "./SMKSYNTH-1.3.0-PS3-Pro.fwsc",
+    "size": 651876,
+    "sha": "fa188e7bffb656c08c6deb07e2940c374e0c616d23fe9269ede02e6941bbf370"
+  },
+  "pro.release": {
+    "name": "Voltar à PS2 · Pro",
+    "product": "SMK-37 Pro_19666",
+    "url": "./SMKSYNTH-1.3.0-PS2-Pro.fwsc",
+    "size": 651876,
+    "sha": "ec7f63be2cd68daf9ade0a56b3b28fb7d5b58998d2ba880c09eb7e70903beed3"
+  },
+  "elite.update": {
+    "name": "Instalar PS3 · Endless MIDI · Elite",
+    "product": "SMK-37 Elite_19667",
+    "url": "./SMKSYNTH-1.3.0-PS3-Elite.fwsc",
+    "size": 651880,
+    "sha": "ae761792a11bf2352e69cc9a156296c1446685f0059ad72af36450f0a408fb50"
+  },
+  "elite.release": {
+    "name": "Voltar à PS2 · Elite",
+    "product": "SMK-37 Elite_19666",
+    "url": "./SMKSYNTH-1.3.0-PS2-Elite.fwsc",
+    "size": 651880,
+    "sha": "fd4146cb79590b497831c69e4c389178f6728d0e54bdc6febafd0ef934267d94"
+  }
+}

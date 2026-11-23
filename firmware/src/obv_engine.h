@@ -220,6 +220,9 @@ static void voice_pan(voice_t *v, int32_t pan)   /* -64..64 */
 #define STEAL_FADE 64u
 static int32_t guard_tail[NPART][2];
 static unsigned guard_left[NPART];
+/* Last dry control-block sample, prepared while the outgoing pattern plays.
+ * Used only for queued cross-engine recalls; not a second rendering engine. */
+static int32_t pattern_tail[NPART][2];
 static unsigned super_part(unsigned p){return obv_patch_engine(pt[p].p)==OBV_ANALOG && pt[p].p->v[P_O1_WAVE]==W_SUPER;}
 static unsigned super_voice(unsigned v){return (vc[v].gate||vc[v].ae.stage!=E_IDLE)&&super_part(vc[v].part);}
 static unsigned super_count(void){unsigned n=0;for(unsigned v=0;v<NV;v++)n+=super_voice(v);return n;}
@@ -667,7 +670,7 @@ static void engine_events(void)
                 memset(&vc[v], 0, sizeof vc[v]);
                 vc[v].noise = noise ? noise : 0x12345678u * (v + 1u) + 0x9E3779B9u;
             }
-            memset(guard_left,0,sizeof guard_left); memset(guard_tail,0,sizeof guard_tail);
+            memset(guard_left,0,sizeof guard_left); memset(guard_tail,0,sizeof guard_tail);memset(pattern_tail,0,sizeof pattern_tail);
         }
         for (p = 0; p < NPART; p++) {
             obv_pending_n[p]=0;
@@ -1054,6 +1057,10 @@ static void engine_audio(int32_t *out, uint32_t n)
         }
         dp_end(DP_DRUM);
         used |= dc_finish(dc_mask, bus, b);
+        for(unsigned tp=0;tp<NPART;tp++){
+            pattern_tail[tp][0]=bus[tp][2u*(b+CTL-1u)];
+            pattern_tail[tp][1]=bus[tp][2u*(b+CTL-1u)+1u];
+        }
     }
     dp_begin(DP_MIX);
     /* Fade the dry track before all sends; effects' existing tails may finish.
@@ -1176,6 +1183,7 @@ static int engine_quiet(void)                   /* nothing sounds: a flash erase
 
 static void engine_init(void)
 {
+    memset(pattern_tail,0,sizeof pattern_tail);
 #if BOARD_SMK37
  mout_clear();mout_blocked=0;mout_used_channels=0;
 #endif
