@@ -327,7 +327,9 @@ def main():
     if a.first_install != bool(a.factory_bank): raise SystemExit("--first-install requires --factory-bank and vice versa")
     FIRST_INSTALL=a.first_install
     if a.identity and not ((a.identity=="19618" and a.release in ("1.0.0","1.0.1","1.0.2","1.0.3") and (a.release!="1.0.0" or FIRST_INSTALL)) or (a.identity=="19634" and a.release=="1.1.0") or (a.identity=="19649" and a.release=="1.2.0") or (a.identity=="19653" and a.release=="1.2.1") or (a.identity=="19655" and a.release=="1.2.2") or (a.identity=="19664" and a.release=="1.3.0") or (a.identity=="19668" and a.release=="1.3.1")): raise SystemExit("Stable profile: 19618 for 1.0.0-1.0.3; 19634 for 1.1.0; 19649 for 1.2.0; 19653 for 1.2.1; 19655 for 1.2.2; 19664 for 1.3.0; 19668 for 1.3.1")
-    # SMKSTAGE independent, standard SMK-37 slot, no private bank.\n    VOICE_HARDWARE=False\n    BOARD = (a.board or os.environ.get("BOARD") or "fm1").lower().replace("-", "")
+    # SMKSTAGE independent, standard SMK-37 slot, no private bank.
+    VOICE_HARDWARE=False
+    BOARD = (a.board or os.environ.get("BOARD") or "fm1").lower().replace("-", "")
     if BOARD not in BOARD_PREFIX:
         raise SystemExit(f"BOARD={BOARD}: use fm1 or smk37")
     model = (a.model or os.environ.get("MODEL") or "pro").lower()
@@ -398,7 +400,7 @@ def main():
         flash=bytearray(flash);flash[0x57000:0x9d000]=seed;flash=bytes(flash)
     pkg = fm1pkg_make.ufw(flash, ota, PRODUCT)
     (OUT / name).write_bytes(pkg)
-    print(f"app      {OUT / 'obervave.bin'}  {len(img)} B")
+    print(f"app      {OUT / 'smkstage.bin'}  {len(img)} B")
     print(f"loader   {LDR / 'ota.bin'}  {len(ota)} B")
     print(f"package  {OUT / name}  {len(pkg)} B, identity {PRODUCT}" + (f", board {BOARD}" if BOARD != "fm1" else ""))
     return 0
