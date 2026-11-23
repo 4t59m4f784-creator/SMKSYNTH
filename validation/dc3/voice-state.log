@@ -1,0 +1,1 @@
+PASS: idle-envelope and engine-transition SUPER waveform retains exact private render/commit states.

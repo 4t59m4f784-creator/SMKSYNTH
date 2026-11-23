@@ -1,0 +1,126 @@
+{
+  "version": "1.3.0",
+  "identity": "SMK-37 Pro_19664",
+  "required_origin": "SMK-37 Pro_016",
+  "installation": "first-install-or-preserving-update",
+  "runtime_base": "fc4ac62a03f9438bc7f16653c45f8ca97e0c10e0",
+  "factory_patterns": 5,
+  "favorites": 8,
+  "extra_user_presets": 0,
+  "tempo": 90,
+  "dp2_runtime_hardware_approved": true,
+  "first_install_hardware_approved": false,
+  "firmware_sha256": "e62f8875ba9c3acaabdd155c8ec8df3b7ab8930007953c20adb9f7abf44dfbd9",
+  "wasm_sha256": "3306cf898c9767a7f957c00bad96f2e7de4304558b979620687d57c8102bf951",
+  "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
+  "app_bytes": 246760,
+  "static_ram_bytes": 96352,
+  "pool_bytes": 332180,
+  "loader_bytes": 7703,
+  "update_firmware_sha256": "ed789dcf52e6fa7999ac6a9b121dba0c1d9e564d5fe59575cc30436dc72983b7",
+  "usb_audio": true,
+  "fader_modes": [
+    "JUMP",
+    "CATCH"
+  ],
+  "usb_audio_validation": [
+    "Mac 44.1/48 kHz",
+    "iPhone AudioShare"
+  ],
+  "known_issues": [
+    "iPhone USB video recording clicks/dropouts"
+  ],
+  "usb_audio_base": "UA1",
+  "supersaw_hardware_approved": true,
+  "supersaw_origin": "https://github.com/isod89/clipper-fm1",
+  "identities": {
+    "pro": "SMK-37 Pro_19664",
+    "elite": "SMK-37 Elite_19664"
+  },
+  "supported_models": [
+    "SMK-37 Pro",
+    "SMK-37 Elite"
+  ],
+  "hardware_approved": true,
+  "elite_installer_hardware_approved": true,
+  "firmware": {
+    "pro": {
+      "model": "SMK-37 Pro",
+      "release": {
+        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 first-install",
+        "product": "SMK-37 Pro_19664",
+        "url": "./firmware/SMKSYNTH-1.3.0-first-install-SMK37-Pro.fwsc",
+        "size": 651339,
+        "sha": "e62f8875ba9c3acaabdd155c8ec8df3b7ab8930007953c20adb9f7abf44dfbd9"
+      },
+      "update": {
+        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 update",
+        "product": "SMK-37 Pro_19664",
+        "url": "./firmware/SMKSYNTH-1.3.0-update-SMK37-Pro.fwsc",
+        "size": 651876,
+        "sha": "ed789dcf52e6fa7999ac6a9b121dba0c1d9e564d5fe59575cc30436dc72983b7"
+      }
+    },
+    "elite": {
+      "model": "SMK-37 Elite",
+      "release": {
+        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 first-install",
+        "product": "SMK-37 Elite_19664",
+        "url": "./firmware/SMKSYNTH-1.3.0-first-install-SMK37-Elite.fwsc",
+        "size": 651339,
+        "sha": "e3ae89a8ed16d91b086e6656acb49773283ecf183e3196f413e4428f49e5e9c5"
+      },
+      "update": {
+        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 update",
+        "product": "SMK-37 Elite_19664",
+        "url": "./firmware/SMKSYNTH-1.3.0-update-SMK37-Elite.fwsc",
+        "size": 651880,
+        "sha": "c5393139a45d7c59f9751b9cc5e7b5d6659a8d9af82dc64e51d464bdcfbe2173"
+      }
+    }
+  },
+  "midi_trs": true,
+  "midi_usb": true,
+  "midi_output_channels": "base + part index; OMNI output 1-4",
+  "midi_panic": "GLOBE + PLAY",
+  "physical_sustain": true,
+  "endless_included": true,
+  "hardware_validation": {
+    "pro": "User approved SU3 /19663; promoted with version and identity changes only.",
+    "elite": "Model-specific packages checked; unified Elite installation flow previously user validated. SU3 approval model not separately specified."
+  },
+  "required_origins": {
+    "pro": "SMK-37 Pro_016",
+    "elite": "SMK-37 Elite_016"
+  },
+  "midi_mode": true,
+  "midi_mode_bluetooth": false,
+  "midi_mode_profiles": 4,
+  "display_themes": [
+    "Obervave",
+    "Zoom"
+  ],
+  "default_theme": "Obervave",
+  "preset_rename": true,
+  "supersaw_oscillators": [
+    1
+  ],
+  "supersaw_voice_limit": 5,
+  "source_identity": "SU3 /19663",
+  "edition": "Endless MIDI",
+  "battery_meter": true,
+  "battery_bands": 4,
+  "midi_keyboard_channel_layers": true,
+  "midi_keyboard_channel_count": 16,
+  "release_name_display": [
+    "splash",
+    "Global > Theme"
+  ],
+  "minor_fix": "SU3 approved: additive SUB, dual-core engine, tempo and UI workflow",
+  "vintage_tuning_fix": true,
+  "dual_core": true,
+  "sub_osc": true,
+  "pattern_tempo": true,
+  "tempo_source_default": "MASTER",
+  "k5_synth_tempo": true
+}

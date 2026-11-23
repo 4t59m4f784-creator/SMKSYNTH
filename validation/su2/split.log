@@ -1,0 +1,4 @@
+   300 ms  pattern slot 0 saved (13416 + 380 B)
+   300 ms  pattern slot 1 saved (14448 + 380 B)
+   300 ms  pattern slot 2 saved (14460 + 380 B)
+PASS: two-pad bank, SINGLE/SPLIT/LAYER, boundaries/octaves, exclusive live gain, same-pitch sequence isolation, sustain, REC selected-only, focus/setting releases, old/new patterns and scene bytes, queued restore, DRUM exclusion/hits, mono handoff, range safety.

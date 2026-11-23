@@ -1,0 +1,54 @@
+{
+  "version": "1.2.2-su2",
+  "identity": 19662,
+  "base": "DC3 db9494718138a99f242a10b59c60c8cd22fdf9b0 -> SU1 01aab5142bad261937bb0e55471a701f66360386",
+  "public_unchanged": "1.2.2 /19655",
+  "toolchain": "jieli 20260730.1",
+  "sdk": "AC79NN_SDK_V1.2.1_2023-12-13",
+  "defines": "OBV_DUAL_CORE=1; explicit --voice-hardware; no factory seed",
+  "ram_static": 96336,
+  "ram_limit": 98304,
+  "pool": 332180,
+  "cpu1_stack_top": 339360,
+  "pool_limit": 344064,
+  "voice_bytes": 184,
+  "part_host_bytes": 168,
+  "worker_private_bytes": 3780,
+  "app_bytes": {
+    "pro": 246016,
+    "elite": 246020
+  },
+  "packages": {
+    "pro.update": {
+      "name": "Instalar SU2 · Endless MIDI · Pro",
+      "product": "SMK-37 Pro_19662",
+      "url": "./SMKSYNTH-1.2.2-SU2-Pro-d05ae6ff.fwsc",
+      "size": 651876,
+      "sha": "d05ae6ff6a0e756fcc6270b1ab7f8f7f25ab8d6c9b804c927e28ff2b218d3913"
+    },
+    "pro.release": {
+      "name": "Retornar à oficial 1.2.2 · Pro",
+      "product": "SMK-37 Pro_19655",
+      "url": "./SMKSYNTH-1.2.2-oficial-Pro.fwsc",
+      "size": 651819,
+      "sha": "57dfa2f9f733fc4a901da2d4161031774fc528ffa4d3f22dbeaa756a0df576f7"
+    },
+    "elite.update": {
+      "name": "Instalar SU2 · Endless MIDI · Elite",
+      "product": "SMK-37 Elite_19662",
+      "url": "./SMKSYNTH-1.2.2-SU2-Elite-e8535d02.fwsc",
+      "size": 651880,
+      "sha": "e8535d024a39ad24cface92f92c0841f4bc9207e92c436f0d0e0fae22b3879d8"
+    },
+    "elite.release": {
+      "name": "Retornar à oficial 1.2.2 · Elite",
+      "product": "SMK-37 Elite_19655",
+      "url": "./SMKSYNTH-1.2.2-oficial-Elite.fwsc",
+      "size": 651819,
+      "sha": "de43999c81f039d29b185237102ee32c392e530d5b3b7201795fa54b6d81f2c9"
+    }
+  },
+  "physical_validation": "pending user tests",
+  "persistent_layouts": "unchanged",
+  "sub_gain_ceiling": "64/127 of one full simple oscillator; additive, no normalization of OSC1/OSC2"
+}

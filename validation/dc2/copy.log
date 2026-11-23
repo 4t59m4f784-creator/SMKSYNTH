@@ -1,0 +1,1 @@
+PASS: aligned/unaligned word copies, all tail lengths, 0..1000 bytes, guards intact.

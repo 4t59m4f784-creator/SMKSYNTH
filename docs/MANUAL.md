@@ -1,11 +1,12 @@
-# SMKSYNTH 1.2.2 - Endless MIDI - Manual completo
+# SMKSYNTH 1.3.0 - Endless MIDI - Manual completo
 
-[PDF](pdf/SMKSYNTH-1.2.2-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
+[PDF](pdf/SMKSYNTH-1.3.0-Manual-PT.pdf) · [Português](MANUAL.md) · [English](MANUAL.en.md)
 
-Referência: firmware 1.2.2, SMK-37 Pro_19655 / SMK-37 Elite_19655.
+Referência: firmware 1.3.0, SMK-37 Pro_19664 / SMK-37 Elite_19664.
 
 ## Índice
 
+- Novidades 1.3.0: SUB OSC e performance
 - 1. Visão geral e navegação
 - ENDLESS: gravar e tocar
 - MODO MIDI: controlador independente
@@ -39,13 +40,25 @@ Referência: firmware 1.2.2, SMK-37 Pro_19655 / SMK-37 Elite_19655.
 
 Desenvolvido com IA: Marcus Padrini definiu e orientou a experiência, criou os patterns e testou no instrumento. O ChatGPT (OpenAI) contribuiu com soluções técnicas e gerou e revisou código, ferramentas, documentação e gráficos. Engines originais: autores em CREDITS.md. Sem endosso da OpenAI.
 
+## Novidades 1.3.0: SUB OSC e performance
+
+Engine ANALOG dual-core aprovada em testes. Cada voz tem SUB OSC simples e aditivo, sem reduzir OSC1/OSC2: PARA > OSC1 > OSC2 > SUB OSC. K1 WAVE (SQUARE/SAWTOOTH), K3 LEVEL (0-100%), K4 OCT (-1/-2). Segue a fundamental do OSC1 sem seu spread; compartilha filtro e envelopes. Patches antigos iniciam com SUB desligado. Supersaw permanece somente no OSC1.
+
+K5 controla 40-240 BPM em todas as telas do synth. BPM visível na Performance, osciloscópio, Split/Layer, Mixer, ARP e SEQ. MODO MIDI mantém K5 configurável. Em Split/Layer, < seleciona LEVEL e > OCT para K2/K3.
+
+Salvar/copiar pattern grava o BPM interno. GLOBE > TEMPO SOURCE, K1: MASTER (padrão) mantém o andamento em uso; PATTERN recupera o BPM salvo, inclusive na troca durante reprodução. Patterns antigos sem BPM mantêm o atual. Clock MIDI externo tem prioridade. A fonte é salva automaticamente quando parado e sem notas; salvar o pattern continua sendo manual.
+
+GLOBE > INITIALIZE: K1 escolhe PART PATCH ou PATTERN; PLAY abre revisão; K1 INITIALIZE e PLAY confirmam. PATCH cancela. PLAY/PATCH têm função exclusiva nessa página. Pattern inicializado: A/B/C INIT, D bateria básica DRUM-X, níveis iguais, efeitos desligados, sequências vazias com 16 steps e SINGLE. Após executar: NOT SAVED por 2,2 s e retorno à Performance. Nada é salvo até solicitar o salvamento.
+
+Zoom: nomes e partes no Split/Layer, cores das partes no Mixer, identificação persistente dos pads, indicadores de vozes SUB/SUPER e feedback ao segurar REC para apagar. ENDLESS READY indica espera por tecla; contador acompanha a parte selecionada. Corrigidos redesenho na primeira gravação e controles Master (volume, filtro, drive e compressor).
+
 ## 1. Visão geral e navegação
 
-Firmware 1.2.2 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
+Firmware 1.3.0 para M-VAVE SMK-37 Pro / Elite. Quatro partes A-D; ANALOG (OberVave) ou DRUM-X em cada parte. Oito vozes ANALOG compartilhadas. 16 patterns; até 256 steps por track e até quatro notas por step ANALOG.
 
 ![knobs](diagrams/knobs-pt.svg)
 
-K1-K4 editam os rótulos mostrados na tela. K6 seleciona a parte, K7 o preset e K8 o master físico. K5 é contextual: tempo na Performance e em páginas comuns, página/barra em STEPS, próximo pattern nas demais vistas SEQ e Mixer, ou LEVEL/OCT no Split/Layer.
+K1-K4 editam os rótulos mostrados na tela. K6 seleciona a parte, K7 o preset e K8 o master físico. K5 controla o tempo em todas as telas do synth, incluindo ARP/SEQ e Mixer. No MODO MIDI, continua configurável.
 
 Banco de pads e página da tela são estados distintos. PLAY, REC e seleção de engine não escolhem outro banco automaticamente. SEQ solicita explicitamente os steps; KNOB BANK volta ao ciclo manual.
 
@@ -119,7 +132,7 @@ Performance com valores é a tela padrão. PATCH curto abre a tela de logo, osci
 
 ## Bateria e identificação da versão
 
-Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.2.2. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
+Endless MIDI é o nome desta edição pública. A parte inferior da splash mostra o nome e a versão técnica 1.3.0. Para consultar depois, percorra GLOBE até THEME: a tela também mostra ENDLESS MIDI e a versão técnica nos dois temas. O número técnico é atualizado em cada compilação de lançamento.
 
 O medidor discreto de bateria aparece nos cabeçalhos Obervave e Zoom, no osciloscópio, na tela ENDLESS e na performance do MODO MIDI. Usa a leitura existente do instrumento, filtrada para evitar oscilações. Não altera o áudio nem grava configurações.
 
@@ -143,7 +156,7 @@ O medidor não identifica carregamento nem garante autonomia restante. Aguarde a
 | NOTE REPEAT | ANALOG: LFO / LFO DEST / LFO +. DRUM-X redireciona para DRUM SOUND. |
 | ARP | Abre ARP. Novo toque nessa página alterna HOLD da parte. |
 | SCALE | Segure em STEPS ANALOG: STEP+. Na página GLOBAL, toque alterna SYNC AUTO / INTERNAL. |
-| GLOBE | Toque: GLOBAL > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE. Segure: teclas para start/stop, mute, solo e tap tempo. |
+| GLOBE | Toque: GLOBAL > TEMPO SOURCE > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE > INITIALIZE. Segure: teclas para start/stop, mute, solo e tap tempo. |
 | BT / SAVE | Toque: salva o preset da parte no programa atual. Segure 0,7 s: SAVE PRESET AS; K1 move o cursor, K2 muda o caractere e K7 escolhe destino. BT revisa; um segundo BT confirma. |
 | FX | Toque: CHORUS > DELAY > REVERB > DRIVE. Segure: K1/K2/K3 retornos chorus/delay/reverb; K4 tempo do delay. |
 | SEQ | Toque: vistas do sequenciador e posse explícita dos pads de steps. Segure: teclas brancas viram steps. |
@@ -205,7 +218,7 @@ As duas fileiras são configurações independentes. A-D selecionam partes ANALO
 1. Entre no banco 2 com KNOB BANK.
 2. Na fileira desejada, forme o par com dois pads A-D.
 3. Toque SPLIT ou LAYER; ajuste o ponto de divisão em K4.
-4. K5 alterna os controles K2/K3 entre níveis (0-100%) e oitavas (-2 a +2).
+4. < seleciona LEVEL (0-100%); > seleciona OCT (-2 a +2) para K2/K3. K5 controla o tempo.
 5. Toque PLAY 1 (pad 8) ou PLAY 2 (pad 16) para tocar essa configuração.
 6. Salve o pattern para guardar as duas linhas e a linha ativa.
 
@@ -215,7 +228,7 @@ Pad 8/16 branco forte indica a linha tocada. Editar a outra linha não a ativa. 
 
 ![patterns](diagrams/patterns-pt.svg)
 
-Cada posição reúne a sequência de quatro tracks e sua cena: quatro sons, mix e configurações Split/Layer. Favoritos são um banco separado. O tempo é global, não um BPM independente por pattern.
+Cada posição reúne a sequência de quatro tracks e sua cena: quatro sons, mix e configurações Split/Layer. Favoritos são um banco separado. Salvar/copiar o pattern grava o BPM interno atual. GLOBE > TEMPO SOURCE: MASTER mantém o tempo atual nas trocas; PATTERN recupera o BPM salvo. Patterns antigos sem BPM mantêm o tempo em uso.
 
 | Gesto | Ação |
 | --- | --- |
@@ -304,7 +317,7 @@ Para apagar a track inteira, selecione-a com K6 e segure REC por mais de 1,2 s. 
 
 Toques em SEQ percorrem as vistas. ANALOG: TRACKS > STEPS > TRACK > PATTERNS > TRANSPOSE. STEP+ é acessado segurando SCALE em STEPS. DRUM-X: DRUM > DRUM+ > TRACK > TRACKS > PATTERNS > TRANSPOSE.
 
-Em STEPS/DRUM, K5 avança/recua 16 steps; setas < > mudam a página de pads. Nas outras vistas SEQ, K5 escolhe pattern. K6 sempre seleciona a parte; K7 troca seu preset; K8 master. Uma track comporta até 256 steps em 16 páginas; sua DIV é independente. SWING vai de 50 a 75%; TRANSP por track de -24 a +24 semitons.
+K5 controla o tempo também em STEPS/DRUM e demais vistas SEQ. Setas < > mudam a página de pads; os pads do banco Patterns escolhem o pattern. K6 sempre seleciona a parte; K7 troca seu preset; K8 master. Uma track comporta até 256 steps em 16 páginas; sua DIV é independente. SWING vai de 50 a 75%; TRANSP por track de -24 a +24 semitons.
 
 RATCHET: 1x-4x; CHANCE: 0-100% em passos de 5%; ON/OFF desativa sem apagar notas. GATE chega a TIE. NOTE desloca o acorde do step. Na grade DRUM, K1 escolhe a lane e cada pad alterna um hit nessa lane; não é o banco Drum Pads.
 
@@ -391,7 +404,7 @@ FX percorre as quatro páginas de efeito. Os efeitos são compartilhados: MIX de
 
 DELAY TIME usa divisões sincronizadas: 1/16, 1/8T, 1/8, 1/8 pontuada, 1/4, 1/4 pontuada e 1/2. FEEDBK controla repetições; TONE escurece/clareia. REVERB: SIZE tamanho, DAMP amortecimento, PRE-DLY atraso inicial. CHORUS: RATE velocidade, DEPTH intensidade.
 
-Da Performance, toque PATCH para abrir o osciloscópio; toque novamente para abrir Mixer. Toques seguintes percorrem LEVEL > PAN > SEND CHORUS > SEND DELAY > SEND REVERB > SEND DRIVE > MASTER. K1-K4 ajustam A-D nas seis primeiras linhas. Em MASTER, VOL/DJ FLT/DRIVE/COMP são controles globais do mixer. K5 seleciona pattern; segure PATCH para sair.
+Da Performance, toque PATCH para abrir o osciloscópio; toque novamente para abrir Mixer. Toques seguintes percorrem LEVEL > PAN > SEND CHORUS > SEND DELAY > SEND REVERB > SEND DRIVE > MASTER. K1-K4 ajustam A-D nas seis primeiras linhas. Em MASTER, VOL/DJ FLT/DRIVE/COMP são controles globais do mixer. K5 controla o tempo; segure PATCH para sair.
 
 Mute e solo por parte: GLOBE segurado mais as teclas correspondentes. Os estados são indicados no Mixer. F4 Bank B e K8 são o volume físico de saída; não são quatro volumes individuais.
 
@@ -430,7 +443,7 @@ Salvamento manual: uma edição na tela não é uma escrita em flash. Pare o tra
 1. Para primeira instalação, parta do firmware oficial M-VAVE V016 do seu modelo Pro ou Elite. Use o M-UPGRADE oficial para retornar a essa versão.
 2. Exporte seu .smksynth antes de retornar ao oficial. A primeira instalação inicializa/substitui o banco.
 3. Use Chrome/Edge no computador, HTTPS, cabo USB de dados e alimentação estável. Feche outros aplicativos MIDI.
-4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19655 / SMK-37 Elite_19655.
+4. No instalador web, conecte, confira origem/destino e confirme. Aguarde SMK-37 Pro_19664 / SMK-37 Elite_19664.
 5. Se interromper, retome no mesmo navegador/site com o mesmo pacote. Não troque de instalador no meio.
 
 Backup: pare PLAY/REC, solte controles/notas e conecte a ferramenta. Exporte o banco atual nesta sessão antes de restaurar. Escolha o arquivo, revise e digite RESTAURAR (também na interface inglesa). Restauração substitui o banco inteiro; não mescla. Ao concluir, reinicie e confira seus sons.
@@ -510,7 +523,7 @@ Não há transmissão de MIDI Clock/Start/Stop nem envio automático de Program 
 
 Pressione GLOBE e PLAY juntos, em qualquer ordem. O comando para PLAY/REC, desliga HOLD/sustain, limpa notas pendentes e corta as vozes internas. USB e TRS enviam CC64=0, CC123=0 e CC120=0 aos 16 canais. Solte o pedal antes de usar sustain novamente. As caudas dos efeitos podem terminar normalmente.
 
-A 1.2.2 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
+A 1.3.0 também corrige vozes presas ao mudar POLY/DUAL para MONO/UNISON com teclas mantidas. O Note Off já chegava, mas vozes do modo anterior podiam não ser liberadas. Glide não foi alterado; o caso de mudar somente Glide não reproduziu a falha nos testes.
 
 ## Apêndice MIDI / 1
 
@@ -604,7 +617,7 @@ Constantes: NFTYPE-1 = 5; NDDIV-1 = 6. WAVE 0-4; MODE 0-3; SHAPE 0-5. Para cada 
 
 ## Atualização e áudio USB
 
-Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até Endless MIDI A são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19655 / SMK-37 Elite_19655.
+Já usa SMKSYNTH? Exporte um backup e escolha Atualizar no instalador público. As versões públicas e experimentais compatíveis até Endless MIDI A são aceitas e o banco salvo é preservado. Instalar é exclusivo para a primeira instalação a partir da V016 e substitui o banco. A nova identidade pública é SMK-37 Pro_19664 / SMK-37 Elite_19664.
 
 Áudio USB estéreo de 16 bits, 44,1/48 kHz: testado no Mac e no iPhone com AudioShare. Problema conhecido: vídeos gravados no iPhone com áudio USB podem conter cliques ou cortes.
 

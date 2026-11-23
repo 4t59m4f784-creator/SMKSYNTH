@@ -1,11 +1,12 @@
-# SMKSYNTH 1.2.2 - Endless MIDI - Quick start guide
+# SMKSYNTH 1.3.0 - Endless MIDI - Quick start guide
 
-[PDF](pdf/SMKSYNTH-1.2.2-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
+[PDF](pdf/SMKSYNTH-1.3.0-Quick-Start-EN.pdf) · [Português](QUICKSTART.md) · [English](QUICKSTART.en.md)
 
-Reference: firmware 1.2.2, SMK-37 Pro_19655 / SMK-37 Elite_19655.
+Reference: firmware 1.3.0, SMK-37 Pro_19664 / SMK-37 Elite_19664.
 
 ## Contents
 
+- New in 1.3.0: SUB OSC and performance
 - Quick start / 1. First steps
 - ENDLESS: record and perform
 - MIDI MODE: independent controller
@@ -22,9 +23,21 @@ Reference: firmware 1.2.2, SMK-37 Pro_19655 / SMK-37 Elite_19655.
 
 Developed using AI: Marcus Padrini defined and directed the experience, created the patterns and tested on hardware. ChatGPT (OpenAI) contributed technical solutions and generated and revised code, tools, documentation and graphics. Original engines: authors in CREDITS.md. No OpenAI endorsement.
 
+## New in 1.3.0: SUB OSC and performance
+
+Hardware-tested dual-core ANALOG engine. Each voice has a simple additive SUB OSC, without reducing OSC1/OSC2: PARA > OSC1 > OSC2 > SUB OSC. K1 WAVE (SQUARE/SAWTOOTH), K3 LEVEL (0-100%), K4 OCT (-1/-2). Follows OSC1 fundamental without component spread; shares filter and envelopes. Older patches start with SUB off. Supersaw remains OSC1-only.
+
+K5 controls 40-240 BPM on every synth page. BPM is visible on Performance, scope, Split/Layer, Mixer, ARP and SEQ. MIDI MODE keeps configurable K5. In Split/Layer, < selects LEVEL and > OCT for K2/K3.
+
+Saving/copying a pattern stores internal BPM. GLOBE > TEMPO SOURCE, K1: MASTER (default) keeps current tempo; PATTERN recalls saved BPM, including during playback changes. Older patterns without BPM keep current tempo. External MIDI clock takes priority. Source is saved automatically when stopped and quiet; pattern saving remains manual.
+
+GLOBE > INITIALIZE: K1 chooses PART PATCH or PATTERN; PLAY opens review; K1 INITIALIZE and PLAY confirm. PATCH cancels. PLAY/PATCH have exclusive actions on this page. Initialized pattern: A/B/C INIT, D basic DRUM-X, equal levels, FX off, empty 16-step tracks and SINGLE. After execution: NOT SAVED for 2.2 s, then Performance. Nothing is saved until explicitly requested.
+
+Zoom: patch/part names on Split/Layer, colored Mixer parts, persistent pad identity, SUB/SUPER voice meters and hold-REC clear feedback. ENDLESS READY means waiting for a key; progress follows selected part. First-record redraw and Master controls (volume, filter, drive and compressor) are fixed.
+
 ## Quick start / 1. First steps
 
-SMKSYNTH 1.2.2 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
+SMKSYNTH 1.3.0 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. First installation requires official V016 and replaces the bank. Save and export your work before returning to official firmware.
 
 1. Set K8/master to a suitable level and press PLAY.
 2. K6 selects A-D; K7 changes the part preset.
@@ -36,7 +49,7 @@ SMKSYNTH 1.2.2 - M-VAVE SMK-37 Pro / Elite. Use this guide after installation. F
 
 ![faders](diagrams/faders-en.svg)
 
-K1-K4 follow the screen. K5: tempo on Performance; LEVEL/OCT in Split/Layer; page in STEPS; pattern in other SEQ/Mixer views. FADER BANK only changes faders. GLOBAL > FADER MODE: JUMP engages immediately; CATCH waits to cross the stored value. Bank B F4 = K8/master.
+K1-K4 follow the screen. K5: tempo (40-240 BPM) on every synth page; remains configurable in MIDI MODE. Split/Layer: < LEVEL, > OCT. FADER BANK only changes faders. GLOBAL > FADER MODE: JUMP engages immediately; CATCH waits to cross the stored value. Bank B F4 = K8/master.
 
 Five examples start at 90 BPM. Eight favourites, no extra personal presets. PLAY/REC and engine choice preserve the pad bank; SEQ explicitly requests steps.
 
@@ -100,7 +113,7 @@ Performance values are the default view. A short PATCH opens the logo, overall-o
 
 ## Battery and release identification
 
-Endless MIDI is this public edition name. The bottom of the splash shows its name and technical version 1.2.2. To check later, cycle GLOBE to THEME: that page also shows ENDLESS MIDI and the technical version in either theme. The technical number is updated for every release build.
+Endless MIDI is this public edition name. The bottom of the splash shows its name and technical version 1.3.0. To check later, cycle GLOBE to THEME: that page also shows ENDLESS MIDI and the technical version in either theme. The technical number is updated for every release build.
 
 A discreet battery meter appears in Obervave and Zoom headers, the oscilloscope, ENDLESS view and MIDI MODE performance. It uses the existing instrument reading, filtered to avoid fluctuations. It does not change audio or write settings.
 
@@ -126,7 +139,7 @@ The meter does not detect charging or guarantee remaining runtime. Allow a few s
 
 1. In the same row, hold one A-D part and tap another to form the pair. Use two ANALOG parts.
 2. Choose SINGLE, SPLIT or LAYER. K4 sets the split point.
-3. K5 switches K2/K3 between the two parts’ levels and octaves.
+3. < selects LEVEL; > selects OCT for K2/K3. K5 controls tempo.
 4. Pad 8 or 16 selects the playing row (bright white). Editing the other row does not activate it.
 5. Save the pattern to store both configurations and the active row.
 
@@ -163,7 +176,7 @@ With ANALOG selected, an already selected Drum Pads bank becomes inactive. Retur
 | NOTE REPEAT | ANALOG: LFO / LFO DEST / LFO +. DRUM-X redirects to DRUM SOUND. |
 | ARP | Open ARP. Another tap on that page toggles the part’s HOLD. |
 | SCALE | Hold in ANALOG STEPS: STEP+. On GLOBAL, tap toggles SYNC AUTO / INTERNAL. |
-| GLOBE | Tap: GLOBAL > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE. Hold: keys for start/stop, mute, solo and tap tempo. |
+| GLOBE | Tap: GLOBAL > TEMPO SOURCE > POLYPHONY > OUTPUT > PART SETUP > CONTROLS > THEME > MIDI MODE > INITIALIZE. Hold: keys for start/stop, mute, solo and tap tempo. |
 | FX | Tap: CHORUS > DELAY > REVERB > DRIVE. Hold: K1/K2/K3 chorus/delay/reverb returns; K4 delay time. |
 | SEQ | Tap: sequencer views and explicit step-pad ownership. Hold: white keys become steps. |
 | REC | Tap: arm while stopped; toggle recording while running. Hold over 1.2 s: clear selected track. |
@@ -209,7 +222,7 @@ MIDI Clock/Start/Stop output and automatic Program Change on internal preset sel
 
 Press GLOBE and PLAY together in either order. This stops PLAY/REC, clears HOLD/sustain and pending notes, and cuts internal voices. USB and TRS send CC64=0, CC123=0 and CC120=0 on all 16 channels. Release the pedal before using sustain again. Effect tails may finish normally.
 
-1.2.2 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
+1.3.0 also fixes stuck voices when changing POLY/DUAL to MONO/UNISON with keys held. Note Off already arrived, but old-mode voices could remain gated. Glide is unchanged; editing only Glide did not reproduce the failure in tests.
 
 ## Links
 

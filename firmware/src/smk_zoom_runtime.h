@@ -4,7 +4,7 @@ static void zm_mark_dirty(void){dirty_page=1;}
 static void zm_focus_capture(unsigned k,int p){
  if(!(zm_zoom||zm_scope_active())||layer||is_seq_page(page)||page==PG_THEME||page==PG_KEYBOARD||page==PG_MIDI||page==PG_CONTROLS)return;
  int numeric=p>=0&&(PDEF[p].kind==K_NUM||PDEF[p].kind==K_BIP||PDEF[p].kind==K_SEMI||PDEF[p].kind>=K_MS);
- if(page==PG_MIXER)numeric=1;if(page==PG_DRIVE)numeric=k!=0;if(page==PG_SUPER)numeric=k<2;
+ if(page==PG_MIXER)numeric=1;if(page==PG_DRIVE)numeric=k!=0;if(page==PG_SUPER)numeric=k<2;if(page==PG_SUB)numeric=k==2;
  if(obv_drums_selected()&&page==PG_DSOUND)numeric=k!=0;
  if(numeric){zm_focus_knob=k+1;zm_focus_on=1;zm_focus_t=fm1_ms;}
 }
@@ -12,7 +12,7 @@ static void zm_scope_rearm(void){unsigned best=0,level=0;for(unsigned v=0;v<NV;v
 static int zm_display_poll(void){
  static unsigned scope_was;
  unsigned full=zm_full();uint32_t owner=full?1u+page+(layer<<8)+(zm_scope_active()<<12)+(zm_zoom<<13)+(zm_scope_active()?0u:((seq_trk%NTRK)<<14)+(set.pat<<16)):0u;
- if(owner!=zm_display_owner){zm_display_owner=owner;lcd_fill(0,0,240,240,C_PANEL);dirty_hdr=dirty_page=dirty_tags=dirty_steps=1;scope_state=1;zm_footer_hash=0;zm_scope_t=0;hints_key=0xFFFFFFFFu;}
+ if(owner!=zm_display_owner){zm_display_owner=owner;lcd_fill(0,0,240,240,C_PANEL);end_ui_seen=0;dirty_hdr=dirty_page=dirty_tags=dirty_steps=1;scope_state=1;zm_footer_hash=0;zm_scope_t=0;hints_key=0xFFFFFFFFu;}
  if(!full){scope_was=0;return 0;}
  if(zm_focus_on&&!zm_focus_visible()){zm_focus_on=0;dirty_page=1;}
  /* Display-only context notices while the scope remains the active PERFORM view. */

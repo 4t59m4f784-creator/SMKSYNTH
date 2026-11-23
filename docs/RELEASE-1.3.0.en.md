@@ -1,0 +1,5 @@
+# SMKSYNTH 1.3.0 — Endless MIDI
+
+Additive SQUARE/SAW SUB OSC in the dual-core ANALOG engine. K5 controls tempo on every synth page; per-pattern BPM with MASTER/PATTERN. Improved Zoom, hold-REC feedback, confirmed INITIALIZE with automatic return, and fixed Master controls. ENDLESS and USB/TRS MIDI MODE channels/layers retained. Supersaw remains OSC 1-only.
+
+Promoted from user-approved SU3 /19663, public identity 19664 for Pro/Elite. Updates preserve user data; first install requires matching V016 and seeds factory data. Old patches start with SUB off. Save/copy a pattern to store internal BPM; MASTER keeps current tempo, PATTERN recalls stored BPM. Missing legacy BPM keeps current tempo; external clock takes priority. Split/Layer: < LEVEL, > OCT. INITIALIZE: K1 target, PLAY review, K1 INITIALIZE then PLAY confirm; PATCH cancels. NOT SAVED appears for 2.2 seconds before returning to Performance; save explicitly to keep changes. Pattern reset: INIT A/B/C, basic DRUM-X D, equal levels, no FX, empty 16-step tracks and SINGLE. Global semitone transpose is deferred.

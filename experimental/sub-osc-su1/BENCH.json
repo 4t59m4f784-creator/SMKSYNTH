@@ -1,0 +1,12 @@
+{
+  "host_only": true,
+  "voices": 8,
+  "blocks": 60000,
+  "baseline_seconds": 0.083996,
+  "sub_off_seconds": 0.088548,
+  "sub_100_seconds": 0.107721,
+  "off_vs_dc3_percent": 5.419305681222908,
+  "on_vs_dc3_percent": 28.245392637744658,
+  "not_device_cpu_percent": true,
+  "compiler": "x86-64 cc -O2; target main remains -Os"
+}

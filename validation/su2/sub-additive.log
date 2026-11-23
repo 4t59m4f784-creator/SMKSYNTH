@@ -1,0 +1,3 @@
+OSC1 440 Hz after/before SUB: 1.000075; SUB 220 Hz power 18382575.2; no mix normalization.
+Linear additive residual RMS 1.928, signal RMS 3972.711 (fixed-point rounding included).
+PASS: SUB adds its fundamental without attenuating the original oscillator; no extra voices.

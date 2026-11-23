@@ -194,11 +194,12 @@ def build_app():
         ld.write_text(txt.replace("LENGTH = 0x8DFBC", f"LENGTH = {APP_SLOT:#X}".replace("0X", "0x")))
     tc("pi32v2/bin/ld", "--gc-sections", "-e", "_start", "-T", ld, OUT / "crt0.o", OUT / "fm1_vec.o",
        OUT / "fm1_isr.o", OUT / "obervave.o", OUT / "obv_supersaw.o", "-o", elf)
-    for sect in ("text.bin", "data.bin", "ramtext.bin"):
+    for sect in ("text.bin", "data.bin", "ramtext.bin", "c1text.bin"):
         (OUT / sect).unlink(missing_ok=True)
     *_, syms, dis, rt = tc_all(("common/bin/objcopy", "-O", "binary", "-j", ".text", elf, OUT / "text.bin"),
                                ("common/bin/objcopy", "-O", "binary", "-j", ".data", elf, OUT / "data.bin"),
                                ("common/bin/objcopy", "-O", "binary", "-j", ".ram_text", elf, OUT / "ramtext.bin"),
+                               ("common/bin/objcopy", "-O", "binary", "-j", ".c1_text", elf, OUT / "c1text.bin"),
                                ("common/bin/objdump", "-t", elf),
                                ("common/bin/objdump", "-d", elf),
                                ("common/bin/objdump", "-d", "-j", ".ram_text", elf))
@@ -208,7 +209,7 @@ def build_app():
         return int(re.search(r"^([0-9a-f]+) .*\s" + name + r"$", syms, re.M).group(1), 16)
     img = bytearray((OUT / "text.bin").read_bytes())
     # .ram_text and .data follow .text at their load addresses; crt0 copies them by words
-    for sect, lname in (("ramtext.bin", "_rt_load"), ("data.bin", "_data_load")):
+    for sect, lname in (("ramtext.bin", "_rt_load"), ("c1text.bin", "_c1t_load"), ("data.bin", "_data_load")):
         load = symv(lname)
         if load % 4:
             raise SystemExit(f"{lname} {load:#x} is not word aligned")
@@ -252,6 +253,9 @@ def check(img, syms, dis, rt):
     ram = sym("_bss_end") - 0x01C08000
     pool = sym("_pool_end") - 0x01C20000
     notes.append(f"image {len(img)} B of {APP_SLOT}; RAM .data+.bss {ram} B of 98304; pool {pool} B of 344064")
+    pool_top = sym("_c1_stack_hi") - 0x01C20000
+    notes.append(f"CPU1 stack top {pool_top} B of 344064 pool region")
+    if pool_top > 344064: errors.append("CPU1 stacks exceed reserved RAM")
     if pool > 344064: errors.append("pool exceeds reserved RAM")
     if ram > 96 * 1024:
         errors.append(f"RAM .data+.bss {ram} B > 96 KiB")
@@ -321,7 +325,7 @@ def main():
     if a.identity and a.experimental_id: raise SystemExit("Choose one identity option")
     if a.first_install != bool(a.factory_bank): raise SystemExit("--first-install requires --factory-bank and vice versa")
     FIRST_INSTALL=a.first_install
-    if a.identity and not ((a.identity=="19618" and a.release in ("1.0.0","1.0.1","1.0.2","1.0.3") and (a.release!="1.0.0" or FIRST_INSTALL)) or (a.identity=="19634" and a.release=="1.1.0") or (a.identity=="19649" and a.release=="1.2.0") or (a.identity=="19653" and a.release=="1.2.1") or (a.identity=="19655" and a.release=="1.2.2")): raise SystemExit("Stable profile: 19618 for 1.0.0-1.0.3; 19634 for 1.1.0; 19649 for 1.2.0; 19653 for 1.2.1; 19655 for 1.2.2")
+    if a.identity and not ((a.identity=="19618" and a.release in ("1.0.0","1.0.1","1.0.2","1.0.3") and (a.release!="1.0.0" or FIRST_INSTALL)) or (a.identity=="19634" and a.release=="1.1.0") or (a.identity=="19649" and a.release=="1.2.0") or (a.identity=="19653" and a.release=="1.2.1") or (a.identity=="19655" and a.release=="1.2.2") or (a.identity=="19664" and a.release=="1.3.0")): raise SystemExit("Stable profile: 19618 for 1.0.0-1.0.3; 19634 for 1.1.0; 19649 for 1.2.0; 19653 for 1.2.1; 19655 for 1.2.2")
     if not a.voice_hardware:
         raise SystemExit("OBERVAVE VOICE: installable builds require the explicit --voice-hardware profile")
     if (a.board or os.environ.get("BOARD"))!="smk37" or (a.model or os.environ.get("MODEL") or "pro").lower() not in ("pro","elite") or not (a.experimental_id or a.identity) or not a.release or (not a.identity and "-" not in a.release):

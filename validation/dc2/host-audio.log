@@ -1,0 +1,11 @@
+PASS mode=0 jobs=27696 fallbacks=0 private=3528 bytes
+PASS mode=1 jobs=23740 fallbacks=3956 private=3528 bytes
+PASS mode=2 jobs=27696 fallbacks=2517 private=3528 bytes
+PASS mode=3 jobs=13824 fallbacks=0 private=3528 bytes
+30a0109ffec4af806d0b6cab29d279864e538acdafe8011dcc531e9482a9659e  build/dc1/serial.pcm
+30a0109ffec4af806d0b6cab29d279864e538acdafe8011dcc531e9482a9659e  build/dc1/worker-0.pcm
+30a0109ffec4af806d0b6cab29d279864e538acdafe8011dcc531e9482a9659e  build/dc1/worker-1.pcm
+30a0109ffec4af806d0b6cab29d279864e538acdafe8011dcc531e9482a9659e  build/dc1/worker-2.pcm
+30a0109ffec4af806d0b6cab29d279864e538acdafe8011dcc531e9482a9659e  build/dc1/worker-3.pcm
+PASS mode=0 jobs=27696 fallbacks=0 private=3528 bytes
+PASS mode=2 jobs=27696 fallbacks=2517 private=3528 bytes

@@ -11,8 +11,8 @@ static void zm_focus_capture(unsigned k,int p);
 static uint32_t zm_focus_t,zm_focus_on,zm_footer_t,zm_footer_hash,zm_scope_t,zm_display_owner;
 static char zm_focus_label[24],zm_focus_value[32];
 static void zm_copy(char*d,const char*s,unsigned cap){unsigned i=0;while(i+1<cap&&s[i]){d[i]=s[i];i++;}d[i]=0;}
-static void zm_boot(void){zm_zoom=mm_data.reserved[0]==0x5Au&&mm_data.reserved[1]==1u;zm_scope=zm_theme_pending=zm_focus_on=0;}
-static void zm_theme_set(unsigned zoom){if(zm_zoom==!!zoom)return;zm_zoom=!!zoom;mm_data.reserved[0]=0x5A;mm_data.reserved[1]=(uint8_t)zm_zoom;zm_theme_pending=1;zm_theme_t=fm1_ms;zm_focus_on=0;}
+static void zm_boot(void){zm_zoom=mm_data.reserved[0]==0x5Au&&(mm_data.reserved[1]&1u)&&mm_data.reserved[1]<=3u;ctl_pattern_tempo=mm_data.reserved[0]==0x5Au&&mm_data.reserved[1]<=3u?(mm_data.reserved[1]>>1)&1u:0u;zm_scope=zm_theme_pending=zm_focus_on=0;}
+static void zm_theme_set(unsigned zoom){if(zm_zoom==!!zoom)return;zm_zoom=!!zoom;mm_data.reserved[0]=0x5A;mm_data.reserved[1]=(uint8_t)(zm_zoom|(ctl_pattern_tempo<<1));zm_theme_pending=1;zm_theme_t=fm1_ms;zm_focus_on=0;}
 static uint32_t zm_hash(const void*p,unsigned n){uint32_t h=2166136261u;const uint8_t*b=p;while(n--)h=(h^*b++)*16777619u;return h;}
 /* Save ONLY the theme over the last committed maps. Never commit unsaved edits. */
 static void zm_theme_poll(void){
@@ -22,7 +22,7 @@ static void zm_theme_poll(void){
   for(unsigned i=0;i<4;i++)mm_default(&mm_verify.profile[i]);
  }
  unsigned seq=mm_data.seq+1u;if(!seq)seq=1;
- mm_verify.seq=seq;mm_verify.reserved[0]=0x5A;mm_verify.reserved[1]=(uint8_t)zm_zoom;
+ mm_verify.seq=seq;mm_verify.reserved[0]=0x5A;mm_verify.reserved[1]=(uint8_t)(zm_zoom|(ctl_pattern_tempo<<1));
  uint32_t h=zm_hash(&mm_verify,sizeof mm_verify);unsigned slot=mm_slot^1u;
  int bad=mm_store_save(slot,&mm_verify,sizeof mm_verify)||mm_store_load(slot,&mm_verify,sizeof mm_verify)||!mm_valid(&mm_verify)||zm_hash(&mm_verify,sizeof mm_verify)!=h;
  if(!bad){mm_data.seq=seq;mm_slot=slot;zm_theme_pending=0;}else {zm_theme_pending=2;zm_theme_t=fm1_ms;}
@@ -81,10 +81,11 @@ static void zm_focus_draw(void){
  zm_value(27,125,zm_focus_value,186,C_CREAM);
 }
 static void zm_activity_body(void){
+ if(su2_footer_body())return;
  uint16_t accent=C_RED;
  if(zm_transpose_active()){zm_text(8,222,"DRUM-X FIXED",16,C_AMBER);return;}
  if(page==PG_KEYBOARD&&!zm_scope_active()){zm_text(8,222,"K5 LEVEL / OCT",16,C_AMBER);return;}
- if(!zm_scope_active()&&!(page<=PG_OUTPUT||page==PG_DKIT||page==PG_DSOUND))return;
+ if(!zm_scope_active()&&!(page<=PG_OUTPUT||page==PG_DKIT||page==PG_DSOUND||page==PG_SUB||page==PG_SUPER))return;
  if(obv_drums_selected()){
   static const char*const names[]={"BD","SD","CP","CH","OH","TM","RM","BL"};
   for(unsigned i=0;i<8;i++){int x=22+(int)i*28;unsigned hit=drum_stamp[seq_trk%NTRK][i]&&eng_t+1u-drum_stamp[seq_trk%NTRK][i]<FS/8u;uint16_t c=hit?accent:C_KNOB_HI;if(hit)cv_rect(x-12,207,24,33,RGB(58,22,26));zm_text(x-8,207,names[i],16,hit?accent:C_AMBER);
@@ -94,7 +95,7 @@ static void zm_activity_body(void){
   for(unsigned i=0;i<NCARD;i++){int32_t level=0;for(unsigned v=i;v<NV;v+=NCARD)if(ui_vlevel[v]>level)level=ui_vlevel[v];unsigned bright=clampi(level>>7,0,255);int x=22+(int)i*28;uint16_t c=blend565(blend565(C_PANEL,accent,45),accent,bright);if(bright>8)cv_disc(x,224,9,0,blend565(C_PANEL,c,64));cv_disc(x,224,6,0,c);cv_disc(x,224,6,1,blend565(C_PANEL,c,170));}
  }
 }
-static void zm_activity(void){cv_begin(240,33,C_PANEL);cv_oy=-207;zm_activity_body();cv_oy=0;cv_blit(0,207);}
+static void zm_activity(void){if(page==PG_KEYBOARD||page==PG_INITIALIZE||page==PG_TEMPO||page==PG_THEME)return;cv_begin(240,40,C_PANEL);cv_oy=-200;zm_activity_body();cv_oy=0;cv_blit(0,200);}
 static void zm_scope_plot(void){
  for(unsigned y=60;y<198;y+=69){cv_begin(240,69,C_PANEL);cv_oy=-(int)y;cv_rect(8,60,224,138,C_SCOPE_BG);cv_line(8,129,231,129,C_SCOPE_MID);for(int x=64;x<232;x+=56)cv_line(x,60,x,197,C_SCOPE_MID);
   for(unsigned i=1;i<224;i++){int a=clampi(scope[(i-1u)*SCOPE_N/224u]>>8,-65,65),b=clampi(scope[i*SCOPE_N/224u]>>8,-65,65);cv_line((int)i+7,129-a,(int)i+8,129-b,C_AMBER);}

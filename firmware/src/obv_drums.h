@@ -73,12 +73,12 @@ static void drums_lane_config(uint32_t kit,uint32_t lane,dx_lane_t *out)
         }
     }
 }
-static uint32_t drums_render(uint32_t p,int32_t *out)
+static uint32_t drums_render_state(obv_dhit_t *hits, const uint8_t *v, volatile uint16_t *peaks, int32_t *out)
 {
-    uint32_t used=0;const uint8_t *v=live_p[p].v;
+    uint32_t used=0;
     int32_t y[CTL];
     for(unsigned l=0;l<8;l++){
-        obv_dhit_t *h=&drum_hit[p][l];drum_peak[p][l]=0;
+        obv_dhit_t *h=&hits[l];peaks[l]=0;
         if(!h->core.active&&!h->core.trig)continue;
         used=1;uint32_t retrigger=h->core.trig,kit=h->kit;dx_lane_t lane;drums_lane_config(kit,l,&lane);
         int32_t tune=((int32_t)v[P_O2_SEMI]-24)*16+clampi((int32_t)v[DP_PITCH[l]]-64,-12,12)*16;
@@ -94,12 +94,14 @@ static uint32_t drums_render(uint32_t p,int32_t *out)
         for(unsigned i=0;i<CTL;i++){
             int32_t a=(int32_t)(((int64_t)y[i]*(g+(dg*(int32_t)(i+1u))/(int32_t)CTL))>>12);
             int32_t pk=a<0?-a:a;if(pk>32767)pk=32767;
-            if(pk>drum_peak[p][l])drum_peak[p][l]=(uint16_t)pk;
+            if(pk>peaks[l])peaks[l]=(uint16_t)pk;
             out[2*i]+=a;out[2*i+1]+=a;
         }
     }
     return used;
 }
+static uint32_t drums_render(uint32_t p,int32_t *out)
+{ return drums_render_state(drum_hit[p],live_p[p].v,drum_peak[p],out); }
 static const obv_engine_ops_t obv_drums_ops={"DRUMS",0,0,drums_trigger,drums_render,drums_reset,drums_busy};
 static void obv_drums_preset(patch_t *p,uint32_t kit)
 {

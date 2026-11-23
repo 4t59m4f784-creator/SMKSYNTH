@@ -1,0 +1,1 @@
+PASS: dense mixed and normal-only serial PCM plus complete final melodic, Supersaw and drum states match original DC2a serial implementation byte for byte.

@@ -35,7 +35,7 @@
 #define FM1_EMU_USP_L (*(volatile uint32_t *)0x1EEF0E4u)
 
 extern char _guard0[], _ustack_lo[], _guard1[], _sstack_lo[], _sstack_top[], _etext[];
-extern uint32_t _rt_start[], _rt_end[];
+extern uint32_t _rt_start[], _rt_end[], _c1t_end[];
 
 enum { FM1_GUARD_STACK = 1, FM1_GUARD_WRITE = 2, FM1_GUARD_BUS = 4, FM1_GUARD_PC = 8 };
 
@@ -76,13 +76,24 @@ static void fm1_guard_enable(uint32_t which)
         FM1_PC_LIMIT0_L = 0x02000120u;
         FM1_PC_LIMIT0_H = (uint32_t)(uintptr_t)_etext;
         {   /* RAM code (.ram_text); with none, repeat the XIP window */
-            volatile uint32_t rs = (uint32_t)(uintptr_t)_rt_start, re = (uint32_t)(uintptr_t)_rt_end;
+            volatile uint32_t rs = (uint32_t)(uintptr_t)_rt_start, re = (uint32_t)(uintptr_t)_c1t_end;
             FM1_PC_LIMIT1_L = re > rs ? rs : 0x02000120u;
             FM1_PC_LIMIT1_H = re > rs ? re - 1u : (uint32_t)(uintptr_t)_etext;
         }
     }
     fm1__dbg_lock();
 }
+
+static void fm1_guard_pc_open(void)
+{
+    fm1__dbg_unlock();
+    FM1_PC_LIMIT0_L = 0u;
+    FM1_PC_LIMIT0_H = 0xFFFFFFFFu;
+    FM1_PC_LIMIT1_L = 0u;
+    FM1_PC_LIMIT1_H = 0xFFFFFFFFu;
+    fm1__dbg_lock();
+}
+
 
 /* write-protect 0x01C7FD50..0x01C7FFFF (boot info, mailbox, vectors):
  * call after the last fm1_irq_attach */

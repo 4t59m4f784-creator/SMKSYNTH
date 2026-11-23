@@ -1,0 +1,35 @@
+PASS SU3: tempo metadata/save/copy; MASTER/PATTERN audio-boundary recall; legacy fallback; K5 on every synth page; init auto return; keyboard footer preservation; SUB/SUPER voices; Endless cache invalidation. PASS SU2: master real controls; six colored mixer pages; SINGLE actual-part identity; levels/octaves; Endless READY/play/REC; REC progress/abort/ack; init cancel/busy/target-change/execution; parts and manual flash preservation; INIT + basic DRUM-X, 16 empty steps per track.
+     0 ms  pattern slot 4 saved (13416 + 380 B)
+PASS SUB: legacy defaults; packed extensions; SUPER coexistence; DRUM isolation; preset/pattern persistence; real K1/K3/K4; navigation; phase/frequency; unison fundamental; rapid edits; silent phase. voice=184 part=168 worker=3780
+PASS: 8 normal/UNISON voices and existing 5 SUPER ceiling; four-part SUB ownership; rapid mode/wave stress; bounded stereo peak 28759.
+   300 ms  pattern slot 0 saved (13416 + 380 B)
+   300 ms  pattern slot 1 saved (14448 + 380 B)
+   300 ms  pattern slot 2 saved (14460 + 380 B)
+PASS: two-pad bank, SINGLE/SPLIT/LAYER, boundaries/octaves, exclusive live gain, same-pitch sequence isolation, sustain, REC selected-only, focus/setting releases, old/new patterns and scene bytes, queued restore, DRUM exclusion/hits, mono handoff, range safety.
+     0 ms  pattern slot 0 saved (14476 + 380 B)
+PASS SP1: OSC1-only controls, all 128 MIDI pitches/extremes, MIX=0 exact saw, bounded output, independent knobs, page/drum routing, presets/favorites/flash-scene recall/name/octave/layout, 8-voice/4-part legacy OSC2 SUPER fallback, original stored bytes retained and explicit SYNC/XMOD bypass.
+OSC1 440 Hz after/before SUB: 1.000075; SUB 220 Hz power 18382575.2; no mix normalization.
+Linear additive residual RMS 1.928, signal RMS 3972.711 (fixed-point rounding included).
+PASS: SUB adds its fundamental without attenuating the original oscillator; no extra voices.
+PASS mode=0 jobs=22416 fallbacks=0 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=1 jobs=19214 fallbacks=3202 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=3 jobs=11168 fallbacks=0 private=3780 bytes normal=104 SUPER=24430 plain_only=0
+PASS mode=0 jobs=22416 fallbacks=0 private=3780 bytes normal=57379 SUPER=0 plain_only=1
+PASS mode=1 jobs=19214 fallbacks=3202 private=3780 bytes normal=57379 SUPER=0 plain_only=1
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=57379 SUPER=0 plain_only=1
+PASS mode=3 jobs=11168 fallbacks=0 private=3780 bytes normal=28834 SUPER=0 plain_only=1
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS mode=2 jobs=22416 fallbacks=2037 private=3780 bytes normal=146 SUPER=48622 plain_only=0
+PASS SU3 installer: all 4 hashes/CRCs/model pins, stable/experimental origins, stock/foreign refusal, identity substitution guard, interrupted update/return and per-model recovery. No hardware accessed.
+PASS SU3 packages: 4 exact products, sizes, SHA/CRC, 20 blocks; all packages leave restore journal/private bank unseeded for preserving updates.
+PASS: stable/SS/UI/ENDLESS/SP1 identities and files; B2 signature, unknown identity, model, layout and SHA guards before restore writes
+PASS: SMK-37 Pro_19663 full export, CRC retry, interrupted restore/resume and exact bank readback
+PASS: SMK-37 Elite_19663 full export, CRC retry, interrupted restore/resume and exact bank readback
+PASS: SUB + 137 BPM pattern bank exports/restores byte-identically via B2, including CRC retry and interrupted restore, for Pro/Elite.
+PASS: pending/invalid restore journal refuses firmware update before app erase.
+PASS: 62 erase-interruption/retry points keep bank byte-identical.
+PASS: B1->B2 bank byte-identical, app updated, protected ranges intact, unknown owner refuses before erases, disconnect/resume preserves bank.
+PASS: pending/invalid restore journal refuses firmware update before app erase.
+PASS: 62 erase-interruption/retry points keep bank byte-identical.
+PASS: B1->B2 bank byte-identical, app updated, protected ranges intact, unknown owner refuses before erases, disconnect/resume preserves bank.
