@@ -1,0 +1,24 @@
+name: SMKSTAGE B3 host DSP regression
+on:
+  push:
+    branches: [smkstage-b3-alpha]
+    paths:
+      - 'firmware/src/organ_*.h'
+      - 'tests/stage_organ_test.c'
+      - 'tests/organ_ref.h'
+      - 'tests/fx_ref.h'
+      - '.github/workflows/smkstage-host.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dsp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile upstream sound-fidelity regression tests (stage rotary bypass)
+        run: |
+          mkdir -p build/stage
+          cc -O1 -Wall -Wno-unused-function -Wno-unused-variable -Ifirmware/src -Itests -o build/stage/b3-test tests/stage_organ_test.c -lm
+          build/stage/b3-test
