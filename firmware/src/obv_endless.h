@@ -4,9 +4,13 @@
  */
 static int endless_screen(void){return page==PG_SEQ&&seq_view==SV_ENDLESS&&!layer;}
 static void endless_finish(void){end_record=0;end_record_mask=0;end_count=0;}
-static void endless_reset(void){
+/* Input/UI cleanup must not restart tracks already launched by the ISR. */
+static void endless_clear_input(void){
  for(unsigned n=0;n<128;n++)if(end_owner[n]&128u)keyboard_play_note(0,n,0);
- memset(end_owner,0,sizeof end_owner);endless_finish();end_held=0;end_global_transpose=0;end_pending=end_clock_valid=end_idle_frames=0;
+ memset(end_owner,0,sizeof end_owner);endless_finish();end_ui_seen=0;
+}
+static void endless_reset(void){
+ endless_clear_input();end_held=0;end_global_transpose=0;end_pending=end_clock_valid=end_idle_frames=0;
  for(unsigned t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
  end_ui_seen=0;
 }
@@ -133,7 +137,9 @@ static void endless_knob(knob_view_t*k,unsigned i){
 }
 static void endless_poll(void){
  static uint16_t epoch;
- if(epoch!=keyboard_pattern_epoch){epoch=keyboard_pattern_epoch;endless_recall();}
+ /* The audio-boundary swap owns playback state. Observing its epoch here
+  * only retires outgoing key/record bookkeeping, never launches a second time. */
+ if(epoch!=keyboard_pattern_epoch){epoch=keyboard_pattern_epoch;endless_clear_input();if(end_mode)endless_mark_tracks();}
  /* Page navigation only observes ENDLESS. PARA or REC explicitly enables it. */
  if(end_record&&(!endless_screen()||seq_trk+1u!=end_record||ctl_seq_run||layer||keyboard_active()||obv_drums_selected()))endless_finish();
  if(ctl_panic)endless_reset();

@@ -1,0 +1,23 @@
+name: Validate Endless MIDI PS1
+on:
+  push:
+    branches: [experimental/endless-midi-ps1]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pattern transition regression and existing Endless behavior
+        run: |
+          mkdir -p build/ps1
+          for name in pattern_transition endless endless_midi seq_dp2 su3_workflow; do
+            cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -fno-sanitize-recover=all -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/${name}_test.c -lm -o build/ps1/$name
+            ASAN_OPTIONS=detect_leaks=0 build/ps1/$name
+          done
+          node tests/ps1_installer_test.mjs
+          python3 tests/ps1_packages_test.py

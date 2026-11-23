@@ -369,6 +369,8 @@ static void seq_tick(void)
                 keyboard_pattern_epoch++;
                 end_global_transpose=0;end_pending=end_clock_valid=0;end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
                 pat = pat_q;if(ctl_pattern_tempo&&pattern_tempo(&pat)){ctl_tempo=pattern_tempo(&pat);q=quarter_len();}seq_trk=pattern_focus(&pat);end_held=0;endless_pattern_state(&pat);
+                /* Keep the Endless trigger grid on this same destination downbeat. */
+                end_clock_valid=end_mode;end_clock_phase=seq_beat_cnt;end_idle_frames=0;
                 keyboard_pattern_gains(&pat);
                 if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) { snd_old[t] = live_p[t]; live_p[t] = snd_q[t]; } ctl_snd_swap = 0; ui_snd_swapped = 1; }
                 mx_swap_in();                   /* (its mixer, drive and master on the same downbeat) */

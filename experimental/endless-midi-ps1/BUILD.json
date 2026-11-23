@@ -1,0 +1,19 @@
+{
+  "version": "1.3.0-ps1",
+  "identity": 19665,
+  "base_public": "1.3.0",
+  "base_commit": "f08318eb58752b3813eb0fc447ff1ebb7bffd194",
+  "public_unchanged": true,
+  "dual_core": true,
+  "ram_static_bytes": 96352,
+  "pool_bytes": 332180,
+  "physical_validation": "pending",
+  "source_sha256": {
+    "firmware/src/obv_endless.h": "fea0e69bd915600aede91fff3cdf6f8ea23fead3d5a7255d102ab22666d68042",
+    "firmware/src/obv_seq.h": "d2bd6c4104358650bdd98680368c9765e762d350e4c01f03baced3fc0368bf4f"
+  },
+  "application_bytes": {
+    "pro": 246856,
+    "elite": 246860
+  }
+}
