@@ -5,6 +5,15 @@ on:
     paths-ignore:
       - .github/workflows/tuning-test.yml
       - .github/workflows/publish.yml
+      - docs/images/splash-endless-midi-130.png
+      - docs/images/smksynth-social-v3.png
+      - docs/images/smksynth-social-v3.svg
+      - web/site/index.html
+      - web/install/index.html
+      - tools/check_public_web.py
+      - tools/render_splash.c
+      - tools/build_social_preview.py
+      - .github/workflows/release-review.yml
   workflow_dispatch:
 concurrency:
   group: smksynth-publication

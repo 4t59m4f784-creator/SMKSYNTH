@@ -1,0 +1,44 @@
+name: Publish website artwork
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/images/splash-endless-midi-130.png
+      - docs/images/smksynth-social-v3.png
+      - docs/images/smksynth-social-v3.svg
+      - web/site/index.html
+      - web/install/index.html
+      - tools/check_public_web.py
+      - tools/render_splash.c
+      - tools/build_social_preview.py
+      - .github/workflows/tuning-test.yml
+permissions:
+  contents: read
+concurrency:
+  group: smksynth-publication
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble website using immutable release downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v1.3.0 --repo 4t59m4f784-creator/SMKSYNTH --pattern 'SMKSYNTH-1.3.0-source.zip' --pattern SHA256SUMS.txt --dir releases/1.3.0 --clobber
+          python3 tools/package_release.py build/public-site --reuse-release
+          python3 tools/check_public_web.py build/public-site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/public-site
+      - uses: actions/deploy-pages@v4
+        id: deployment
