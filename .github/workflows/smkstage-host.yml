@@ -5,6 +5,7 @@ on:
     paths:
       - 'firmware/src/organ_*.h'
       - 'firmware/src/smkstage.c'
+      - 'tools/build_stage.py'
       - 'tests/stage_organ_test.c'
       - 'tests/organ_ref.h'
       - 'tests/fx_ref.h'
