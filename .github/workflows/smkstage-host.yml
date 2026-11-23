@@ -4,6 +4,7 @@ on:
     branches: [smkstage-b3-alpha]
     paths:
       - 'firmware/src/organ_*.h'
+      - 'firmware/src/smkstage.c'
       - 'tests/stage_organ_test.c'
       - 'tests/organ_ref.h'
       - 'tests/fx_ref.h'
