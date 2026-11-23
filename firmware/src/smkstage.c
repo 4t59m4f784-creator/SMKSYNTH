@@ -7,6 +7,8 @@
 #define OBV_DUAL_CORE 1
 #include "platform.c"
 #include "organ_tab.h"
+/* Keep Leslie/reverb delay lines in the large .pool, not 96 KiB system RAM. */
+#define ORGAN_POOL __attribute__((section(".pool")))
 #define ORGAN_C1_RUN(fn,arg) fm1_mc_run((fn),(arg))
 #define ORGAN_C1_WAIT() fm1_mc_wait()
 static volatile uint8_t stage_les_bypass;
