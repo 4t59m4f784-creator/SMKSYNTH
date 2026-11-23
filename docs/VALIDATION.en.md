@@ -1,9 +1,11 @@
-# Public validation 1.3.0
+# Public validation 1.3.1
 
-Approved runtime: SU3 /19663; firmware sources are byte-identical. Public identity 19664, Pro and Elite. Only build version/identity and first-install seed differ. Native RAM 96,352/98,304 bytes; pool 332,180/344,064, voice 184 bytes. No poliphony reduction.
+Approved runtime: PS3 /19667. Firmware sources are byte-identical to the approved PS3; promotion changes build version/identity to 19668 for Pro and Elite. Static RAM 96,384/98,304 bytes; pool 332,180/344,064; unchanged polyphony. No additional synthesis changes were introduced in the promotion.
 
-Four packages verified: SHA-256, CRC, model/loader identity, matching initial/update applications and factory seed only in initial install. Automated native SU3, sanitizer, additive SUB, dual-core fallback/audio, controls, MIDI and WASM regressions pass. Backup supports public/experimental identities, including 19663 and 19664. Host tests do not replace hardware installation or CPU measurements. The user approved SU3; each final public package has not been separately flashed on physical hardware. Known iPhone USB-video clicks remain.
+The user confirmed the first kick when entering pattern 1 and strong stability during repeated recalls with different tempos. Development checks covered PS1/PS2/PS3 native regressions, sanitizers, first attack in the recall CTL, 10,128 rapid requests and 253 commits, same-engine recall PCM identical to PS2, dual-core audio/fallback, controls, MIDI and WASM.
 
-[Release](RELEASE-1.3.0.en.md) · [Manifest](../RELEASE.json)
+All four final public packages are checked for SHA-256, CRC, model and loader identities. Initial-install/update applications match; only first installation seeds the unchanged factory bank. Updating preserves bank, theme and MIDI maps. Backup accepts identities 19664–19668 and earlier compatible versions.
 
-Installation checks distinguish first installation from an update: only the matching official V016 model can receive the factory-seeded package; existing SMKSYNTH identities use the preserving update. Wrong-model packages, altered hashes and CRCs, substituted devices, foreign loaders and invalid pending journals are rejected before writes. Interruption/resume tests preserve the original source identity. The public 1.2.2 installer remains archived for its unfinished transfers. The WebAssembly simulator runs the same musical/UI sources with a serial host renderer; it demonstrates controls and sound but does not measure the hardware's dual-core headroom.
+Host tests do not replace physical CPU measurement or installation of each package on each model. PS3 runtime was hardware-approved; all four final 1.3.1 packages have not been individually installed. Known iPhone USB-video clicks remain. The 1.3.0 manual/PDFs still apply because no features changed.
+
+[Release](RELEASE-1.3.1.en.md) · [Manifest](../RELEASE.json)

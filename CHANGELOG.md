@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.1 — Endless MIDI — 2026-11-23
+
+Correção de estabilidade nas trocas de patterns com BPMs diferentes, sincronismo do Endless e primeiro ataque ao trocar de engine. Corrigidos também o corte da primeira nota pela ativação do ARP, estouro aritmético no reverb e sobreposição de valores no Mixer Zoom. Promovida da PS3 aprovada; dados salvos e funcionalidades preservados.
+
+Maintenance fix for pattern-change stability, Endless alignment and first attacks across engine changes; also fixes ARP first-note cuts, reverb arithmetic overflow and Zoom Mixer popup stacking. Hardware-approved PS3 promoted; saved data and existing features preserved.
+
+[Notas](docs/RELEASE-1.3.1.md) · [English](docs/RELEASE-1.3.1.en.md)
+
 ## 1.3.0 — Endless MIDI — 2026-11-22
 
 SUB OSC aditivo SQUARE/SAW na engine ANALOG dual-core. K5 controla o tempo em todas as telas do synth; BPM por pattern com MASTER/PATTERN. Zoom aprimorado, feedback REC, INITIALIZE com confirmação e retorno automático, e Master corrigido. Mantidos ENDLESS e MODO MIDI USB/TRS com canais e layers. Supersaw somente no OSC 1.

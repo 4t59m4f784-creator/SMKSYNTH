@@ -4,7 +4,7 @@ from pathlib import Path
 import base64,subprocess
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
-image=base64.b64encode((ROOT/'docs/images/splash-endless-midi-130.png').read_bytes()).decode()
+image=base64.b64encode((ROOT/'docs/images/splash-endless-midi-131.png').read_bytes()).decode()
 pads=''.join(f'<rect x="{72+c*66}" y="{466+r*43}" width="54" height="32" rx="5" fill="{["#234461","#452536"][r]}" stroke="{["#78b6ed","#f0474d"][r]}" stroke-opacity=".6"/>' for r in range(2) for c in range(8))
 svg=f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630">
 <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101c2b"/><stop offset="1" stop-color="#080d15"/></linearGradient><linearGradient id="line"><stop stop-color="#f0474d"/><stop offset="1" stop-color="#78b6ed"/></linearGradient></defs>
@@ -19,7 +19,7 @@ svg=f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1
 <image x="774" y="183" width="334" height="334" style="image-rendering:pixelated" xlink:href="data:image/png;base64,{image}"/>
 <path d="M72 561 H1128" stroke="#2a3c50"/>
 <text x="72" y="599" font-size="19" fill="#9fb3c6">Firmware gratuito e de código aberto</text><text x="1128" y="599" text-anchor="end" font-size="18" fill="#e5edf5">Por Marcus Padrini</text></g></svg>'''
-out=ROOT/'docs/images/smksynth-social-v3.svg';out.write_text(svg)
+out=ROOT/'docs/images/smksynth-social-v4.svg';out.write_text(svg)
 subprocess.run(['inkscape',str(out),'--export-type=png','--export-filename='+str(out.with_suffix('.png'))],check=True)
 
 # Palette encoding keeps the crawler download small without changing the SVG artwork.

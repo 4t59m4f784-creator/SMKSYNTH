@@ -26,7 +26,7 @@ def package(destination,reuse_release=False):
  for name in ['index.html','style.css','i18n.js']:shutil.copy2(ROOT/'web/site'/name,dest/name)
  for source,name in [(ROOT/'web/install','install'),(ROOT/'web/install-elite','install-elite'),(ROOT/'web/backup','backup'),(ROOT/'web/simulator','simulator'),(ROOT/'docs','docs'),(ROOT/'docs/images','assets'),(out,'downloads')]:shutil.copytree(source,dest/name,dirs_exist_ok=True)
  if (ROOT/'experimental/tuning-tf1').exists():shutil.copytree(ROOT/'experimental/tuning-tf1',dest/'experimental/tuning-tf1',dirs_exist_ok=True)
- for folder in ['sub-osc-su1','endless-midi-su2','endless-midi-su3']:
+ for folder in ['sub-osc-su1','endless-midi-su2','endless-midi-su3','endless-midi-ps1','endless-midi-ps2','endless-midi-ps3']:
   if (ROOT/'experimental'/folder).exists():shutil.copytree(ROOT/'experimental'/folder,dest/'experimental'/folder,dirs_exist_ok=True)
  for name in ['README.md','LICENSE','LICENSING.md','CREDITS.md','CHANGELOG.md','RELEASE.json']:shutil.copy2(ROOT/name,dest/name)
  print(json.dumps(dict(destination=str(dest),version=version,source_sha256=sha(archive))))

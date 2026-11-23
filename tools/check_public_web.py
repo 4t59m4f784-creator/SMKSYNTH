@@ -83,10 +83,10 @@ def check(site):
         if folder in ('', 'install'):
             origin='https://4t59m4f784-creator.github.io/SMKSYNTH/'
             assert parser.meta['og:url']==origin+('install/' if folder else '')
-            assert parser.meta['og:image']==origin+'assets/smksynth-social-v3.png'
+            assert parser.meta['og:image']==origin+'assets/smksynth-social-v4.png'
             assert parser.meta['og:image:width']=='1200' and parser.meta['og:image:height']=='630'
             assert parser.meta['twitter:card']=='summary_large_image'
-            card=(site/'assets/smksynth-social-v3.png').read_bytes()
+            card=(site/'assets/smksynth-social-v4.png').read_bytes()
             assert card[:8]==b'\x89PNG\r\n\x1a\n' and int.from_bytes(card[16:20],'big')==1200 and int.from_bytes(card[20:24],'big')==630
         if folder == '':
             embeds = re.findall(r'youtube(?:-nocookie)?\.com/embed/([A-Za-z0-9_-]+)', html)
@@ -130,7 +130,7 @@ def check(site):
     assert (site / 'simulator/factory-session.bin').read_bytes() == (ROOT / 'factory/simulator-session.bin').read_bytes(), 'Changed factory session'
     for language in ('PT', 'EN'):
         for kind in ('Quick-Start', 'Manual'):
-            pdf = site / 'docs/pdf' / f'SMKSYNTH-{version}-{kind}-{language}.pdf'
+            pdf = site / 'docs/pdf' / f'SMKSYNTH-{release.get("documentation_version", version)}-{kind}-{language}.pdf'
             assert pdf.read_bytes().startswith(b'%PDF-'), f'Missing PDF: {pdf}'
     assert (site / 'downloads' / f'SMKSYNTH-{version}-source.zip').is_file()
     print(f'PASS: public {version} pages, PT/EN links, modules, firmware pins, frozen simulator and PDFs')

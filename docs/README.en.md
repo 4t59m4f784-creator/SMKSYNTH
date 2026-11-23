@@ -1,8 +1,8 @@
 # SMKSYNTH
 
-**Official 1.3.0 — Endless MIDI.** Approved dual-core ANALOG engine with additive SUB OSC, universal synth K5 tempo, stored pattern BPM and MASTER/PATTERN selection. Improved Zoom Split/Layer and Mixer, pad/Endless status, hold-REC feedback, confirmed INITIALIZE and fixed Master controls. MIDI MODE retains configurable K5.
+**Official 1.3.1 — Endless MIDI.** Stability and first-attack fixes for pattern changes. All 1.3.0 features retained.
 
-[What’s new in 1.3.0](RELEASE-1.3.0.en.md)
+[What’s new in 1.3.0](RELEASE-1.3.1.en.md)
 
 
 **A performance instrument for the M‑VAVE SMK‑37 Pro and SMK‑37 Elite.**

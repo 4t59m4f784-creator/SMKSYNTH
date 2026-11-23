@@ -52,7 +52,7 @@ static int su2_footer_body(void){
 }
 static void su2_mixer_colors(void){
  for(unsigned i=0;i<4;i++){int x=4+(i%2)*120,y=54+(i/2)*76;char l[2]={(char)('A'+i),0};
- cv_begin(112,2,C_TRKC[i]);cv_blit(x,y);cv_begin(30,27,RGB(19,25,36));cv_rect(1,1,24,25,C_TRKC[i]);zm_center(13,1,l,24,C_CREAM);cv_blit(x+27,y+4);}
+ cv_rect(x,y,112,2,C_TRKC[i]);cv_rect(x+28,y+5,24,25,C_TRKC[i]);zm_center(x+40,y+5,l,24,C_CREAM);}
 }
 static void su2_keyboard_draw(void){
  const keyboard_cfg_t*k=keyboard_row(&pat,kb_edit_row),*play=keyboard_live(&pat);unsigned combined=keyboard_active();

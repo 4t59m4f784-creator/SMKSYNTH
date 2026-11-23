@@ -1,23 +1,23 @@
 {
-  "version": "1.3.0",
-  "identity": "SMK-37 Pro_19664",
+  "version": "1.3.1",
+  "identity": "SMK-37 Pro_19668",
   "required_origin": "SMK-37 Pro_016",
   "installation": "first-install-or-preserving-update",
-  "runtime_base": "fc4ac62a03f9438bc7f16653c45f8ca97e0c10e0",
+  "runtime_base": "70da8dcaa9c6240a31ea4a872b66a5e9632c02d6",
   "factory_patterns": 5,
   "favorites": 8,
   "extra_user_presets": 0,
   "tempo": 90,
   "dp2_runtime_hardware_approved": true,
   "first_install_hardware_approved": false,
-  "firmware_sha256": "e62f8875ba9c3acaabdd155c8ec8df3b7ab8930007953c20adb9f7abf44dfbd9",
-  "wasm_sha256": "3306cf898c9767a7f957c00bad96f2e7de4304558b979620687d57c8102bf951",
+  "firmware_sha256": "1d7569ebcd0880c98f0510c7c43fdb8c2513c8c2a222e8a3f15f4d51d1d92d26",
+  "wasm_sha256": "ba982584130587ed6b4afe9ce0930da0a3256085338747ca1776dda746005471",
   "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
-  "app_bytes": 246756,
-  "static_ram_bytes": 96352,
+  "app_bytes": 248228,
+  "static_ram_bytes": 96384,
   "pool_bytes": 332180,
   "loader_bytes": 7760,
-  "update_firmware_sha256": "ed789dcf52e6fa7999ac6a9b121dba0c1d9e564d5fe59575cc30436dc72983b7",
+  "update_firmware_sha256": "5012a66f359c6d9c3a9ed7af156064f80257160313212f4de01795aa63e4c5be",
   "usb_audio": true,
   "fader_modes": [
     "JUMP",
@@ -34,8 +34,8 @@
   "supersaw_hardware_approved": true,
   "supersaw_origin": "https://github.com/isod89/clipper-fm1",
   "identities": {
-    "pro": "SMK-37 Pro_19664",
-    "elite": "SMK-37 Elite_19664"
+    "pro": "SMK-37 Pro_19668",
+    "elite": "SMK-37 Elite_19668"
   },
   "supported_models": [
     "SMK-37 Pro",
@@ -47,35 +47,35 @@
     "pro": {
       "model": "SMK-37 Pro",
       "release": {
-        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 first-install",
-        "product": "SMK-37 Pro_19664",
-        "url": "./firmware/SMKSYNTH-1.3.0-first-install-SMK37-Pro.fwsc",
+        "name": "SMKSYNTH 1.3.1 \u00b7 Endless MIDI \u00b7 first-install",
+        "product": "SMK-37 Pro_19668",
+        "url": "./firmware/SMKSYNTH-1.3.1-first-install-SMK37-Pro.fwsc",
         "size": 651339,
-        "sha": "e62f8875ba9c3acaabdd155c8ec8df3b7ab8930007953c20adb9f7abf44dfbd9"
+        "sha": "1d7569ebcd0880c98f0510c7c43fdb8c2513c8c2a222e8a3f15f4d51d1d92d26"
       },
       "update": {
-        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 update",
-        "product": "SMK-37 Pro_19664",
-        "url": "./firmware/SMKSYNTH-1.3.0-update-SMK37-Pro.fwsc",
+        "name": "SMKSYNTH 1.3.1 \u00b7 Endless MIDI \u00b7 update",
+        "product": "SMK-37 Pro_19668",
+        "url": "./firmware/SMKSYNTH-1.3.1-update-SMK37-Pro.fwsc",
         "size": 651876,
-        "sha": "ed789dcf52e6fa7999ac6a9b121dba0c1d9e564d5fe59575cc30436dc72983b7"
+        "sha": "5012a66f359c6d9c3a9ed7af156064f80257160313212f4de01795aa63e4c5be"
       }
     },
     "elite": {
       "model": "SMK-37 Elite",
       "release": {
-        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 first-install",
-        "product": "SMK-37 Elite_19664",
-        "url": "./firmware/SMKSYNTH-1.3.0-first-install-SMK37-Elite.fwsc",
+        "name": "SMKSYNTH 1.3.1 \u00b7 Endless MIDI \u00b7 first-install",
+        "product": "SMK-37 Elite_19668",
+        "url": "./firmware/SMKSYNTH-1.3.1-first-install-SMK37-Elite.fwsc",
         "size": 651339,
-        "sha": "e3ae89a8ed16d91b086e6656acb49773283ecf183e3196f413e4428f49e5e9c5"
+        "sha": "8ca3f472f12a9cd1994b7bcd435db63fde151c2b9b194cda35250cbfef31af6f"
       },
       "update": {
-        "name": "SMKSYNTH 1.3.0 \u00b7 Endless MIDI \u00b7 update",
-        "product": "SMK-37 Elite_19664",
-        "url": "./firmware/SMKSYNTH-1.3.0-update-SMK37-Elite.fwsc",
+        "name": "SMKSYNTH 1.3.1 \u00b7 Endless MIDI \u00b7 update",
+        "product": "SMK-37 Elite_19668",
+        "url": "./firmware/SMKSYNTH-1.3.1-update-SMK37-Elite.fwsc",
         "size": 651880,
-        "sha": "c5393139a45d7c59f9751b9cc5e7b5d6659a8d9af82dc64e51d464bdcfbe2173"
+        "sha": "c14164281879e8c0d89d85b7301ad20c626bef69c519590fde9627366f3f2bc4"
       }
     }
   },
@@ -86,8 +86,8 @@
   "physical_sustain": true,
   "endless_included": true,
   "hardware_validation": {
-    "pro": "User approved SU3 /19663; promoted with version and identity changes only.",
-    "elite": "Model-specific packages checked; unified Elite installation flow previously user validated. SU3 approval model not separately specified."
+    "pro": "User approved PS3 /19667: first kick on pattern transition and repeated pattern recalls with different tempos. Promoted with build version/identity only.",
+    "elite": "Model-specific packages and preserving update path checked. Elite installer flow previously validated on hardware; PS3 approval model not independently specified."
   },
   "required_origins": {
     "pro": "SMK-37 Pro_016",
@@ -106,7 +106,7 @@
     1
   ],
   "supersaw_voice_limit": 5,
-  "source_identity": "SU3 /19663",
+  "source_identity": "PS3 /19667",
   "edition": "Endless MIDI",
   "battery_meter": true,
   "battery_bands": 4,
@@ -116,7 +116,7 @@
     "splash",
     "Global > Theme"
   ],
-  "minor_fix": "SU3 approved: additive SUB, dual-core engine, tempo and UI workflow",
+  "minor_fix": "Pattern transition stability, first attacks, ARP first note, reverb arithmetic and Zoom Mixer overlay",
   "vintage_tuning_fix": true,
   "dual_core": true,
   "sub_osc": true,
@@ -124,11 +124,12 @@
   "tempo_source_default": "MASTER",
   "k5_synth_tempo": true,
   "app_bytes_by_model": {
-    "pro": 246756,
-    "elite": 246760
+    "pro": 248228,
+    "elite": 248236
   },
   "loader_bytes_update": {
     "pro": 7760,
     "elite": 7764
-  }
+  },
+  "documentation_version": "1.3.0"
 }

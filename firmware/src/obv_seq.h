@@ -266,6 +266,29 @@ static void seq_from_top(uint32_t t)            /* track t: step 1 in this block
     r->hold_end = 0;
 }
 
+/* PS3: commit a queued engine change before the destination's first note.
+ * Close outgoing ownership under its old patch. A 64-sample residual tail
+ * shares the existing steal guard; incoming notes are neither queued nor faded.
+ * Ordinary patch/engine edits retain their existing asynchronous fade path. */
+static void seq_pattern_engine_commit(uint32_t p,uint32_t id)
+{
+    obv_engine_track_t *s=&obv_engine_track[p];
+    if(!obv_engine_available(id)||(s->active==id&&s->phase==OBV_ENGINE_READY))return;
+    for(unsigned c=0;c<2;c++)guard_tail[p][c]=(int32_t)(((int64_t)pattern_tail[p][c]*s->gain)>>15);
+    guard_left[p]=(guard_tail[p][0]||guard_tail[p][1])?STEAL_FADE:0;
+    seq_release_t(p);obv_flushing[p]=1;parts_off(p);obv_flushing[p]=0;
+    if(obv_engines[s->active]->reset)obv_engines[s->active]->reset(p);
+    obv_pending_n[p]=0;
+    for(unsigned v=0;v<NV;v++)if(vc[v].part==p){
+        vc[v].gate=vc[v].grp=0;vc[v].ae.stage=vc[v].fe.stage=E_IDLE;
+        vc[v].ae.level=vc[v].fe.level=0;vc[v].amp0=vc[v].amp1=0;ui_vlevel[v]=0;
+    }
+    grp_n[p]=0;seq_engine_reset(p);
+    if(id!=s->active&&obv_engines[id]->reset)obv_engines[id]->reset(p);
+    s->active=s->target=(uint8_t)id;s->phase=OBV_ENGINE_READY;s->gain=32768;
+    obv_patch_seen[p]=(uint8_t)id;
+}
+
 static void seq_take_requests(void)             /* the start / stop requests (on a downbeat, or at once when stopped) */
 {
     uint32_t p = trk_pending(), t;
@@ -369,8 +392,14 @@ static void seq_tick(void)
                 keyboard_pattern_epoch++;
                 end_global_transpose=0;end_pending=end_clock_valid=0;end_record_mask=0;for(t=0;t<NTRK;t++){end_keys[t]=0;end_transpose[t]=0;end_restart[t]++;}
                 pat = pat_q;if(ctl_pattern_tempo&&pattern_tempo(&pat)){ctl_tempo=pattern_tempo(&pat);q=quarter_len();}seq_trk=pattern_focus(&pat);end_held=0;endless_pattern_state(&pat);
+                /* Keep the Endless trigger grid on this same destination downbeat. */
+                end_clock_valid=end_mode;end_clock_phase=seq_beat_cnt;end_idle_frames=0;
                 keyboard_pattern_gains(&pat);
-                if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) { snd_old[t] = live_p[t]; live_p[t] = snd_q[t]; } ctl_snd_swap = 0; ui_snd_swapped = 1; }
+                if (ctl_snd_swap) { for (t = 0; t < NTRK; t++) {
+                    snd_old[t] = live_p[t];
+                    seq_pattern_engine_commit(t,obv_patch_engine(&snd_q[t]));
+                    live_p[t] = snd_q[t];
+                } ctl_snd_swap = 0; ui_snd_swapped = 1; }
                 mx_swap_in();                   /* (its mixer, drive and master on the same downbeat) */
                 RING_PUBLISH();
                 ctl_pat_swap = 0;

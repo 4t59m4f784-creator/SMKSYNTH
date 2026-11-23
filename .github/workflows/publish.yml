@@ -34,12 +34,17 @@ jobs:
       - name: Verify release and website
         run: |
           python3 tests/release_factory_test.py
-          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.3.0-first-install-SMK37-Pro.fwsc
+          python3 tests/release_package_test.py web/install/firmware/SMKSYNTH-1.3.1-first-install-SMK37-Pro.fwsc
           cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/tuning tests/midi_return_tuning_test.c -lm
           /tmp/tuning
           node tests/release_110_installer_test.mjs
           python3 tests/release_110_packages_test.py
           sh tests/run_su3_tests.sh
+          mkdir -p build/release131
+          for name in ps3_onset ps2_regression pattern_transition; do
+            cc -O1 -g -fsanitize=address,undefined -fno-sanitize=shift -fno-sanitize-recover=all -DOBV_HOST -DBOARD_SMK37=1 -DOBV_DUAL_CORE=1 -Ifirmware/src -Ifirmware/gen tests/${name}_test.c -lm -o build/release131/$name
+            ASAN_OPTIONS=detect_leaks=0 build/release131/$name
+          done
           sh tests/run_physical_controls_tests.sh
           cc -O1 -DOBV_HOST -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/gen -o /tmp/controls tests/physical_controls_test.c
           /tmp/controls
@@ -50,7 +55,7 @@ jobs:
           node tests/release_i18n_test.mjs
           mkdir -p build/mo1 build/zm1 build/zm3
           node tests/midi_overview_wasm_test.mjs web/simulator/obervave-voice.wasm
-          node tests/battery_release_wasm_test.mjs web/simulator/obervave-voice.wasm 1.3.0
+          node tests/battery_release_wasm_test.mjs web/simulator/obervave-voice.wasm 1.3.1
           node tests/midi_layer_wasm_test.mjs web/simulator/obervave-voice.wasm
           node tests/midi_backpressure_wasm_test.mjs web/simulator/obervave-voice.wasm
           node tests/endless_wasm_test.mjs web/simulator/obervave-voice.wasm
@@ -63,7 +68,7 @@ jobs:
           python3 tools/package_release.py build/audit-site
           python3 tools/check_public_web.py build/audit-site
           node tests/simulator_midi_test.mjs
-          cd releases/1.3.0 && sha256sum -c SHA256SUMS.txt
+          cd releases/1.3.1 && sha256sum -c SHA256SUMS.txt
   release:
     needs: verify
     runs-on: ubuntu-latest
@@ -76,13 +81,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 tools/package_release.py build/release-site
-          if ! gh release view v1.3.0 >/dev/null 2>&1; then
-            gh release create v1.3.0 releases/1.3.0/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.3.0 — Endless MIDI' --notes-file docs/RELEASE-1.3.0.md
+          if ! gh release view v1.3.1 >/dev/null 2>&1; then
+            gh release create v1.3.1 releases/1.3.1/* --target "$GITHUB_SHA" --title 'SMKSYNTH 1.3.1 — Endless MIDI' --notes-file docs/RELEASE-1.3.1.md
           else
-            echo 'Release v1.3.0 already exists; immutable downloads left unchanged.'
+            echo 'Release v1.3.1 already exists; immutable downloads left unchanged.'
           fi
-          gh release upload v1.3.0 releases/1.3.0/RELEASE.json releases/1.3.0/SMKSYNTH-1.3.0-source.zip releases/1.3.0/SHA256SUMS.txt docs/pdf/SMKSYNTH-1.3.0-*.pdf --clobber
-          gh release edit v1.3.0 --notes-file docs/RELEASE-1.3.0.md
+          gh release upload v1.3.1 releases/1.3.1/RELEASE.json releases/1.3.1/SMKSYNTH-1.3.1-source.zip releases/1.3.1/SHA256SUMS.txt docs/pdf/SMKSYNTH-1.3.0-*.pdf --clobber
+          gh release edit v1.3.1 --notes-file docs/RELEASE-1.3.1.md
   pages:
     needs: verify
     runs-on: ubuntu-latest

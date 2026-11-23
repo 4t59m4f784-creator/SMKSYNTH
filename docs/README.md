@@ -1,8 +1,8 @@
-# SMKSYNTH 1.2.1 - documentação / documentation
+# SMKSYNTH 1.3.1 - documentação / documentation
 
-**1.2.1 oficial — Endless MIDI.** ENDLESS com MIDI por parte; MODO MIDI USB/TRS com banco B para selecionar e combinar canais 1–16 do teclado. Rodas e sustain seguem o layer; banco A, encoders e faders mantêm seus mapas. Inclui bateria nos dois temas e identificação da versão na splash e em Global > Theme. **Supersaw somente no OSC 1 para preservar a estabilidade.**
+**1.3.1 oficial — Endless MIDI.** Correções de estabilidade e primeiro ataque nas trocas de patterns; manual e guias 1.3.0 continuam válidos.
 
-[Novidades da Endless MIDI](RELEASE-1.2.1.md)
+[Novidades da Endless MIDI](RELEASE-1.3.1.md)
 
 
 | Documento / Document | Português | English |
