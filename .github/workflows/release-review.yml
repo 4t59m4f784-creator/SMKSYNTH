@@ -4,6 +4,7 @@ on:
     branches: [main, 'release/**']
     paths-ignore:
       - experimental/endless-midi-ps1/**
+      - experimental/endless-midi-ps2/**
       - docs/images/splash-endless-midi-130.png
       - docs/images/smksynth-social-v3.png
       - docs/images/smksynth-social-v3.svg
