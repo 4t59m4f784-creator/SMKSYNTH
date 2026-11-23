@@ -18,7 +18,7 @@ static uint8_t favorites[2][8][3][9], saved[2][8], chosen;
 static uint8_t full[8][12];
 static uint8_t *db(void){return stage_manual==0?(uint8_t*)P.db:stage_manual==1?(uint8_t*)P.dbl:(uint8_t*)P.dbp;}
 static uint32_t clamp(int32_t v,uint32_t max){return v<0?0:(uint32_t)v>max?max:(uint32_t)v;}
-static void slot_save(uint32_t p){
+static void stage_slot_save(uint32_t p){
  if(p>7)return;
  for(uint32_t m=0;m<3;m++)for(uint32_t i=0;i<9;i++)
   favorites[stage_bank][p][m][i]=m==0?P.db[i]:m==1?P.dbl[i]:(i<2?P.dbp[i]:0);
@@ -27,7 +27,7 @@ static void slot_save(uint32_t p){
  full[p][4]=P.vup;full[p][5]=P.vlo;full[p][6]=P.vtype;full[p][7]=P.od;full[p][8]=P.drv;
  full[p][9]=P.rev;full[p][10]=P.swell;full[p][11]=stage_manual;}
 }
-static void slot_load(uint32_t p){
+static void stage_slot_load(uint32_t p){
  if(p>7||!saved[stage_bank][p])return;chosen=(uint8_t)p;
  if(stage_bank){for(uint32_t m=0;m<3;m++)for(uint32_t i=0;i<9;i++){
  uint8_t v=favorites[1][p][m][i];if(m==0)P.db[i]=v;else if(m==1)P.dbl[i]=v;else if(i<2)P.dbp[i]=v;}
@@ -69,7 +69,7 @@ static void controls(void){
  if(on){pad_down[p]=1;pad_start[p]=fm1_ms;if(p>=8&&p!=9)pad_press(p);}
  else if(pad_down[p]){uint32_t duration=fm1_ms-pad_start[p];pad_down[p]=0;
   if(p==9){if(duration>=500u)P.les=0;else P.les=P.les==0?1:P.les==1?2:1;}
-  else if(p<8){if(duration>=600u)slot_save(p);else slot_load(p);}
+  else if(p<8){if(duration>=600u)stage_slot_save(p);else stage_slot_load(p);}
  }}
 }
 static void keys_tick(void){
