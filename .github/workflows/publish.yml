@@ -69,7 +69,7 @@ jobs:
           else
             echo 'Release v1.3.0 already exists; immutable downloads left unchanged.'
           fi
-          gh release upload v1.3.0 releases/1.3.0/SMKSYNTH-1.3.0-source.zip releases/1.3.0/SHA256SUMS.txt docs/pdf/SMKSYNTH-1.3.0-*.pdf --clobber
+          gh release upload v1.3.0 releases/1.3.0/RELEASE.json releases/1.3.0/SMKSYNTH-1.3.0-source.zip releases/1.3.0/SHA256SUMS.txt docs/pdf/SMKSYNTH-1.3.0-*.pdf --clobber
           gh release edit v1.3.0 --notes-file docs/RELEASE-1.3.0.md
   pages:
     needs: verify

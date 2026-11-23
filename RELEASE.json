@@ -13,10 +13,10 @@
   "firmware_sha256": "e62f8875ba9c3acaabdd155c8ec8df3b7ab8930007953c20adb9f7abf44dfbd9",
   "wasm_sha256": "3306cf898c9767a7f957c00bad96f2e7de4304558b979620687d57c8102bf951",
   "factory_bank_sha256": "3a5a19cf385ebb73929bce4457d57b4a99b77560835cedad1413297b2aaf2e77",
-  "app_bytes": 246760,
+  "app_bytes": 246756,
   "static_ram_bytes": 96352,
   "pool_bytes": 332180,
-  "loader_bytes": 7703,
+  "loader_bytes": 7760,
   "update_firmware_sha256": "ed789dcf52e6fa7999ac6a9b121dba0c1d9e564d5fe59575cc30436dc72983b7",
   "usb_audio": true,
   "fader_modes": [
@@ -122,5 +122,13 @@
   "sub_osc": true,
   "pattern_tempo": true,
   "tempo_source_default": "MASTER",
-  "k5_synth_tempo": true
+  "k5_synth_tempo": true,
+  "app_bytes_by_model": {
+    "pro": 246756,
+    "elite": 246760
+  },
+  "loader_bytes_update": {
+    "pro": 7760,
+    "elite": 7764
+  }
 }
