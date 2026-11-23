@@ -1,0 +1,558 @@
+/* SPDX-License-Identifier: GPL-3.0-only */
+/* Host test of the organ's programs and MIDI controllers (organ_core.h), against what setBfree does:
+ *   cc -O1 -Wall -Wno-unused-function -Ifirmware/src -o build/organ_test tests/organ_test.c && build/organ_test */
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#define FM1_TICKS_PER_US 24u
+static uint32_t fm1_ticks(void) { return 0; }
+#include "organ_tab.h"
+static volatile uint8_t stage_les_bypass;
+#include "organ_core.h"
+#include <math.h>
+#include <stdlib.h>
+#include "organ_ref.h"
+#include "fx_ref.h"
+
+static int bad;
+#define CHECK(what, cond) do { int ok_ = !!(cond); if (!ok_) bad = 1; printf("%-58s %s\n", what, ok_ ? "ok" : "FAIL"); } while (0)
+static int dbs(const char *want)
+{
+    uint32_t i;
+    for (i = 0; i < NB; i++) if (P.db[i] != (uint8_t)(want[i] - '0')) return 0;
+    return 1;
+}
+
+/* the level of each key and drawbar against setBfree's own tone generator (tapering and leakage included) */
+static double render_db(int key, int drawbar)
+{
+    static int32_t out[512];
+    uint32_t b, i, j;
+    double e = 0;
+    for (i = 0; i < NB; i++) P.db[i] = (uint8_t)(i == (uint32_t)drawbar ? 8 : 0);
+    P.perc = P.vup = P.od = 0; P.les = 0; P.swell = 127;
+    pk_lo = pk_hi = mk_lo = mk_hi = 0;
+    key_set(&mk_lo, &mk_hi, (uint32_t)key, 1);
+    for (b = 0; b < 400; b++) {
+        memset(out, 0, sizeof out);
+        app_audio(out, 256);
+        if (b >= 300) for (j = 0; j < 256; j++) e += (double)out[2 * j] * out[2 * j];
+    }
+    key_set(&mk_lo, &mk_hi, (uint32_t)key, 0);
+    for (b = 0; b < 400; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }   /* let it fade */
+    return 10.0 * log10(e / (100.0 * 256.0) / 1073741824.0 + 1e-20);
+}
+static void check_levels(void)
+{
+    uint32_t r, d, n = 0, within = 0;
+    double off = render_db(24, 2) - REF[3].db[2];       /* the engine's own gain: C4, 8' */
+    double worst = 0;
+    for (r = 0; r < sizeof REF / sizeof REF[0]; r++)
+        for (d = 0; d < 9u; d++) {
+            double diff = render_db(REF[r].key, (int)d) - off - REF[r].db[d];
+            if (fabs(diff) > worst) worst = fabs(diff);
+            n++;
+            if (fabs(diff) < 1.5) within++;
+        }
+    printf("levels vs setBfree: %u of %u within 1.5 dB, worst %.1f dB\n", within, n, worst);
+    CHECK("levels follow setBfree's tapering and leakage", within == n);
+}
+static void wheel_count(void)                           /* how many wheels sound: the render time is about linear in it */
+{
+    static int32_t out[512];
+    static const int chord[] = {0, 7, 12, 16, 19, 24, 28, 31, 36, 40};
+    uint32_t i, b, c;
+    for (i = 0; i < NB; i++) P.db[i] = 8;
+    P.perc = P.vup = P.od = 0; P.les = 0;
+    for (c = 1; c <= 10; c += 3 + (c > 7)) {
+        pk_lo = pk_hi = mk_lo = mk_hi = 0;
+        for (i = 0; i < c; i++) key_set(&mk_lo, &mk_hi, (uint32_t)chord[i], 1);
+        for (b = 0; b < 4; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+        printf("%2u keys, all drawbars at 8: %u wheels sound\n", c, (unsigned)wheels_on);
+    }
+}
+
+/* key compression and key click, against setBfree (the level relative to one key: 3.64, 6.37, 9.26 dB louder for 4, 7, 10 keys) */
+static double chord_db(int n)
+{
+    static int32_t out[512];
+    static const int ch[] = {24, 28, 31, 36, 40, 43, 48, 52, 55, 60};
+    uint32_t b, j, i;
+    double e = 0;
+    for (i = 0; i < NB; i++) P.db[i] = i == 2 ? 8 : 0;
+    P.perc = P.vup = P.od = 0; P.les = 0; P.swell = 127;
+    pk_lo = pk_hi = mk_lo = mk_hi = 0;
+    for (b = 0; b < 60; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+    for (i = 0; i < (uint32_t)n; i++) key_set(&mk_lo, &mk_hi, (uint32_t)ch[i], 1);
+    for (b = 0; b < 150; b++) {
+        memset(out, 0, sizeof out);
+        app_audio(out, 256);
+        if (b >= 100) for (j = 0; j < 256; j++) e += (double)out[2 * j] * out[2 * j];
+    }
+    for (i = 0; i < (uint32_t)n; i++) key_set(&mk_lo, &mk_hi, (uint32_t)ch[i], 0);
+    for (b = 0; b < 60; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+    return 10.0 * log10(e / 25600.0 / 1073741824.0);
+}
+static void check_compression(void)
+{
+    double one = chord_db(1), d4 = chord_db(4) - one, d7 = chord_db(7) - one, d10 = chord_db(10) - one;
+    printf("key compression: 4 keys %+.2f, 7 keys %+.2f, 10 keys %+.2f dB (setBfree 3.64, 6.37, 9.26)\n", d4, d7, d10);
+    CHECK("key compression follows setBfree", fabs(d4 - 3.64) < 0.4 && fabs(d7 - 6.37) < 0.4 && fabs(d10 - 9.26) < 0.4);
+}
+static void check_click(void)                           /* the attack has a burst of noise: a note-on is not a clean sine */
+{
+    static int32_t out[512];
+    static const int keys[] = {17, 24, 29, 33, 40};
+    uint32_t b, i, j, k;
+    double worst = 1e9;
+    for (k = 0; k < 5; k++) {
+        double on = 0, st = 0;
+        for (i = 0; i < NB; i++) P.db[i] = i == 2 ? 8 : 0;
+        P.perc = P.vup = P.od = 0; P.les = 0; P.swell = 127;
+        pk_lo = pk_hi = mk_lo = mk_hi = 0;
+        for (b = 0; b < 60; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+        key_set(&mk_lo, &mk_hi, (uint32_t)keys[k], 1);
+        for (b = 0; b < 12; b++) {
+            memset(out, 0, sizeof out);
+            app_audio(out, 256);
+            for (j = 2; j < 256; j++) {                 /* the second difference: a high-pass, a sine hardly shows */
+                double d = (double)out[2 * j] - 2.0 * out[2 * (j - 1)] + out[2 * (j - 2)];
+                if (b == 0) on += d * d; else if (b == 11) st += d * d;
+            }
+        }
+        key_set(&mk_lo, &mk_hi, (uint32_t)keys[k], 0);
+        for (b = 0; b < 60; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+        if (10.0 * log10(on / st) < worst) worst = 10.0 * log10(on / st);
+    }
+    printf("key click: the first block is %.1f dB above the steady one in the second difference (worst of 5 keys)\n", worst);
+    CHECK("a note-on has a click", worst > 6.0);
+}
+int main(void)
+{
+    fx_bypass = 1;                                                  /* the tone generator alone; the reverb and the Leslie are checked below */
+    uint32_t n, cnt = 0, reg = 0, i, chg;
+
+    organ_pc(0);                                                    /* program change 0 = program 1 (offset 1) */
+    CHECK("PC 0 selects 'Jazz 1 all'", P.pgm == 1 && !strcmp(PGM[P.pgm].name, "Jazz 1 all"));
+    CHECK("  drawbars 888000000 (the 10th digit is ignored)", dbs("888000000"));
+    CHECK("  perc on, soft, fast, 3rd", P.perc && P.soft && P.fast && P.perc3);
+    CHECK("  vibrato C3 on, overdrive on, rotary chorale = slow", P.vtype == 5 && P.vup && P.od && P.les == 1);
+
+    organ_program(5);
+    CHECK("program 5 'Standard B' 888000000, leaves the rest alone", dbs("888000000") && P.perc && P.vtype == 5);
+    organ_program(2);
+    CHECK("program 2 'Fredriks tfn 1' 758757200", dbs("758757200"));
+    organ_program(11);
+    CHECK("program 11 sets 881 1 0000, vibrato C3, perc 3rd", dbs("888110000") && P.vtype == 5 && P.perc && P.perc3);
+    organ_program(15);
+    CHECK("program 15 'Booker T' perc on, 2nd harmonic", P.perc && !P.perc3);
+    organ_program(108);
+    CHECK("program 108 'Paul Shaffer' rotary tremolo = fast", P.les == 2 && dbs("888788678"));
+    organ_program(109);
+    CHECK("program 109 is 'Reggae' (the later one replaces)", !strcmp(PGM[109].name, "Reggae") && dbs("808000008"));
+    organ_program(22);
+    CHECK("program 22 'Silence' all zero", dbs("000000000"));
+    organ_program(55);
+    CHECK("program 55 'Random' fills drawbars within 0..8", ({ int ok = 1; for (i = 0; i < NB; i++) ok &= P.db[i] <= 8; ok; }));
+    chg = 0; for (i = 0; i < 5; i++) { uint8_t before = P.db[0] * 100 + P.db[4]; organ_program(55); chg |= before != P.db[0] * 100 + P.db[4]; }
+    CHECK("  and differs from call to call", chg);
+    P.pgm = 7; organ_program(64);
+    CHECK("program 64 (lower manual only) is kept but changes nothing", P.pgm == 64 && PGM[64].set == 0);
+    organ_program(120);
+    CHECK("program 120 does not exist: nothing happens", P.pgm == 64);
+
+    for (n = 1; n < 128; n++) { cnt += PGM[n].name != 0; reg += pgm_registration(n); }
+    CHECK("110 programs, 57 registrations", cnt == 110 && reg == 57);
+    CHECK("PRESETS steps 1 -> 2 -> ... -> 26 -> 55 -> 56 -> 82", pgm_step(1, 1) == 2 && pgm_step(26, 1) == 55 && pgm_step(56, 1) == 82);
+    CHECK("  and back, and stops at the ends", pgm_step(82, -1) == 56 && pgm_step(1, -1) == 1 && pgm_step(110, 1) == 110);
+
+    organ_cc(70, 0);   CHECK("CC 70 value 0 = drawbar 16' fully out (8)", P.db[0] == 8);
+    organ_cc(70, 127); CHECK("CC 70 value 127 = pushed in (0)", P.db[0] == 0);
+    organ_cc(72, 64);  CHECK("CC 72 value 64 = 4 (as rint((127-64)*8/127))", P.db[2] == 4);
+    organ_cc(78, 0);   CHECK("CC 78 = drawbar 1'", P.db[8] == 8);
+    organ_cc(7, 100);  CHECK("CC 7 and CC 11 are the swell", P.swell == 100);
+    organ_cc(11, 50);  CHECK("  CC 11", P.swell == 50);
+    organ_cc(66, 127); CHECK("CC 66 percussion on", P.perc == 1);
+    organ_cc(80, 0);   CHECK("CC 80 percussion off", P.perc == 0);
+    organ_cc(81, 127); CHECK("CC 81 soft", P.soft == 1);
+    organ_cc(82, 0);   CHECK("CC 82 slow", P.fast == 0);
+    organ_cc(83, 127); CHECK("CC 83 >= 64: 2nd harmonic", P.perc3 == 0);
+    organ_cc(83, 0);   CHECK("CC 83 < 64: 3rd harmonic", P.perc3 == 1);
+    organ_cc(92, 0);   CHECK("CC 92 knob 0 = V1", P.vtype == 0);
+    organ_cc(92, 23);  CHECK("CC 92 value 23 = C1", P.vtype == 1);
+    organ_cc(92, 127); CHECK("CC 92 value 127 = C3 (clamped)", P.vtype == 5);
+    organ_cc(31, 127); CHECK("CC 31 vibrato upper on", P.vup == 1);
+    organ_cc(95, 0);   CHECK("CC 95 routing 0 = off", P.vup == 0);
+    organ_cc(95, 64);  CHECK("CC 95 routing 64 = upper", P.vup == 1);
+    organ_cc(1, 0);    CHECK("CC 1 (mod wheel) 0 = slow", P.les == 1);
+    organ_cc(1, 60);   CHECK("CC 1 60 = stop", P.les == 0);
+    organ_cc(1, 127);  CHECK("CC 1 127 = fast", P.les == 2);
+    organ_cc(64, 127); CHECK("CC 64 sustain toggles fast -> slow", P.les == 1);
+    organ_cc(64, 127); CHECK("  held (127 again): no second toggle", P.les == 1);
+    organ_cc(64, 0);   CHECK("  a release (0) does nothing", P.les == 1);
+    organ_cc(64, 127); CHECK("  the next press: slow -> fast", P.les == 2);
+    organ_cc(64, 0);
+    organ_cc(65, 127); CHECK("CC 65 overdrive on", P.od == 1);
+    organ_cc(65, 0);   CHECK("CC 65 overdrive off", P.od == 0);
+    organ_cc(93, 127); CHECK("CC 93 drive 127 = 20", P.drv == 20);
+    organ_cc(93, 0);   CHECK("CC 93 drive 0 = 0", P.drv == 0);
+    mk_lo = 5; organ_cc(123, 0); CHECK("CC 123 releases MIDI notes", mk_lo == 0);
+    CHECK("character starts at 16", P.chr == 16);
+    organ_cc(99, 1); organ_cc(98, 0); organ_cc(6, 77); CHECK("NRPN 1/0 sets the character", P.chr == 77);
+    organ_cc(101, 0); organ_cc(6, 5); CHECK("  an RPN in between: data entry goes nowhere", P.chr == 77);
+    organ_cc(6, 9); CHECK("  and stays nowhere", P.chr == 77);
+    {
+        static const uint8_t nm[12] = "My Jazz";
+        organ_cc(71, 127); organ_cc(93, 127);
+        CHECK("program 112 empty: not a registration", !pgm_registration(112));
+        user_store(112, nm); CHECK("store into 112", UPGM[0].used == 1 && P.pgm == 112 && pgm_name(112)[0] == 'M');
+        organ_program(5); organ_cc(93, 0); P.chr = 16;
+        CHECK("program 5 sets the 5 1/3' back", P.db[1] == 8);
+        organ_program(112); CHECK("program 112 brings it all back", P.db[1] == 0 && P.drv == 20 && P.chr == 77 && P.pgm == 112);
+        CHECK("  and the PRESETS knob finds it", pgm_step(110, 1) == 112 && pgm_step(112, -1) == 110);
+        organ_pc(111); CHECK("program change 111 selects it", P.pgm == 112);
+        UPGM[0].rsv[0] = 0; UPGM[0].drv = 8; user_check();   /* stored before 0.6: drive 8 then is 12 now */
+        CHECK("a program from before 0.6: its drive 8 becomes 12, once", UPGM[0].drv == 12 && UPGM[0].rsv[0] == UP_DRV_NEW && (user_check(), UPGM[0].drv == 12));
+        UPGM[0].rsv[0] = 0; UPGM[0].drv = 16; user_check();
+        CHECK("a program from before 0.6: drive 16 becomes 20", UPGM[0].drv == 20 && UPGM[0].used == 1);
+        UPGM[0].used = 0; organ_program(5); P.chr = 16; P.drv = 0;
+    }
+    organ_cc(99, 2); organ_cc(98, 1); organ_cc(6, 6000 >> 7); organ_cc(38, 6000 & 127);
+    CHECK("NRPN 2/1 horn fast 600 rpm", les_p[1] == 6000 && ls_tgt[1] > 973000u && ls_tgt[1] < 974000u);
+    organ_cc(98, 6); organ_cc(6, 2000 >> 7); organ_cc(38, 2000 & 127);
+    CHECK("NRPN 2/6 drum up 2 s", les_p[6] == 2000 && ls_k[2] == 190);
+    organ_cc(98, 0); organ_cc(6, 127); organ_cc(38, 127); CHECK("  clamped to 150 rpm slow", les_p[0] == 1500);
+    les_set(0, 403); les_set(1, 4234); les_set(6, 4127);
+    CHECK("setBfree's values give its constants again", ls_tgt[0] == LES_HORN_SLOW && ls_tgt[1] == LES_HORN_FAST && ls_k[2] == LES_DRUM_ACC);
+    organ_cc(99, 3); organ_cc(98, 0); organ_cc(6, 4417 >> 7); organ_cc(38, 4417 & 127);   /* 441.7 Hz: rounded to 442 */
+    CHECK("NRPN 3/0 tuning 441.7 Hz -> 442 Hz (within 5 ppm)", ton_p[0] == 4420 && winc != WHEEL_INC &&
+          winc[57] > WHEEL_INC[57] + WHEEL_INC[57] / 220u - 400u && winc[57] < WHEEL_INC[57] + WHEEL_INC[57] / 220u + 400u);
+    organ_cc(6, 0); organ_cc(38, 0); CHECK("  clamped to 430 Hz", ton_p[0] == 4300);
+    organ_cc(6, 127); organ_cc(38, 127); CHECK("  clamped to 450 Hz", ton_p[0] == 4500);
+    organ_cc(98, 1); organ_cc(6, 0); organ_cc(38, 0); CHECK("NRPN 3/1 key click 0", ton_p[1] == 0 && atk_kd == 2048);
+    organ_cc(6, 1000 >> 7); organ_cc(38, 1000 & 127); CHECK("  key click 1.0", atk_kd == -2048);
+    ton_set(0, 4400); ton_set(1, 500); CHECK("setBfree's tuning and click again", winc == WHEEL_INC && atk_kd == 0);
+    printf(bad ? "FAILED\n" : "all ok\n");
+    check_levels();
+    check_compression();
+    check_click();
+    wheel_count();
+    {   /* the reverb and the stopped Leslie against setBfree's own, sample by sample */
+        static int32_t x[256], l[256], r[256];
+        double er = 0, sr = 0, el = 0, sl = 0, ee = 0, se = 0;
+        uint32_t b, i, s = 12345u;
+        for (b = 0; b < 32u; b++) {
+            for (i = 0; i < 256u; i++) x[i] = (b | i) ? 0 : 16384;
+            reverb_run(x, 256, 64);
+            for (i = 0; i < 256u; i++) { double d = x[i] - FXR_RV[b * 256u + i]; er += d * d; sr += (double)FXR_RV[b * 256u + i] * FXR_RV[b * 256u + i]; }
+        }
+        for (b = 0; b < 32u; b++) {
+            for (i = 0; i < 256u; i++) { s = s * 1664525u + 1013904223u; x[i] = (int32_t)((s >> 16) & 0x7FFF) - 16384; }
+            leslie_run(x, l, r, 256, 0);
+            for (i = 0; i < 256u; i++) {
+                double d = l[i] - FXR_WL[b * 256u + i], f = r[i] - FXR_WR[b * 256u + i];
+                el += d * d; sl += (double)FXR_WL[b * 256u + i] * FXR_WL[b * 256u + i];
+                ee += f * f; se += (double)FXR_WR[b * 256u + i] * FXR_WR[b * 256u + i];
+            }
+        }
+        printf("reverb error %.1f dB, Leslie (stop) error L %.1f dB R %.1f dB\n", 10 * log10(er / sr), 10 * log10(el / sl), 10 * log10(ee / se));
+        CHECK("reverb impulse response = setBfree (error < -30 dB)", er < sr * 0.001);
+        CHECK("Leslie (stop) = setBfree (error < -30 dB)", el < sl * 0.001 && ee < se * 0.001);
+    }
+    {   /* percussion against setBfree's tone generator (3rd and 2nd harmonic, soft and normal, slow; level at 85 ms after the key
+         * relative to the 8' fundamental; the decay: setBfree's plug-in multiplies by 0.9999 per sample at 48 kHz, 41.7 dB/s) */
+        static const struct { int key, third, soft; double f, want; } PC[] = {
+            {29, 1, 1, 349.23, -6.0}, {36, 1, 1, 523.25, -2.5}, {41, 1, 1, 698.46, -7.0},
+            {29, 1, 0, 349.23, 0.0},  {36, 1, 0, 523.25, 3.5},  {41, 1, 0, 698.46, -1.0},
+            {29, 0, 1, 349.23, -9.5}, {36, 0, 1, 523.25, -6.0}, {41, 0, 1, 698.46, -10.5},
+            {29, 0, 0, 349.23, -3.5}, {36, 0, 0, 523.25, 0.0},  {41, 0, 0, 698.46, -4.5}};   /* keys F4, C5, F5; setBfree at 48 kHz */
+        static float y[44100];
+        static int32_t out[512];
+        uint32_t c, b, i, j;
+        double worst = 0, decay = 0;
+        for (c = 0; c < sizeof PC / sizeof PC[0]; c++) {
+            double h = PC[c].third ? 3.0 : 2.0, a[3];
+            struct { double f; uint32_t n0, n1; } W[3];
+            for (i = 0; i < NB; i++) P.db[i] = (uint8_t)(i == 2u ? 8 : 0);
+            P.perc = 1; P.perc3 = (uint8_t)PC[c].third; P.soft = (uint8_t)PC[c].soft; P.fast = 0; P.vup = P.od = 0; P.les = 0; P.swell = 127;
+            pk_lo = pk_hi = mk_lo = mk_hi = 0;
+            for (b = 0; b < 60; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+            key_set(&mk_lo, &mk_hi, (uint32_t)PC[c].key, 1);
+            for (b = 0; b < 160; b++) {
+                memset(out, 0, sizeof out);
+                app_audio(out, 256);
+                for (j = 0; j < 256u; j++) y[b * 256u + j] = (float)out[2u * j] / 32768.0f;
+            }
+            key_set(&mk_lo, &mk_hi, (uint32_t)PC[c].key, 0);
+            W[0].f = PC[c].f;     W[0].n0 = 26460; W[0].n1 = 35280;   /* the fundamental, 0.6 .. 0.8 s */
+            W[1].f = h * PC[c].f; W[1].n0 = 1764;  W[1].n1 = 5733;    /* the percussion around 85 ms (40 .. 130 ms) */
+            W[2].f = h * PC[c].f; W[2].n0 = 10584; W[2].n1 = 14553;   /* and 200 ms later */
+            for (i = 0; i < 3u; i++) {
+                double re = 0, im = 0, wsum = 0;
+                for (j = W[i].n0; j < W[i].n1; j++) {
+                    double w = 0.5 - 0.5 * cos(2 * M_PI * (j - W[i].n0) / (W[i].n1 - W[i].n0)), ph = 2 * M_PI * W[i].f * j / 44100.0;
+                    re += w * y[j] * cos(ph); im += w * y[j] * sin(ph); wsum += w;
+                }
+                a[i] = 2.0 * sqrt(re * re + im * im) / wsum;
+            }
+            {
+                double got = 20 * log10(a[1] / a[0]), d = got - PC[c].want;
+                if (fabs(d) > worst) worst = fabs(d);
+                decay += 20 * log10(a[2] / a[1]);
+            }
+        }
+        decay /= (double)(sizeof PC / sizeof PC[0]);
+        printf("percussion: worst level error %.2f dB, decay %.1f dB per 200 ms (setBfree 48 kHz: -8.3)\n", worst, decay);
+        CHECK("percussion level = setBfree (3rd, 2nd, soft, normal; < 0.6 dB)", worst < 0.6);
+        CHECK("percussion slow decay = setBfree's plug-in (-8.3 dB per 200 ms)", fabs(decay + 8.3) < 0.5);
+    }
+    {   /* the percussion's click: setBfree high-passes the percussion bus as a first difference, envelope and all, so the key's attack
+         * (a bouncing envelope) comes out as a click. rms of the first difference 0 .. 10 ms after the key against 50 .. 100 ms, dB,
+         * the percussion alone (no drawbars) on F4, setBfree's tone generator: 3rd 10.8, 2nd 18.0 */
+        static const struct { int third; double want; } CK[2] = {{1, 10.8}, {0, 18.0}};
+        static int32_t out[512];
+        double worst = 0;
+        uint32_t c, b, i, j;
+        fx_bypass = 1;
+        for (c = 0; c < 2u; c++) {
+            static float y[8820];
+            double r0 = 0, r1 = 0, got;
+            for (i = 0; i < NB; i++) P.db[i] = 0;
+            P.perc = 1; P.perc3 = (uint8_t)CK[c].third; P.soft = 1; P.fast = 0; P.vup = P.od = 0; P.les = 0; P.swell = 127;
+            pk_lo = pk_hi = mk_lo = mk_hi = 0;
+            for (b = 0; b < 60; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+            key_set(&mk_lo, &mk_hi, 29, 1);
+            for (b = 0; b < 34; b++) {
+                memset(out, 0, sizeof out);
+                app_audio(out, 256);
+                for (j = 0; j < 256u; j++) y[b * 256u + j] = (float)out[2u * j] / 32768.0f;
+            }
+            key_set(&mk_lo, &mk_hi, 29, 0);
+            for (j = 1; j < 441u; j++) r0 += (double)(y[j] - y[j - 1]) * (double)(y[j] - y[j - 1]);
+            for (j = 2206; j < 4410u; j++) r1 += (double)(y[j] - y[j - 1]) * (double)(y[j] - y[j - 1]);
+            got = 10 * log10((r0 / 440.0) / (r1 / 2204.0));
+            if (fabs(got - CK[c].want) > worst) worst = fabs(got - CK[c].want);
+        }
+        fx_bypass = 0;
+        printf("percussion click: worst error %.1f dB against setBfree's tone generator\n", worst);
+        CHECK("percussion click = setBfree (F4, 3rd and 2nd; < 3 dB)", worst < 3.0);
+    }
+    {   /* three manuals: the lower one has the upper one's wiring and its own drawbars, the pedal 16' and 8', MIDI channels 1 to 3 */
+        static int32_t out[512];
+        static int32_t rec[2][16384];
+        double lvl[3] = {0, 0, 0};
+        uint32_t m, b, j, i, zc;
+        int ok_route = 1;
+        for (i = 0; i < NB; i++) { P.db[i] = P.dbl[i] = 0; }
+        P.dbp[0] = P.dbp[1] = 0;
+        P.perc = P.vup = P.vlo = P.od = 0; P.les = 0; P.swell = 127; fx_bypass = 1;
+        for (m = 0; m < 3u; m++) {              /* the same drawbar (8') on each manual, the same key (C4): the same level */
+            double e = 0;
+            P.db[2] = (uint8_t)(m == 0 ? 8 : 0); P.dbl[2] = (uint8_t)(m == 1 ? 8 : 0); P.dbp[1] = (uint8_t)(m == 2 ? 8 : 0);
+            pk_lo = pk_hi = mk_lo = mk_hi = pl_lo = pl_hi = ml_lo = ml_hi = pp_k = mp_k = 0;
+            organ_midi_note(m, m == 2u ? 48u : 60u, 1);
+            for (b = 0; b < 200; b++) {
+                memset(out, 0, sizeof out);
+                app_audio(out, 256);
+                if (b >= 100) for (j = 0; j < 256u; j++) e += (double)out[2 * j] * out[2 * j];
+            }
+            organ_midi_note(m, m == 2u ? 48u : 60u, 0);
+            for (b = 0; b < 200; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+            lvl[m] = 10 * log10(e / (100.0 * 256.0) / 1073741824.0 + 1e-20);
+        }
+        printf("C4 on 8': upper %.2f dB, lower %.2f dB, pedal (C3 key) %.2f dB\n", lvl[0], lvl[1], lvl[2]);
+        CHECK("the lower manual sounds as the upper one does (same wiring, tapering)", fabs(lvl[0] - lvl[1]) < 0.1);
+        CHECK("the pedal sounds (its 8')", lvl[2] > -60.0 && fabs(lvl[2] - lvl[0]) < 6.0);
+        {   /* the pedal's pitch, as setBfree's wiring has it: the 16' sounds the key's own pitch (MIDI 36 = C2 = 65.4 Hz), the 8' an octave up */
+            static const struct { uint32_t d; double hz; } PD[2] = {{1, 130.81}, {0, 65.41}};
+            double worst = 0;
+            for (m = 0; m < 2u; m++) {
+                P.dbp[0] = P.dbp[1] = 0; P.dbp[PD[m].d] = 8;
+                pk_lo = pk_hi = mk_lo = mk_hi = pl_lo = pl_hi = ml_lo = ml_hi = pp_k = mp_k = 0;
+                organ_midi_note(2, 36, 1);
+                for (b = 0; b < 100; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+                for (b = 0; b < 64; b++) {
+                    memset(out, 0, sizeof out);
+                    app_audio(out, 256);
+                    for (j = 0; j < 256u; j++) rec[0][b * 256u + j] = out[2 * j];
+                }
+                organ_midi_note(2, 36, 0);
+                for (b = 0; b < 200; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+                zc = 0;
+                for (j = 1; j < 16384u; j++) if (rec[0][j - 1] < 0 && rec[0][j] >= 0) zc++;
+                { double hz = zc * 44100.0 / 16384.0, err = fabs(hz - PD[m].hz) / PD[m].hz; if (err > worst) worst = err; }
+            }
+            printf("pedal pitch: MIDI note 36 at 16' and 8': worst %.1f %% off\n", worst * 100);
+            CHECK("pedal pitch: MIDI note 36 sounds 65.4 Hz (16') and 130.8 Hz (8')", worst < 0.06);
+        }
+        /* the scanner takes the manuals that are routed to it, never the pedal: lower only, vibrato on the upper one: identical to no vibrato */
+        P.db[2] = 0; P.dbl[2] = 8; P.dbp[0] = P.dbp[1] = 0; P.vtype = 5;
+        for (m = 0; m < 3u; m++) {              /* 0: no vibrato, 1: upper only (lower is not routed), 2: lower routed */
+            P.vup = m == 1u; P.vlo = m == 2u;
+            pk_lo = pk_hi = mk_lo = mk_hi = pl_lo = pl_hi = ml_lo = ml_hi = pp_k = mp_k = 0;
+            for (i = 0; i < NW; i++) { wcur[i] = wcurv[i] = 0; wph[i] = i * 7919u; }
+            vwi = 0; vph = 0; memset(vdl, 0, sizeof vdl);
+            organ_midi_note(1, 60, 1);
+            for (b = 0; b < 40; b++) {
+                memset(out, 0, sizeof out);
+                app_audio(out, 256);
+                if (b >= 8) for (j = 0; j < 256u; j++) rec[m == 2u ? 1 : 0][(b - 8) * 256u + j] = out[2 * j];
+                if (m == 1u && b >= 8) for (j = 0; j < 256u; j++) if (rec[0][(b - 8) * 256u + j] != out[2 * j]) ok_route = 0;
+                if (m == 0u && b >= 8) for (j = 0; j < 256u; j++) rec[0][(b - 8) * 256u + j] = out[2 * j];
+            }
+            organ_midi_note(1, 60, 0);
+            for (b = 0; b < 200; b++) { memset(out, 0, sizeof out); app_audio(out, 256); }
+        }
+        { double d = 0; for (j = 0; j < 8192u; j++) d += fabs((double)rec[1][j] - rec[0][j]); printf("lower routed to the scanner changes the sound (mean difference %.0f)\n", d / 8192.0); CHECK("the lower manual follows its own vibrato switch", ok_route && d / 8192.0 > 20.0); }
+        P.vup = P.vlo = 0; fx_bypass = 0;
+        /* MIDI: notes and drawbars by channel */
+        pk_lo = pk_hi = mk_lo = mk_hi = pl_lo = pl_hi = ml_lo = ml_hi = pp_k = mp_k = 0;
+        organ_midi_note(0, 36, 1); organ_midi_note(1, 36, 1); organ_midi_note(2, 36, 1);
+        CHECK("note on channel 1 = upper, 2 = lower, 3 = pedal (36 is C2 / C2 / key 12)", mk_lo == 1u && ml_lo == 1u && mp_k == 1u << 12);
+        organ_midi_note(0, 36, 0); organ_midi_note(1, 36, 0); organ_midi_note(2, 36, 0);
+        CHECK("  and off", !(mk_lo | ml_lo | mp_k));
+        organ_midi_note(2, 20, 1);
+        CHECK("  a pedal note below C1 is folded up an octave to C1 (24 or 32)", mp_k != 0);
+        mp_k = 0;
+        organ_cc_ch(0, 70, 0); organ_cc_ch(1, 70, 0); organ_cc_ch(2, 70, 0); organ_cc_ch(2, 72, 64); organ_cc_ch(2, 71, 0);
+        CHECK("CC 70 on channel 1 = upper 16', channel 2 = lower, channel 3 = pedal 16'", P.db[0] == 8 && P.dbl[0] == 8 && P.dbp[0] == 8);
+        CHECK("  CC 72 on channel 3 = pedal 8' (127 - 64 -> 4), CC 71 = nothing", P.dbp[1] == 4 && P.dbp[0] == 8);
+        organ_cc_ch(0, 30, 127); organ_cc_ch(0, 31, 0);
+        CHECK("CC 30 = vibrato lower, 31 = upper", P.vlo == 1 && P.vup == 0);
+        organ_cc_ch(0, 95, 96);
+        CHECK("CC 95 = 96: both", P.vlo == 1 && P.vup == 1);
+        organ_cc_ch(0, 95, 32);
+        CHECK("CC 95 = 32: lower only", P.vlo == 1 && P.vup == 0);
+        for (i = 0; i < NB; i++) { P.db[i] = 0; P.dbl[i] = 0; }
+        P.vup = P.vlo = 0;
+        organ_program(5u);
+    }
+    {   /* the overdrive is setBfree's preamp (b_overdrive/overdrive.c): the same model in double precision, a three-tone signal, three characters */
+        static const double CF[8] = {0.00127616566, 0.00497944288, 0.0142455412, 0.14084346, 0.464444974, 0.0142455412, 0.00497944288, 0.00127616566};
+        static const double AF[8] = {0.204190232, -0.0633467727, 0.0327789369, -0.0185333957, 0.0103064728, -0.00532702988, 0.00249628401, -0.00122011836};
+        static const uint32_t CH[3] = {0, 64, 127};
+        static int32_t q[4096];
+        double worst = 1e9, xh[8], yh[33];
+        uint32_t c, i, k;
+        for (c = 0; c < 3u; c++) {
+            double fb, fb2, sag = 0, z = 0, z1 = 0, gf = 0, se = 0, sr = 0;
+            uint32_t ch = CH[c];
+            if (ch < 32u) { fb = 0.5821; fb2 = 0.999 + (0.5821 - 0.999) * (ch / 31.0); }
+            else if (ch < 64u) { fb = 0.5821 + (0.999 - 0.5821) * ((ch - 32u) / 31.0); fb2 = 0.5821; }
+            else { fb = 0.999; fb2 = 0.5821 + (0.999 - 0.5821) * ((ch - 64u) / 63.0); }
+            memset(xh, 0, sizeof xh); memset(yh, 0, sizeof yh);
+            od_xi = od_yi = 0; od_sag = od_z = od_z1 = od_gf = 0; memset(od_xh, 0, sizeof od_xh); memset(od_yh, 0, sizeof od_yh);
+            for (i = 0; i < 4096u; i++)
+                q[i] = (int32_t)lrint(32768.0 * 0.045 * (sin(0.0592 * i) + 0.5 * sin(0.1488 * i) + 0.35 * sin(0.2961 * i)) / 1.85 * 1.6);
+            od_run(q, 4096, ch, OD_DRIVE_SETBFREE);
+            for (i = 0; i < 4096u; i++) {
+                double xin, bias, norm, u, v, t, in = 32768.0 * 0.045 * (sin(0.0592 * i) + 0.5 * sin(0.1488 * i) + 0.35 * sin(0.2961 * i)) / 1.85 * 1.6;
+                in = floor(in + 0.5) / 32768.0;
+                xin = 3.5675 / (ORGAN_LEVEL / 32768.0) * in; sag = 0.991 * sag + fabs(xin); bias = 0.5347 - 0.0094 * sag; norm = 1 - 1 / (1 + bias * bias);
+                for (k = 7; k > 0; k--) xh[k] = xh[k - 1];
+                xh[0] = xin;
+                u = 0;
+                for (k = 0; k < 8u; k++) u += CF[k] * xh[k];
+                u += 0.6214 * gf;
+                t = u - z; z = u + z * fb; u = t;
+                if (u < 0) { v = 1 / (1 + (u - bias) * (u - bias)) - 1 + norm; } else { v = 1 - norm - 1 / (1 + (u + bias) * (u + bias)); }
+                t = v + fb2 * z1; v = t - z1; z1 = t; gf = v;
+                for (k = 32; k > 0; k--) yh[k] = yh[k - 1];
+                yh[0] = v;
+                t = 0.323601515 * yh[16];
+                for (k = 0; k < 8u; k++) t += AF[k] * (yh[15 - 2 * k] + yh[17 + 2 * k]);
+                t *= OD_GOUT[OD_DRIVE_SETBFREE] / 32768.0 * (ORGAN_LEVEL / 32768.0);   /* setBfree's input gain 3.5675 with its output gain */
+                if (i >= 256u) { se += (q[i] / 32768.0 - t) * (q[i] / 32768.0 - t); sr += t * t; }
+            }
+            if (10 * log10(sr / (se + 1e-30)) < worst) worst = 10 * log10(sr / (se + 1e-30));
+        }
+        printf("overdrive vs setBfree's preamp model: worst SNR %.1f dB (characters 0, 64, 127)\n", worst);
+        CHECK("overdrive = setBfree's preamp (SNR > 35 dB)", worst > 35.0);
+    }
+    {   /* CC 64 (sustain pedal): one Leslie toggle per press, also from a pedal that sends values between */
+        static const uint8_t SEQ[] = {32, 63, 95, 127, 95, 63, 31, 0};
+        uint32_t k, before;
+        organ_cc(1, 20); before = P.les;
+        for (k = 0; k < sizeof SEQ; k++) organ_cc(64, SEQ[k]);
+        CHECK("sustain pedal with values between: one toggle a press", P.les != before && (P.les == 1u || P.les == 2u));
+        for (k = 0; k < sizeof SEQ; k++) organ_cc(64, SEQ[k]);
+        CHECK("sustain pedal: the second press toggles back", P.les == before);
+        organ_cc(64, 127); organ_cc(64, 0);
+        CHECK("sustain pedal: a plain on / off still toggles", P.les != before);
+        organ_cc(64, 127); organ_cc(64, 0); organ_cc(1, 64);
+    }
+    {   /* the output equalizer: bass +9 dB at 100 Hz, mid -6 dB at 1 kHz, treble +3 dB at 6 kHz (tools/eq_coef.py); gains measured on sines against the exact biquad response */
+        static const int32_t C[3][5] = {{269855968, -532667224, 262902030, -532696507, 264293259},
+                                        {256231159, -482993494, 231706375, -482993494, 219502078},
+                                        {343491397, -321185190, 113559353, -207541646, 74971751}};
+        static const uint16_t EP[6] = {36, 100, 6, 1000, 24, 6000};
+        static const double F[5] = {30, 100, 1000, 3000, 12000}, W[5] = {8.91, 4.43, -6.0, -0.61, 2.9}, T[5] = {0.3, 0.3, 0.3, 0.3, 0.3};
+        static int32_t l[256], r[256];
+        uint32_t f, i, b, ok = 1;
+        int32_t cc[5]; int32_t dmax = 0; uint32_t k;
+        for (k = 0; k < 3u; k++) {           /* the firmware's own biquads (integer) against tools/eq_coef.py (double) */
+            eq_calc(k, EP[2u * k], EP[2u * k + 1u], cc);
+            for (i = 0; i < 5u; i++) { int32_t d = cc[i] - C[k][i]; if (d < 0) d = -d; if (d > dmax) dmax = d; }
+        }
+        printf("  equalizer coefficients: at most %d LSB (Q28) from tools/eq_coef.py\n", dmax);
+        CHECK("equalizer: the integer biquads match tools/eq_coef.py within 4 LSB", dmax <= 4);
+        CHECK("equalizer: a value out of range is refused", eq_set((const uint16_t[6]){37, 100, 18, 800, 18, 6000}) != 0);
+        CHECK("equalizer: taken", eq_set(EP) == 0);
+        for (f = 0; f < 5u; f++) {
+            double ph = 0, si = 0, so = 0, g;
+            for (b = 0; b < 400u; b++) {
+                for (i = 0; i < 256u; i++) { l[i] = r[i] = (int32_t)(8000 * sin(ph)); ph += 2 * M_PI * F[f] / 44100; }
+                if (b >= 200u) for (i = 0; i < 256u; i++) si += (double)l[i] * l[i];
+                eq_run(l, r, 256);
+                if (b >= 200u) for (i = 0; i < 256u; i++) so += (double)l[i] * l[i];
+            }
+            g = 10 * log10(so / si);
+            printf("  equalizer at %5.0f Hz: %+5.1f dB (expected about %+4.1f)\n", F[f], g, W[f]);
+            if (fabs(g - W[f]) > T[f]) ok = 0;
+        }
+        CHECK("equalizer: the gains of the three bands", ok);
+        eq_set((const uint16_t[6]){18, 80, 18, 800, 18, 6000}); eq_run(l, r, 0);
+        CHECK("equalizer: all at 0 dB, nothing computed", eq_on == 0);
+    }
+    {   /* the limiter: a sine over full scale comes out at 0.9 with little distortion; a burst starts with few clipped samples; the gain comes back */
+        static int32_t x[256], all[256 * 40], yy[256];
+        lim_t st = {32768, 32768};
+        uint32_t blk, i, k0, clipped = 0;
+        double amp[3] = {1.05, 1.3, 1.8}, ph = 0.0;
+        int okthd = 1, okpk = 1;
+        for (k0 = 0; k0 < 3u; k0++) {
+            double pkout = 0, hs = 0, ts = 0;
+            st.g = 32768; ph = 0;
+            for (blk = 0; blk < 40u; blk++) {
+                for (i = 0; i < 256u; i++) { x[i] = (int32_t)(amp[k0] * 32768.0 * sin(ph)); ph += 2 * 3.14159265358979 * 1000.0 / 44100.0; }
+                block_limit(&st, x, 0, 256u);
+                for (i = 0; i < 256u; i++) all[blk * 256u + i] = x[i];
+            }
+            for (i = 256u * 20u; i < 256u * 40u; i++) { double a = fabs((double)all[i]); if (a > pkout) pkout = a; }
+            /* distortion: what is left of the signal after a fit of sine and cosine at 1 kHz is taken away (the gain still moves a little, that is amplitude, not distortion) */
+            {   double sc = 0, cc = 0, ss = 0, cs = 0; uint32_t n = 256u * 20u;
+                for (i = 0; i < n; i++) { double w = 2 * 3.14159265358979 * 1000.0 / 44100.0 * (double)(i + 256u * 20u); double v = all[i + 256u * 20u]; sc += v * sin(w); cc += v * cos(w); ss += sin(w) * sin(w); cs += cos(w) * cos(w); }
+                sc /= ss; cc /= cs;
+                for (i = 0; i < n; i++) { double w = 2 * 3.14159265358979 * 1000.0 / 44100.0 * (double)(i + 256u * 20u); double v = all[i + 256u * 20u], f = sc * sin(w) + cc * cos(w); hs += (v - f) * (v - f); ts += f * f; }
+            }
+            printf("limiter, sine at %.2f of full scale: peak %.3f, distortion %.1f dB\n", amp[k0], pkout / 32768.0, 10 * log10(hs / ts + 1e-30));
+            if (pkout > 0.905 * 32768.0) okpk = 0;
+            if (!(10 * log10(hs / ts + 1e-30) < -45.0)) okthd = 0;
+        }
+        CHECK("limiter keeps the peak at 0.9", okpk);
+        CHECK("limiter distortion below -45 dB", okthd);
+        {   /* a burst out of silence */
+            st.g = 32768; ph = 0;
+            for (blk = 0; blk < 4u; blk++) {
+                for (i = 0; i < 256u; i++) { x[i] = (int32_t)(1.5 * 32768.0 * sin(ph)); ph += 2 * 3.14159265358979 * 1000.0 / 44100.0; }
+                block_limit(&st, x, 0, 256u);
+                for (i = 0; i < 256u; i++) if (x[i] >= 32767 || x[i] <= -32767) clipped++;
+            }
+            printf("limiter, a burst at 1.5 out of silence: %u samples clipped of 1024\n", clipped);
+            CHECK("a burst clips less than 16 samples", clipped < 16u);
+        }
+        for (blk = 0; blk < 200u; blk++) { for (i = 0; i < 256u; i++) x[i] = 1000; block_limit(&st, x, 0, 256u); }
+        CHECK("the gain comes back to 1", st.g == 32768);
+    }
+    return bad;
+}
