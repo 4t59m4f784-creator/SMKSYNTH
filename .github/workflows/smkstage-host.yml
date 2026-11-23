@@ -22,3 +22,7 @@ jobs:
           mkdir -p build/stage
           cc -O1 -Wall -Wno-unused-function -Wno-unused-variable -Ifirmware/src -Itests -o build/stage/b3-test tests/stage_organ_test.c -lm
           build/stage/b3-test
+      - name: Syntax check SMK-37 application (no binary emitted)
+        run: |
+          cc -std=gnu11 -fsyntax-only -Wno-unused-function -Wno-unused-variable -DBOARD_SMK37=1 -Ifirmware/src -Ifirmware/hal -Ifirmware/gen firmware/src/smkstage.c
+          python3 -m py_compile tools/build_stage.py
