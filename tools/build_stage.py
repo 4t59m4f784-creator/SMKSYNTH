@@ -182,7 +182,8 @@ def build_app():
             ("cc", "-c", FW / "hal" / "fm1_isr.S", "-o", OUT / "fm1_isr.o"),
             ("cc", *flags, "-c", FW / "src" / "smkstage.c", "-o", OUT / "smkstage.o"),
             # DSP-only speed optimization: never change the USB/main -Os profile.
-            # SMKSTAGE: no OberVave supersaw component]
+            # SMKSTAGE: no OberVave supersaw component
+           ]
     tc_all(*cmds)
     elf = OUT / "smkstage.elf"
     ld = FW / "app.ld"
