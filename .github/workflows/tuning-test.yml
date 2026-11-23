@@ -1,5 +1,10 @@
 name: Publish website and isolated installers
 on:
+  push:
+    branches: [main]
+    paths:
+      - web/site/**
+      - .github/workflows/tuning-test.yml
   workflow_dispatch:
 permissions:
   contents: read
