@@ -624,7 +624,7 @@ void fm1_cstart(void)
     if(flash_ok)b2_scan();if(b2_pending){b2_latched=b1_active=1;}
     else
 #endif
-    smk_owner_check();
+    /* SMKSTAGE alpha: never erase/claim another firmware's stored data at boot. */
 #endif
     fm1_audio_init(abuf, HALF_WORDS, isr_alnk0, 3);   /* (abuf is zero: .bss) */
     usb_start();
