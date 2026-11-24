@@ -29,6 +29,7 @@ static volatile uint8_t stage_les_bypass;
 static volatile uint8_t stage_audio_ready;
 #include "organ_core.h"
 static uint8_t stage_manual, stage_bank, stage_page, stage_f1_caught;
+static uint8_t stage_library_program=5u; /* original setBfree registration IDs 1..127 */
 static uint8_t stage_store_dirty,stage_save_now,stage_store_status,stage_data_locked;
 static uint32_t stage_store_change_ms,stage_store_last_ms,stage_store_seq,stage_store_sector=STAGE_STORE_B;
 /* The pending indicator stays visible until flash verification succeeds. */
@@ -241,11 +242,18 @@ static void controls(void){
  if(b&(1u<<BTN_LEFT)){stage_manual=(stage_manual+2u)%3u;stage_f1_caught=0;}
  if(b&(1u<<BTN_RIGHT)){stage_manual=(stage_manual+1u)%3u;stage_f1_caught=0;}
  if(b&(1u<<BTN_KNOB_BANK))stage_bank^=1;
- if(b&(1u<<BTN_EDIT))stage_page=(stage_page+1u)%8u;
+ if(b&(1u<<BTN_EDIT))stage_page=(stage_page+1u)%9u;
  if(b&(1u<<BTN_HOME))stage_page=0;
  if(b&(1u<<BTN_SAVE)){stage_save_now=1;stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  for(uint32_t i=0;i<8;i++){int32_t v=fm1_enc_take(i);if(!v)continue;
  if(stage_page==0){uint8_t *d=db();if(stage_manual!=2||i<2)d[i]=(uint8_t)clamp((int32_t)d[i]+v,8);}
+ else if(stage_page==8u&&i==0u){
+  /* K1 previews the selected setBfree registration; pad bank B captures a favorite. */
+  uint32_t target=stage_library_program;int32_t step=v>0?1:-1,remaining=v>0?v:-v;
+  if(remaining>16)remaining=16;
+  while(remaining-->0){uint32_t next=pgm_step(target,step);if(next==target)break;target=next;}
+  if(target!=stage_library_program){stage_library_program=(uint8_t)target;organ_program(target);}
+ }
  else if(stage_page==1&&i<4u)les_set(i,clamp((int32_t)les_p[i]+v*5,(uint32_t)LES_MAX[i]));
  else if(stage_page==2&&i<4u)les_set(i+4u,clamp((int32_t)les_p[i+4u]+v*25,(uint32_t)LES_MAX[i+4u]));
  else if(stage_page==3){if(i==0)ton_set(0,clamp((int32_t)ton_p[0]+v*10u,4500));else if(i==1)ton_set(1,clamp((int32_t)ton_p[1]+v*10u,1000));}
@@ -302,7 +310,7 @@ static void leds(void){
 static uint32_t stage_sig(void){
  uint32_t h=2166136261u;
  #define STAGE_MIX(x) do{h=((h ^ (uint32_t)(x))*16777619u);}while(0)
- STAGE_MIX(stage_manual);STAGE_MIX(stage_bank);STAGE_MIX(stage_page);STAGE_MIX(chosen);
+ STAGE_MIX(stage_manual);STAGE_MIX(stage_bank);STAGE_MIX(stage_page);STAGE_MIX(chosen);STAGE_MIX(stage_library_program);
  for(uint32_t m=0;m<3;m++){const volatile uint8_t *p=m==0?P.db:m==1?P.dbl:P.dbp;for(uint32_t i=0;i<(m==2?2u:9u);i++)STAGE_MIX(p[i]);}
  STAGE_MIX(P.perc);STAGE_MIX(P.perc3);STAGE_MIX(P.fast);STAGE_MIX(P.soft);
  STAGE_MIX(P.vtype);STAGE_MIX(P.vup);STAGE_MIX(P.vlo);STAGE_MIX(P.les);
@@ -324,11 +332,11 @@ static void stage_kv(int32_t x,int32_t y,const char *tag,uint32_t value){
 }
 static void screen_draw(void){
  uint8_t *d=db();uint32_t count=stage_manual==2?2u:9u;
- static const char *const pages[8]={"PERFORMANCE","LESLIE SPEED","LESLIE RAMP","TONEWHEELS","DRIVE","PLATE REVERB","3 BAND EQ","VIB / PERC"};
+ static const char *const pages[9]={"PERFORMANCE","LESLIE SPEED","LESLIE RAMP","TONEWHEELS","DRIVE","PLATE REVERB","3 BAND EQ","VIB / PERC","PRESET LIBRARY"};
  lcd_sync();
  draw_text_box(0,2,240,&FONT_S,"SMKSTAGE B3",C_WHITE,1);
  draw_text_box(0,23,240,&FONT_S,stage_manual==0?"UPPER":stage_manual==1?"LOWER":"PEDAL",RGB(245,65,77),1);
- draw_text_box(0,44,240,&FONT_S,pages[stage_page%8u],C_WHITE,1);
+ draw_text_box(0,44,240,&FONT_S,pages[stage_page%9u],C_WHITE,1);
  cv_begin(240,128,C_BLACK);
  if(stage_page==0u){
   for(uint32_t j=0;j<9;j++){
@@ -370,6 +378,15 @@ static void screen_draw(void){
   stage_kv(7,68,"K4 MID Hz",eq_p[3]);
   stage_kv(7,88,"K5 HIGH dB INDEX",eq_p[4]);
   stage_kv(7,108,"K6 HIGH Hz",eq_p[5]);
+ }else if(stage_page==8u){
+  stage_kv(7,7,"SETBFREE PRESET",stage_library_program);
+  const char *name=pgm_name(stage_library_program);
+  char buf[23];uint32_t k=0;
+  if(name)for(;k<21u&&name[k];k++)buf[k]=name[k];
+  buf[k]=0;
+  cv_text(7,43,&FONT_S,buf,C_WHITE);
+  cv_text(7,76,&FONT_S,"K1: BROWSE + LOAD",RGB(180,184,196));
+  cv_text(7,100,&FONT_S,"BANK B: HOLD=FAV",RGB(180,184,196));
  }else if(stage_page==7u){
   stage_kv(7,8,"K1 VIB TYPE",P.vtype+1u);
   stage_kv(7,35,"K2 UPPER VIB",P.vup);
@@ -377,7 +394,7 @@ static void screen_draw(void){
   stage_kv(7,89,"K4 PERC ON",P.perc);
  }
  cv_blit(0,68);
- draw_text_box(0,204,240,&FONT_S,stage_page==0?"K1-8 BARS / F1=9":stage_page==1?"0.1 RPM / HORN+DRUM":stage_page==2?"ACC/DEC = MILLISECONDS":stage_page==3?"LEAKAGE MODEL FIXED":stage_page==4?"PAD16=OVERDRIVE":stage_page==5?"DATTORRO / F4 MIX":stage_page==6?"GAIN 18=FLAT  (+/-9DB)":"PERC: PAD11",RGB(190,198,211),1);
+ draw_text_box(0,204,240,&FONT_S,stage_page==0?"K1-8 BARS / F1=9":stage_page==1?"0.1 RPM / HORN+DRUM":stage_page==2?"ACC/DEC = MILLISECONDS":stage_page==3?"LEAKAGE MODEL FIXED":stage_page==4?"PAD16=OVERDRIVE":stage_page==5?"DATTORRO / F4 MIX":stage_page==6?"GAIN 18=FLAT  (+/-9DB)":stage_page==7u?"PERC: PAD11":"57 ORIGINAL REGISTRATIONS",RGB(190,198,211),1);
  draw_text_box(0,222,240,&FONT_S,stage_store_status==3u?"FLASH LOCKED - NO SAVE":stage_store_status==2u?"UNSAVED  BT:SAVE":stage_store_status==1u?"SAVED  BT:SAVE":"BT:SAVE / PARA:NEXT",stage_store_status==3u?RGB(255,110,90):C_WHITE,1);
 }
 /* Drawbar-only updates use one 26x124 canvas lane (~6.4 KiB DMA)
