@@ -217,9 +217,17 @@ static void stage_mod_leslie(void){
  if(!initialized){
   mode=raw<550u?2u:1u;
   initialized=1;
- }else if(mode==1u&&raw<520u)mode=2u;
- else if(mode==2u&&raw>580u)mode=1u;
- if(P.les!=mode){
+  P.les=mode;
+  return;
+ }
+ uint8_t next=mode;
+ if(mode==1u&&raw<520u)next=2u;
+ else if(mode==2u&&raw>580u)next=1u;
+ /* Only a physical wheel state transition sends a Leslie command.
+  * Pad 10, saved presets and MIDI can select STOP/FAST/SLOW independently
+  * without being overwritten continuously by a stationary wheel. */
+ if(next!=mode){
+  mode=next;
   P.les=mode;
   stage_store_dirty=1;
   stage_store_change_ms=fm1_ms;
