@@ -69,6 +69,106 @@ static void stage_slot_load(uint32_t p){
  }}
  stage_f1_caught=0;stage_store_dirty=1;stage_store_change_ms=fm1_ms;
 }
+
+/* Stage's own journal: two sectors E8000/E9000; SMKSYNTH patterns stop at E2000.
+ * Do not write an occupied sector unless it contains a valid Stage record.
+ * The previous valid sector survives a power failure during a new save.
+ * Unlike the SMKSYNTH owner routine, this never clears foreign storage. */
+_Static_assert(STAGE_STORE_A>=SLOTS_AT+NBLOB*SLOT_SECT*4096u,"B3 journal overlaps SMKSYNTH patterns");
+_Static_assert(STAGE_STORE_B+4096u<=FL_SMP_HI,"B3 journal outside allowed sample window");
+#define STAGE_TAG 0x33424753u
+#define STAGE_REV 3u
+typedef struct {
+ uint32_t tag,version,sequence;
+ uint8_t db[9],dbl[9],dbp[2];
+ uint8_t sound[16],manual,bank,chosen,bypass;
+ uint8_t fav[2][8][3][9],valid[2][8],full[8][12];
+ uint16_t lf[8][8],tf[8][2],ef[8][6];
+ uint8_t pf[8][3],bf[8],cf[8],plate[3];
+ uint16_t les[8],ton[2],eq[6];
+} stage_record_t;
+static stage_record_t stage_last_record;
+static uint8_t stage_have_record;
+static void stage_capture(stage_record_t *r){
+ memset(r,0,sizeof *r);r->tag=STAGE_TAG;r->version=STAGE_REV;
+ for(uint32_t j=0;j<9;j++){r->db[j]=P.db[j];r->dbl[j]=P.dbl[j];}
+ for(uint32_t j=0;j<2;j++)r->dbp[j]=P.dbp[j];
+ const uint8_t q[16]={P.vtype,P.vup,P.vlo,P.perc,P.perc3,P.fast,P.soft,P.les,P.rev,P.od,P.drv,P.swell,P.pgm,P.chr,0,0};
+ memcpy(r->sound,q,sizeof q);r->manual=stage_manual;r->bank=stage_bank;r->chosen=chosen;r->bypass=stage_les_bypass;
+ memcpy(r->fav,favorites,sizeof favorites);memcpy(r->valid,saved,sizeof saved);memcpy(r->full,full,sizeof full);
+ memcpy(r->lf,favorite_les,sizeof favorite_les);memcpy(r->tf,favorite_ton,sizeof favorite_ton);memcpy(r->ef,favorite_eq,sizeof favorite_eq);
+ memcpy(r->pf,favorite_plate,sizeof favorite_plate);memcpy(r->bf,favorite_bypass,sizeof favorite_bypass);memcpy(r->cf,favorite_chr,sizeof favorite_chr);
+ r->plate[0]=stage_plate_size;r->plate[1]=stage_plate_tone;r->plate[2]=stage_plate_pre;
+ for(uint32_t j=0;j<8;j++)r->les[j]=les_p[j];
+ for(uint32_t j=0;j<2;j++)r->ton[j]=ton_p[j];
+ for(uint32_t j=0;j<6;j++)r->eq[j]=eq_p[j];
+}
+static void stage_restore(const stage_record_t *r){
+ for(uint32_t j=0;j<9;j++){P.db[j]=r->db[j];P.dbl[j]=r->dbl[j];}
+ for(uint32_t j=0;j<2;j++)P.dbp[j]=r->dbp[j];
+ P.vtype=r->sound[0];P.vup=r->sound[1];P.vlo=r->sound[2];P.perc=r->sound[3];P.perc3=r->sound[4];
+ P.fast=r->sound[5];P.soft=r->sound[6];P.les=r->sound[7];P.rev=r->sound[8];P.od=r->sound[9];
+ P.drv=r->sound[10];P.swell=r->sound[11];P.pgm=r->sound[12];P.chr=r->sound[13];
+ stage_manual=r->manual;stage_bank=r->bank;chosen=r->chosen;stage_les_bypass=r->bypass;
+ memcpy(favorites,r->fav,sizeof favorites);memcpy(saved,r->valid,sizeof saved);memcpy(full,r->full,sizeof full);
+ memcpy(favorite_les,r->lf,sizeof favorite_les);memcpy(favorite_ton,r->tf,sizeof favorite_ton);memcpy(favorite_eq,r->ef,sizeof favorite_eq);
+ memcpy(favorite_plate,r->pf,sizeof favorite_plate);memcpy(favorite_bypass,r->bf,sizeof favorite_bypass);memcpy(favorite_chr,r->cf,sizeof favorite_chr);
+ stage_plate_size=r->plate[0];stage_plate_tone=r->plate[1];stage_plate_pre=r->plate[2];
+ for(uint32_t j=0;j<8;j++)les_set(j,r->les[j]);
+ for(uint32_t j=0;j<2;j++)ton_set(j,r->ton[j]);
+ eq_set(r->eq);ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
+ stage_f1_caught=0;
+}
+static int stage_valid(const stage_record_t *r){
+ if(r->tag!=STAGE_TAG||r->version!=STAGE_REV||r->manual>2||r->bank>1||r->chosen>7||
+ r->sound[0]>5||r->sound[7]>2||r->sound[8]>127||r->sound[10]>20||r->sound[13]>127||
+ r->plate[0]>100||r->plate[1]>100||r->plate[2]>100)return 0;
+ for(uint32_t i=0;i<9;i++)if(r->db[i]>8||r->dbl[i]>8)return 0;
+ for(uint32_t i=0;i<2;i++)if(r->dbp[i]>8)return 0;
+ for(uint32_t i=0;i<8;i++)if(r->les[i]<LES_MIN[i]||r->les[i]>LES_MAX[i])return 0;
+ for(uint32_t i=0;i<2;i++)if(r->ton[i]<(i?0u:4300u)||r->ton[i]>(i?1000u:4500u))return 0;
+ for(uint32_t i=0;i<6;i++)if(r->eq[i]<EQ_MIN[i]||r->eq[i]>EQ_MAX[i])return 0;
+ return 1;
+}
+static uint8_t stage_sector_state(uint32_t off,stage_record_t *r){
+ uint32_t h[3];if(!flash_ok||st_read(off,h,sizeof h))return 0;
+ if(h[0]==0xFFFFFFFFu&&h[1]==0xFFFFFFFFu&&h[2]==0xFFFFFFFFu)return 1; /* blank */
+ if(!sector_load(off,r,sizeof *r)&&stage_valid(r))return 2; /* our valid record */
+ return 0; /* foreign or interrupted record: never erase unknown contents */
+}
+static void stage_store_boot(void){
+ static stage_record_t a,b;
+ uint8_t sa=stage_sector_state(STAGE_STORE_A,&a),sb=stage_sector_state(STAGE_STORE_B,&b);
+ if(!sa||!sb){stage_data_locked=1;stage_store_status=3;return;}
+ if(sa==2u&&sb==2u){stage_last_record=(int32_t)(a.sequence-b.sequence)>=0?a:b;stage_store_sector=stage_last_record.sequence==a.sequence?STAGE_STORE_A:STAGE_STORE_B;}
+ else if(sa==2u){stage_last_record=a;stage_store_sector=STAGE_STORE_A;}
+ else if(sb==2u){stage_last_record=b;stage_store_sector=STAGE_STORE_B;}
+ else {stage_store_status=0;return;}
+ stage_store_seq=stage_last_record.sequence;stage_have_record=1;stage_restore(&stage_last_record);stage_store_status=1;
+}
+static void stage_store_commit(void){
+ static stage_record_t r,check;
+ if(stage_data_locked||!flash_ok){stage_store_status=3;return;}
+ stage_capture(&r);
+ if(stage_have_record){r.sequence=stage_last_record.sequence;if(!memcmp(&r,&stage_last_record,sizeof r)){stage_store_dirty=0;stage_save_now=0;stage_store_status=1;return;}}
+ r.sequence=stage_store_seq+1u;
+ uint32_t next=stage_store_sector==STAGE_STORE_A?STAGE_STORE_B:STAGE_STORE_A;
+ if(!stage_sector_state(next,&check)){stage_data_locked=1;stage_store_status=3;return;}
+ if(sector_save(next,&r,sizeof r)==0&&!sector_load(next,&check,sizeof check)&&stage_valid(&check)&&!memcmp(&r,&check,sizeof r)){
+  stage_store_sector=next;stage_store_seq=r.sequence;stage_last_record=r;stage_have_record=1;
+  stage_store_dirty=0;stage_save_now=0;stage_store_status=1;stage_store_last_ms=fm1_ms;
+ }else{stage_data_locked=1;stage_store_status=3;}
+}
+static void stage_factory_slots(void){
+ static const uint8_t source[8]={5,104,7,15,18,107,106,108};
+ for(uint32_t i=0;i<8;i++){
+  organ_program(source[i]);stage_bank=0;stage_slot_save(i);
+  stage_bank=1;stage_slot_save(i);
+ }
+ stage_bank=0;chosen=0;organ_program(5u);
+ stage_store_dirty=0;
+}
+
 static void pad_press(uint32_t p){
  switch(p){
  case 8:stage_les_bypass^=1u;break;  /* pad 9 Leslie on/off */
@@ -203,11 +303,13 @@ static void screen_draw(void){
 }
 static void app_main(void){
  uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
- organ_program(5u);P.les=1;
+ organ_program(5u);P.les=1;P.rev=32;ovp_plate_init();ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
+ stage_factory_slots();stage_store_boot();
  for(;;){platform_poll();keys_tick();controls();
  while(midi_get(&st,&a,&b)){uint32_t ch=st&15u;
  switch(st&0xF0u){case 0x90u:organ_midi_note(ch,a,b!=0);break;case 0x80u:organ_midi_note(ch,a,0);break;
  case 0xB0u:organ_cc_ch(ch,a,b);break;case 0xC0u:organ_pc(a);break;}}
+ if(stage_store_dirty && !fm1_in.keys && quiet() && (stage_save_now || fm1_ms-stage_store_change_ms>=10000u) && (stage_save_now || !stage_store_last_ms || fm1_ms-stage_store_last_ms>=30000u))stage_store_commit();
  if(fm1_ms-leds_ms>=40u){leds_ms=fm1_ms;leds();}
  if(first_draw || (fm1_ms-draw_ms>=75u && stage_sig()!=last_sig)){draw_ms=fm1_ms;last_sig=stage_sig();first_draw=0;screen_draw();}
  }}
