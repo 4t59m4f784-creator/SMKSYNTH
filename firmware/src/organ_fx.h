@@ -13,6 +13,7 @@
 #define ORGAN_POOL
 #endif
 
+#ifndef STAGE_PLATE
 /* ---- reverb: four feedback combs in parallel, three all-pass in series, a low-pass, a little feedback */
 static int32_t rv_dl[RV_TOTAL] ORGAN_POOL;
 static uint32_t rv_ix[7];                       /* where each line is now (0 .. RV_LEN - 1) */
@@ -49,6 +50,7 @@ static void reverb_run(int32_t *x, uint32_t n, uint32_t mix)   /* mix 0..127: se
     }
 }
 
+#endif /* STAGE_PLATE: old comb reverb omitted */
 /* ---- Leslie: horn and drum turn, each sound reaches the left and the right microphone on several paths
  * (direct, first reflection, second reflection), delayed by the rotor's distance to the microphone (the Doppler
  * shift) and, for the horn, filtered by its angle (it is a beam). The drum gets the whole signal, the horn the
