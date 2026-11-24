@@ -24,6 +24,9 @@ static uint8_t stage_plate_size=77u,stage_plate_tone=69u,stage_plate_pre=10u;
 #define ORGAN_C1_RUN(fn,arg) fm1_mc_run((fn),(arg))
 #define ORGAN_C1_WAIT() fm1_mc_wait()
 static volatile uint8_t stage_les_bypass;
+/* Audio ISR starts before app_main. Do not render until plate delay-line pointers,
+ * factory program state and store journal are initialized. */
+static volatile uint8_t stage_audio_ready;
 #include "organ_core.h"
 static uint8_t stage_manual, stage_bank, stage_page, stage_f1_caught;
 static uint8_t stage_store_dirty,stage_save_now,stage_store_status,stage_data_locked;
@@ -381,6 +384,8 @@ static void app_main(void){
  uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
  organ_program(5u);P.les=1;P.rev=32;ovp_plate_init();ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
  stage_factory_slots();stage_store_boot();
+ /* Publish ready only after every audio dependency is initialized. */
+ __asm__ volatile("csync" ::: "memory");stage_audio_ready=1u;
  for(;;){platform_poll();keys_tick();controls();stage_mod_leslie();
  while(midi_get(&st,&a,&b)){uint32_t ch=st&15u;
  switch(st&0xF0u){case 0x90u:organ_midi_note(ch,a,b!=0);break;case 0x80u:organ_midi_note(ch,a,0);break;
