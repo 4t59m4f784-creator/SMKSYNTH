@@ -556,19 +556,26 @@ static void platform_poll(void)
 
 static void fm1_fault(const fm1_crash_t *c)
 {
-    char b[12];
-    uint32_t i, t0, v[3] = {c->vec, c->pc, c->rets};
+    /* Seven independent hardware fault fields, captured before stopping
+     * the audio engine. 0x030004A8 vs 0x020004A8 points at the timer ISR:
+     * IRQ63 vector value distinguishes corrupted vector from PC bit-flip.
+     * This UI does not erase flash or modify any interrupt configuration. */
+    char b[22];
+    static const char *const labels[7]={"VEC ","PC  ","RETS","DBG ","EMU ","T63 ","SP  "};
+    uint32_t i,k,v[7]={c->vec,c->pc,c->rets,c->dbg,c->emu,c->irq_timer_vec,c->sp};
     fm1_audio_stop();
     lcd_fill(0, 0, 240, 240, RGB(160, 0, 0));
-    draw_text_box(0, 20, 240, &FONT_S, APP_NAME " CRASH", C_WHITE, 1);
-    for (i = 0; i < 3u; i++) {
-        uint32_t k;
-        for (k = 0; k < 8u; k++) b[k] = "0123456789ABCDEF"[(v[i] >> (28u - 4u * k)) & 15u];
-        b[8] = 0;
-        draw_text_box(10, 60 + i * 20, 220, &FONT_S, b, C_WHITE, 0);
+    draw_text_box(0, 7, 240, &FONT_S, APP_NAME " CRASH", C_WHITE, 1);
+    for(i=0;i<7u;i++){
+        for(k=0;k<4u;k++)b[k]=labels[i][k];
+        b[4]=' ';b[5]=' ';
+        for(k=0;k<8u;k++)b[6u+k]="0123456789ABCDEF"[(v[i]>>(28u-4u*k))&15u];
+        b[14]=0;
+        draw_text_box(1, 38+(int32_t)i*24, 238, &FONT_S, b, C_WHITE, 0);
     }
-    t0 = fm1_ticks();
-    while ((uint32_t)(fm1_ticks() - t0) < 8000u * 1000u * FM1_TICKS_PER_US)
+    draw_text_box(0, 223, 240, &FONT_S, "PHOTO THESE CODES", C_WHITE, 1);
+    uint32_t t0=fm1_ticks();
+    while((uint32_t)(fm1_ticks()-t0)<8000u*1000u*FM1_TICKS_PER_US)
         fm1_wdt_feed();
     fm1_reboot();
 }
