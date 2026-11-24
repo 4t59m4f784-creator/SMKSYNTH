@@ -50,6 +50,7 @@ typedef struct {
     uint32_t magic, count, vec, pc, rets, emu, dbg, sp, psr, icfg, uptime_ms;
     uint32_t etm[4];
     uint32_t early;                          /* consecutive crashes < 3 s after boot */
+    uint32_t irq_timer_vec, irq_audio_vec;  /* forensic: capture actual vector-table contents at exception */
 } fm1_crash_t;
 /* Not static: .noinit holds whatever the last run (or power-on) left, and a
  * file-local object would let the compiler assume its zero initial value and
@@ -151,6 +152,8 @@ void fm1_fault_c(uint32_t *f)
     fm1_crash.sp = f[24];
     fm1_crash.psr = f[20];
     fm1_crash.icfg = f[21];
+    fm1_crash.irq_timer_vec = FM1_VEC[FM1_IRQ_TIMER5];
+    fm1_crash.irq_audio_vec = FM1_VEC[FM1_IRQ_ALNK0];
     fm1_crash.uptime_ms = *(volatile uint32_t *)0x10804u / 24000u;   /* TIMER4 since boot */
     for (i = 0; i < 4u; i++)
         fm1_crash.etm[i] = FM1_ETM_PC(i);
