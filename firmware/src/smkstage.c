@@ -132,14 +132,26 @@ static int stage_valid(const stage_record_t *r){
 }
 static uint8_t stage_sector_state(uint32_t off,stage_record_t *r){
  uint32_t h[3];if(!flash_ok||st_read(off,h,sizeof h))return 0;
- if(h[0]==0xFFFFFFFFu&&h[1]==0xFFFFFFFFu&&h[2]==0xFFFFFFFFu)return 1; /* blank */
+ if(h[0]==0xFFFFFFFFu&&h[1]==0xFFFFFFFFu&&h[2]==0xFFFFFFFFu){
+  /* A blank header alone is insufficient: an interrupted write leaves payload. */
+  uint32_t check[16];
+  uint32_t off_sector=off;
+  for(uint32_t ofs=0;ofs<4096u;ofs+=sizeof check){
+   if(st_read(off_sector + ofs,check,sizeof check))return 0;
+   for(uint32_t i=0;i<16u;i++)if(check[i]!=0xFFFFFFFFu)return 0;
+  }
+  return 1;
+ } /* genuinely erased */
  if(!sector_load(off,r,sizeof *r)&&stage_valid(r))return 2; /* our valid record */
  return 0; /* foreign or interrupted record: never erase unknown contents */
 }
 static void stage_store_boot(void){
  static stage_record_t a,b;
  uint8_t sa=stage_sector_state(STAGE_STORE_A,&a),sb=stage_sector_state(STAGE_STORE_B,&b);
- if(!sa||!sb){stage_data_locked=1;stage_store_status=3;return;}
+ if(!sa||!sb){/* Restore a surviving verified copy, but never erase an unknown/interrupted sector. */
+ if(sa==2u){stage_last_record=a;stage_restore(&a);stage_have_record=1;}
+ else if(sb==2u){stage_last_record=b;stage_restore(&b);stage_have_record=1;}
+ stage_data_locked=1;stage_store_status=3;return;}
  if(sa==2u&&sb==2u){stage_last_record=(int32_t)(a.sequence-b.sequence)>=0?a:b;stage_store_sector=stage_last_record.sequence==a.sequence?STAGE_STORE_A:STAGE_STORE_B;}
  else if(sa==2u){stage_last_record=a;stage_store_sector=STAGE_STORE_A;}
  else if(sb==2u){stage_last_record=b;stage_store_sector=STAGE_STORE_B;}
