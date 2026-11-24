@@ -223,9 +223,11 @@ static void controls(void){
  {stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  }
  static uint8_t last[4];
- for(uint32_t i=0;i<4;i++){uint8_t f=fm1_in.fader[i],prev=last[i];if(last[i]==f)continue;last[i]=f;
+ for(uint32_t i=0;i<4;i++){uint8_t f=fm1_in.fader[i];if(last[i]==f)continue;last[i]=f;
  if(i==0){uint8_t *d=db(),at=stage_manual==2?1:8,val=(uint8_t)(8u-(f*8u+63u)/127u);
-  if(!stage_f1_caught){uint8_t was=(uint8_t)(8u-(prev*8u+63u)/127u);if(val==d[at]||(was<=d[at]&&val>=d[at])||(was>=d[at]&&val<=d[at]))stage_f1_caught=1;else continue;}d[at]=val;
+  /* The physical drawbar must respond immediately: bottom=0, top=8.
+   * Do not require crossing an invisible pickup position on a loaded preset. */
+  d[at]=val;
  }else if(i==1)P.swell=f;else if(i==2)P.drv=(uint8_t)((f*20u+63u)/127u);else P.rev=f;
  stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  int32_t event;while((event=smk_pad_take())>=0){
