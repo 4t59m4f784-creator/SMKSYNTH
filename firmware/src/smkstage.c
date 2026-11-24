@@ -21,8 +21,15 @@ static void keys_tick(void);
 #define STAGE_PLATE 1
 static uint8_t stage_plate_size=77u,stage_plate_tone=69u,stage_plate_pre=10u;
 #include "smkstage_plate.h"
-#define ORGAN_C1_RUN(fn,arg) fm1_mc_run((fn),(arg))
-#define ORGAN_C1_WAIT() fm1_mc_wait()
+/* D4 EXPERIMENT ONLY: all 91 tonewheels rendered on CPU0 in the SAME
+ * original wheels_render(0,1,...) path. CPU1 stays booted/idle, no wheel
+ * jobs dispatched. No change to Leslie, chorus, plate, samples, controls,
+ * keybed scan, interrupt priorities or flash journal.
+ * This is for isolating CPU1 handoff from the repeatable PC-limit crash.
+ * Expected higher CPU0 load; never an optimized production option. */
+#define STAGE_SINGLE_CORE_TONEWHEELS 1
+#define ORGAN_C1_RUN(fn,arg) 0
+#define ORGAN_C1_WAIT() 0
 static volatile uint8_t stage_les_bypass;
 /* Audio ISR starts before app_main. Do not render until plate delay-line pointers,
  * factory program state and store journal are initialized. */
