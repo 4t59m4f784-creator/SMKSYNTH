@@ -233,10 +233,27 @@ def check(img, syms, dis, rt):
     if img[:4] != bytes.fromhex("04818000"):
         errors.append(f"image starts with {img[:4].hex()}, not the entry stub")
     rt_calls = [ln for ln in rt.splitlines() if re.search(r"\bcall\b", ln)]
-    if rt_calls:                    # RAM code runs with the flash off: no calls into XIP
-        errors.append(f".ram_text contains calls: {rt_calls[:3]}")
+    # The D3 timer IRQ entry is the sole explicitly sanctioned exception:
+    # flash writes run with global IRQs disabled (fm1_flash.h irq_save()),
+    # so TIMER5 can never make this far-call while flash is unavailable.
+    # All true flash-driver routines in RAM remain prohibited from calling.
+    timer_m = re.search(r"^([0-9a-f]+) .*\\sisr_timer5$", syms, re.M)
+    timer_addr = int(timer_m.group(1), 16) if timer_m else None
+    timer_calls, prohibited = [], []
+    for ln in rt_calls:
+        ins = LINE.match(ln)
+        if (ins and timer_addr is not None
+                and timer_addr <= int(ins.group(1), 16) < timer_addr + 48
+                and "call r0" in ins.group(3)):
+            timer_calls.append(ln)
+        else:
+            prohibited.append(ln)
+    if timer_addr is None or not (0x01C00000 <= timer_addr < 0x01C06000):
+        errors.append("TIMER5 ISR wrapper is not in on-chip .ram_text")
+    if len(timer_calls) != 1 or prohibited:
+        errors.append(f".ram_text has unexpected calls: {prohibited[:3]} (timer: {timer_calls[:3]})")
     else:
-        notes.append(f".ram_text: {len([ln for ln in rt.splitlines() if LINE.match(ln)])} insns, no calls")
+        notes.append("RAM timer ISR wrapper has exactly one guarded far-call; flash driver has none")
     for ln in dis.splitlines():     # nothing may call or load an address in the chip ROM
         mm = LINE.match(ln)
         if not mm:
