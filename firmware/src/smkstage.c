@@ -184,7 +184,7 @@ static void controls(void){
  if(b&(1u<<BTN_LEFT)){stage_manual=(stage_manual+2u)%3u;stage_f1_caught=0;}
  if(b&(1u<<BTN_RIGHT)){stage_manual=(stage_manual+1u)%3u;stage_f1_caught=0;}
  if(b&(1u<<BTN_KNOB_BANK))stage_bank^=1;
- if(b&(1u<<BTN_EDIT))stage_page=(stage_page+1u)%9u;
+ if(b&(1u<<BTN_EDIT))stage_page=(stage_page+1u)%8u;
  if(b&(1u<<BTN_HOME))stage_page=0;
  if(b&(1u<<BTN_SAVE)){stage_save_now=1;stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  for(uint32_t i=0;i<8;i++){int32_t v=fm1_enc_take(i);if(!v)continue;
@@ -196,7 +196,7 @@ static void controls(void){
  else if(stage_page==5){if(i==0)stage_plate_size=(uint8_t)clamp((int32_t)stage_plate_size+v,100);else if(i==1)stage_plate_tone=(uint8_t)clamp((int32_t)stage_plate_tone+v,100);else if(i==2)stage_plate_pre=(uint8_t)clamp((int32_t)stage_plate_pre+v,100);else if(i==3)P.rev=(uint8_t)clamp((int32_t)P.rev+v,127);ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);}
  else if(stage_page==6&&i<6u){uint16_t p[6];for(uint32_t j=0;j<6;j++)p[j]=eq_p[j];p[i]=(uint16_t)clamp((int32_t)p[i]+v*(i&1u? (i==5u?100:20):1),EQ_MAX[i]);if(p[i]<EQ_MIN[i])p[i]=EQ_MIN[i];eq_set(p);}
  else if(stage_page==7){if(i==0)P.vtype=(uint8_t)clamp((int32_t)P.vtype+v,5);else if(i==1)P.vup^=1u;else if(i==2)P.vlo^=1u;else if(i==3)P.perc^=1u;}
- if(stage_page!=8u){stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
+ {stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  }
  static uint8_t last[4];
  for(uint32_t i=0;i<4;i++){uint8_t f=fm1_in.fader[i],prev=last[i];if(last[i]==f)continue;last[i]=f;
@@ -264,42 +264,62 @@ static void stage_kv(int32_t x,int32_t y,const char *tag,uint32_t value){
  cv_text(x,y,&FONT_S,line,C_WHITE);
 }
 static void screen_draw(void){
- uint8_t *d=db();uint32_t count=stage_manual==2?2:9;
+ uint8_t *d=db();uint32_t count=stage_manual==2?2u:9u;
+ static const char *const pages[8]={"PERFORMANCE","LESLIE SPEED","LESLIE RAMP","TONEWHEELS","DRIVE","PLATE REVERB","3 BAND EQ","VIB / PERC"};
+ lcd_sync();
  draw_text_box(0,2,240,&FONT_S,"SMKSTAGE B3",C_WHITE,1);
- draw_text_box(0,25,240,&FONT_S,stage_manual==0?"UPPER":stage_manual==1?"LOWER":"PEDAL",RGB(240,55,65),1);
- draw_text_box(0,47,240,&FONT_S,stage_bank?"BANK B FAVORITES":"BANK A DRAWBARS",C_WHITE,1);
+ draw_text_box(0,23,240,&FONT_S,stage_manual==0?"UPPER":stage_manual==1?"LOWER":"PEDAL",RGB(245,65,77),1);
+ draw_text_box(0,44,240,&FONT_S,pages[stage_page%8u],C_WHITE,1);
  cv_begin(240,128,C_BLACK);
- if(stage_page==0){
+ if(stage_page==0u){
   for(uint32_t j=0;j<9;j++){
    int32_t x=4+(int32_t)j*26;uint32_t v=j<count?d[j]:0;
    cv_rect(x,6,19,103,RGB(35,38,43));
-   /* Hammond: 0 = pushed all the way up, 8 = pulled down. */
    cv_rect(x+7,8,5,10+(int32_t)v*10,RGB(140,143,151));
    cv_rect(x,10+(int32_t)v*10,19,13,j<count?RGB(220,53,64):RGB(70,70,75));
    char n[2]={(char)('0'+v),0};
    cv_text(x+5,111,&FONT_S,n,j<count?C_WHITE:RGB(70,70,70));
   }
- }else if(stage_page==1){
-  for(uint32_t i=0;i<8;i++){
-   char tag[4]={'K',(char)('1'+i),':',0};
-   int32_t x=(int32_t)(i&1u)*120,y=7+(int32_t)(i>>1u)*27;
-   stage_kv(x+5,y,tag,les_p[i]);
-  }
- }else if(stage_page==2){
-  stage_kv(8,12,"K1 DRIVE",P.drv);
-  stage_kv(8,36,"K2 CHAR",P.chr);
-  stage_kv(8,60,"F3 DRIVE",P.drv);
-  stage_kv(8,84,"F4 REVERB",P.rev);
- }else if(stage_page==3){
-  stage_kv(8,12,"K1 VIB TYPE",P.vtype+1u);
-  stage_kv(8,36,"UPPER VIB",P.vup);
-  stage_kv(8,60,"LOWER VIB",P.vlo);
-  stage_kv(8,84,"PERC",P.perc);
+ }else if(stage_page==1u){
+  stage_kv(7,8,"K1 HORN SLOW",les_p[0]);
+  stage_kv(7,35,"K2 HORN FAST",les_p[1]);
+  stage_kv(7,62,"K3 DRUM SLOW",les_p[2]);
+  stage_kv(7,89,"K4 DRUM FAST",les_p[3]);
+ }else if(stage_page==2u){
+  stage_kv(7,8,"K1 HORN ACC",les_p[4]);
+  stage_kv(7,35,"K2 HORN DEC",les_p[5]);
+  stage_kv(7,62,"K3 DRUM ACC",les_p[6]);
+  stage_kv(7,89,"K4 DRUM DEC",les_p[7]);
+ }else if(stage_page==3u){
+  stage_kv(7,8,"K1 TUNE x0.1Hz",ton_p[0]);
+  stage_kv(7,35,"K2 KEY CLICK",ton_p[1]);
+  cv_text(7,65,&FONT_S,"91 ORIGINAL WHEELS",RGB(170,175,185));
+  cv_text(7,88,&FONT_S,"LEAKAGE: SETBFREE",RGB(170,175,185));
+ }else if(stage_page==4u){
+  stage_kv(7,12,"K1 DRIVE",P.drv);
+  stage_kv(7,41,"K2 CHARACTER",P.chr);
+  stage_kv(7,70,"DRIVE ON",P.od);
+ }else if(stage_page==5u){
+  stage_kv(7,8,"K1 SIZE",stage_plate_size);
+  stage_kv(7,35,"K2 TONE",stage_plate_tone);
+  stage_kv(7,62,"K3 PREDELAY",stage_plate_pre);
+  stage_kv(7,89,"K4 MIX",P.rev);
+ }else if(stage_page==6u){
+  stage_kv(7,8,"K1 LOW dB INDEX",eq_p[0]);
+  stage_kv(7,28,"K2 LOW Hz",eq_p[1]);
+  stage_kv(7,48,"K3 MID dB INDEX",eq_p[2]);
+  stage_kv(7,68,"K4 MID Hz",eq_p[3]);
+  stage_kv(7,88,"K5 HIGH dB INDEX",eq_p[4]);
+  stage_kv(7,108,"K6 HIGH Hz",eq_p[5]);
+ }else if(stage_page==7u){
+  stage_kv(7,8,"K1 VIB TYPE",P.vtype+1u);
+  stage_kv(7,35,"K2 UPPER VIB",P.vup);
+  stage_kv(7,62,"K3 LOWER VIB",P.vlo);
+  stage_kv(7,89,"K4 PERC ON",P.perc);
  }
  cv_blit(0,68);
- /* The footer is page-specific, not just a changing label on drawbars. */
- draw_text_box(0,205,240,&FONT_S,stage_page==0?"K1-8 DRAWBARS F1=9":stage_page==1?"LESLIE: K1-8":stage_page==2?"DRIVE / CHARACTER":"VIBRATO / PERC",C_WHITE,1);
- draw_text_box(0,223,240,&FONT_S,"PARA:NEXT  PATCH:BACK",RGB(145,149,162),1);
+ draw_text_box(0,204,240,&FONT_S,stage_page==0?"K1-8 BARS / F1=9":stage_page==1?"0.1 RPM / HORN+DRUM":stage_page==2?"ACC/DEC = MILLISECONDS":stage_page==3?"LEAKAGE MODEL FIXED":stage_page==4?"PAD16=OVERDRIVE":stage_page==5?"DATTORRO / F4 MIX":stage_page==6?"GAIN 18=FLAT  (+/-9DB)":"PERC: PAD11",RGB(190,198,211),1);
+ draw_text_box(0,222,240,&FONT_S,stage_store_status==3u?"FLASH LOCKED - NO SAVE":stage_store_status==1u?"BT:SAVE  STORED":"BT:SAVE / PARA:NEXT",stage_store_status==3u?RGB(255,110,90):C_WHITE,1);
 }
 static void app_main(void){
  uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
