@@ -171,16 +171,28 @@ static void stage_store_commit(void){
   stage_store_dirty=0;stage_save_now=0;stage_store_status=1;stage_store_last_ms=fm1_ms;
  }else{stage_data_locked=1;stage_store_status=3;}
 }
+static void stage_factory_reset_sound(void){
+ P.db[0]=8;P.db[1]=8;P.db[2]=8;
+ for(uint32_t j=3;j<9;j++)P.db[j]=0;
+ const uint8_t lower[9]={8,3,8,0,0,0,0,0,0};
+ for(uint32_t j=0;j<9;j++)P.dbl[j]=lower[j];
+ P.dbp[0]=8;P.dbp[1]=6;
+ P.perc=0;P.perc3=0;P.fast=1;P.soft=0;P.vtype=0;P.vup=0;P.vlo=0;
+ P.les=1;P.od=0;P.drv=12;P.chr=16;P.rev=32;P.swell=127;
+ stage_manual=0;stage_les_bypass=0;stage_plate_size=77u;stage_plate_tone=69u;stage_plate_pre=10u;
+ for(uint32_t j=0;j<8;j++)les_set(j,LES_DEF[j]);
+ for(uint32_t j=0;j<2;j++)ton_set(j,TON_DEF[j]);
+ eq_set(EQ_DEF);ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
+}
 static void stage_factory_slots(void){
  static const uint8_t source[8]={5,104,7,15,18,107,106,108};
  for(uint32_t i=0;i<8;i++){
-  organ_program(source[i]);stage_bank=0;stage_slot_save(i);
+  stage_factory_reset_sound();organ_program(source[i]);stage_bank=0;stage_slot_save(i);
   stage_bank=1;stage_slot_save(i);
  }
- stage_bank=0;chosen=0;organ_program(5u);
+ stage_factory_reset_sound();organ_program(5u);stage_bank=0;chosen=0;
  stage_store_dirty=0;
 }
-
 static void pad_press(uint32_t p){
  switch(p){
  case 8:stage_les_bypass^=1u;break;  /* pad 9 Leslie on/off */
