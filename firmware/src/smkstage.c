@@ -5,6 +5,11 @@
 #define BOARD_SMK37 1
 #define APP_NAME "SMKSTAGE"
 #define OBV_DUAL_CORE 1
+/* K8 controls drawbar 8, not the platform emulated MASTER pot. */
+#define SMK_CONTROLLER_ACTIVE 1
+/* Give keyboard events priority while the LCD DMA is in flight. */
+static void keys_tick(void);
+#define LCD_IDLE() keys_tick()
 #include "platform.c"
 #include "organ_tab.h"
 /* Keep Leslie/reverb delay lines in the large .pool, not 96 KiB system RAM. */
@@ -75,7 +80,7 @@ static void controls(void){
  }}
 }
 static void keys_tick(void){
- uint64_t k=fm1_in.keys;
+ uint64_t k;uint32_t irq=fm1__lock();k=fm1_in.keys;fm1__unlock(irq);
  for(uint32_t i=0;i<37;i++){uint8_t on=(uint8_t)((k>>i)&1u);if(on==held_active[i])continue;
  if(on){held_manual[i]=stage_manual;organ_note(stage_manual,1,48+i,1,1);}
  else organ_note(held_manual[i],1,48+i,0,1);
@@ -98,29 +103,77 @@ static void leds(void){
  padled_set(i,(uint8_t)r,(uint8_t)g,(uint8_t)b);
  }padled_flush();
 }
+/* Rendering on SMK-37 is expensive: update only when parameters change.
+ * No full-screen clearing in the steady state, and note-on/off is serviced
+ * while lcd_sync waits for DMA (LCD_IDLE).
+ */
+static uint32_t stage_sig(void){
+ uint32_t h=2166136261u;
+ #define STAGE_MIX(x) do{h=((h ^ (uint32_t)(x))*16777619u);}while(0)
+ STAGE_MIX(stage_manual);STAGE_MIX(stage_bank);STAGE_MIX(stage_page);STAGE_MIX(chosen);
+ for(uint32_t m=0;m<3;m++){const volatile uint8_t *p=m==0?P.db:m==1?P.dbl:P.dbp;for(uint32_t i=0;i<(m==2?2u:9u);i++)STAGE_MIX(p[i]);}
+ STAGE_MIX(P.perc);STAGE_MIX(P.perc3);STAGE_MIX(P.fast);STAGE_MIX(P.soft);
+ STAGE_MIX(P.vtype);STAGE_MIX(P.vup);STAGE_MIX(P.vlo);STAGE_MIX(P.les);
+ STAGE_MIX(P.od);STAGE_MIX(P.drv);STAGE_MIX(P.chr);STAGE_MIX(P.rev);STAGE_MIX(P.swell);STAGE_MIX(stage_les_bypass);
+ if(stage_page==1u)for(uint32_t i=0;i<8;i++)STAGE_MIX(les_p[i]);
+ if(stage_page==3u)for(uint32_t i=0;i<6;i++)STAGE_MIX(eq_p[i]);
+ #undef STAGE_MIX
+ return h;
+}
+static void stage_number(char *s,uint32_t val){
+ char b[12];uint32_t n=0,i=0;do{b[n++]=(char)('0'+val%10u);val/=10u;}while(val&&n<11);
+ while(n)s[i++]=b[--n];s[i]=0;
+}
+static void stage_kv(int32_t x,int32_t y,const char *tag,uint32_t value){
+ char line[36];uint32_t i=0,k=0;for(;tag[i]&&i<24;i++)line[i]=tag[i];
+ line[i++]=' ';stage_number(line+i,value);
+ cv_text(x,y,&FONT_S,line,C_WHITE);
+}
 static void screen_draw(void){
  uint8_t *d=db();uint32_t count=stage_manual==2?2:9;
- lcd_fill(0,0,240,240,C_BLACK);
  draw_text_box(0,2,240,&FONT_S,"SMKSTAGE B3",C_WHITE,1);
  draw_text_box(0,25,240,&FONT_S,stage_manual==0?"UPPER":stage_manual==1?"LOWER":"PEDAL",RGB(240,55,65),1);
- draw_text_box(0,47,240,&FONT_S,stage_bank?"PRESET FULL":"DRAWBARS",C_WHITE,1);
+ draw_text_box(0,47,240,&FONT_S,stage_bank?"BANK B FAVORITES":"BANK A DRAWBARS",C_WHITE,1);
  cv_begin(240,128,C_BLACK);
- for(uint32_t j=0;j<9;j++){int32_t x=4+(int32_t)j*26;uint32_t v=j<count?d[j]:0;
- cv_rect(x,4,19,95,RGB(34,38,45));
- if(v)cv_rect(x,99-(int32_t)v*11,19,(int32_t)v*11,RGB(215,50,65));
- char s[2]={(char)('0'+v),0};
- cv_text(x+5,104,&FONT_S,s,j<count?C_WHITE:RGB(65,65,65));
+ if(stage_page==0){
+  for(uint32_t j=0;j<9;j++){
+   int32_t x=4+(int32_t)j*26;uint32_t v=j<count?d[j]:0;
+   cv_rect(x,6,19,103,RGB(35,38,43));
+   /* Hammond: 0 = pushed all the way up, 8 = pulled down. */
+   cv_rect(x+7,8,5,10+(int32_t)v*10,RGB(140,143,151));
+   cv_rect(x,10+(int32_t)v*10,19,13,j<count?RGB(220,53,64):RGB(70,70,75));
+   char n[2]={(char)('0'+v),0};
+   cv_text(x+5,111,&FONT_S,n,j<count?C_WHITE:RGB(70,70,70));
+  }
+ }else if(stage_page==1){
+  for(uint32_t i=0;i<8;i++){
+   char tag[4]={'K',(char)('1'+i),':',0};
+   int32_t x=(int32_t)(i&1u)*120,y=7+(int32_t)(i>>1u)*27;
+   stage_kv(x+5,y,tag,les_p[i]);
+  }
+ }else if(stage_page==2){
+  stage_kv(8,12,"K1 DRIVE",P.drv);
+  stage_kv(8,36,"K2 CHAR",P.chr);
+  stage_kv(8,60,"F3 DRIVE",P.drv);
+  stage_kv(8,84,"F4 REVERB",P.rev);
+ }else if(stage_page==3){
+  stage_kv(8,12,"K1 VIB TYPE",P.vtype+1u);
+  stage_kv(8,36,"UPPER VIB",P.vup);
+  stage_kv(8,60,"LOWER VIB",P.vlo);
+  stage_kv(8,84,"PERC",P.perc);
  }
  cv_blit(0,68);
- draw_text_box(0,201,240,&FONT_S,stage_page==0?"K1-K8 DRAWBARS":stage_page==1?"LESLIE EDIT":stage_page==2?"DRIVE EDIT":"VIBRATO EDIT",C_WHITE,1);
+ /* The footer is page-specific, not just a changing label on drawbars. */
+ draw_text_box(0,205,240,&FONT_S,stage_page==0?"K1-8 DRAWBARS F1=9":stage_page==1?"LESLIE: K1-8":stage_page==2?"DRIVE / CHARACTER":"VIBRATO / PERC",C_WHITE,1);
+ draw_text_box(0,223,240,&FONT_S,"PARA:NEXT  PATCH:BACK",RGB(145,149,162),1);
 }
 static void app_main(void){
- uint8_t st,a,b;smk_pad_events=1;smk_pad_grid=1;palette_set(3);
+ uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
  organ_program(5u);P.les=1;
  for(;;){platform_poll();keys_tick();controls();
  while(midi_get(&st,&a,&b)){uint32_t ch=st&15u;
  switch(st&0xF0u){case 0x90u:organ_midi_note(ch,a,b!=0);break;case 0x80u:organ_midi_note(ch,a,0);break;
  case 0xB0u:organ_cc_ch(ch,a,b);break;case 0xC0u:organ_pc(a);break;}}
  if(fm1_ms-leds_ms>=40u){leds_ms=fm1_ms;leds();}
- if(fm1_ms-draw_ms>=100u){draw_ms=fm1_ms;screen_draw();}
+ if(first_draw || (fm1_ms-draw_ms>=75u && stage_sig()!=last_sig)){draw_ms=fm1_ms;last_sig=stage_sig();first_draw=0;screen_draw();}
  }}
