@@ -380,6 +380,38 @@ static void screen_draw(void){
  draw_text_box(0,204,240,&FONT_S,stage_page==0?"K1-8 BARS / F1=9":stage_page==1?"0.1 RPM / HORN+DRUM":stage_page==2?"ACC/DEC = MILLISECONDS":stage_page==3?"LEAKAGE MODEL FIXED":stage_page==4?"PAD16=OVERDRIVE":stage_page==5?"DATTORRO / F4 MIX":stage_page==6?"GAIN 18=FLAT  (+/-9DB)":"PERC: PAD11",RGB(190,198,211),1);
  draw_text_box(0,222,240,&FONT_S,stage_store_status==3u?"FLASH LOCKED - NO SAVE":stage_store_status==2u?"UNSAVED  BT:SAVE":stage_store_status==1u?"SAVED  BT:SAVE":"BT:SAVE / PARA:NEXT",stage_store_status==3u?RGB(255,110,90):C_WHITE,1);
 }
+/* Drawbar-only updates use one 26x124 canvas lane (~6.4 KiB DMA)
+ * instead of the complete 240x124 canvas (~60 KiB). This reduces
+ * SPI/bus contention precisely during rapid encoder movement.
+ * Full page changes still render the complete page once. */
+static uint8_t stage_screen_db[9],stage_screen_page=255u,stage_screen_manual=255u,stage_screen_bank=255u;
+static void stage_screen_snapshot(void){
+ const uint8_t *d=db();
+ for(uint32_t j=0;j<9u;j++)stage_screen_db[j]=(uint8_t)(j<(stage_manual==2u?2u:9u)?d[j]:0u);
+ stage_screen_page=stage_page;stage_screen_manual=stage_manual;stage_screen_bank=stage_bank;
+}
+static void stage_draw_lane(uint32_t j,uint32_t v,uint32_t enabled){
+ cv_begin(26u,124u,C_BLACK);
+ cv_rect(0,6,19,103,RGB(35,38,43));
+ cv_rect(7,8,5,10+(int32_t)v*10,RGB(140,143,151));
+ cv_rect(0,10+(int32_t)v*10,19,13,enabled?RGB(220,53,64):RGB(70,70,75));
+ char n[2]={(char)('0'+v),0};
+ cv_text(5,111,&FONT_S,n,enabled?C_WHITE:RGB(70,70,70));
+ cv_blit(4u+j*26u,68u);
+}
+static void stage_screen_update(void){
+ if(stage_page!=0u||stage_screen_page!=0u||stage_screen_manual!=stage_manual||stage_screen_bank!=stage_bank){
+  screen_draw();stage_screen_snapshot();return;
+ }
+ const uint8_t *d=db();uint32_t count=stage_manual==2u?2u:9u;
+ for(uint32_t j=0;j<9u;j++){
+  uint8_t v=(uint8_t)(j<count?d[j]:0u);
+  if(v!=stage_screen_db[j]){
+   stage_draw_lane(j,v,j<count);
+   stage_screen_db[j]=v;
+  }
+ }
+}
 static void app_main(void){
  uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
  organ_program(5u);P.les=1;P.rev=32;ovp_plate_init();ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
@@ -393,5 +425,5 @@ static void app_main(void){
  if(stage_store_dirty && !stage_data_locked)stage_store_status=2u;
  if(stage_store_dirty && !fm1_in.keys && quiet() && (stage_save_now || fm1_ms-stage_store_change_ms>=10000u) && (stage_save_now || !stage_store_last_ms || fm1_ms-stage_store_last_ms>=30000u))stage_store_commit();
  if(fm1_ms-leds_ms>=40u){leds_ms=fm1_ms;leds();}
- if(first_draw || (fm1_ms-draw_ms>=75u && stage_sig()!=last_sig)){draw_ms=fm1_ms;last_sig=stage_sig();first_draw=0;screen_draw();}
+ if(first_draw || (fm1_ms-draw_ms>=75u && stage_sig()!=last_sig)){draw_ms=fm1_ms;last_sig=stage_sig();if(first_draw){first_draw=0;screen_draw();stage_screen_snapshot();}else stage_screen_update();}
  }}
