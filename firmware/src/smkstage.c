@@ -7,6 +7,10 @@
 #define OBV_DUAL_CORE 1
 /* K8 controls drawbar 8, not the platform emulated MASTER pot. */
 #define SMK_CONTROLLER_ACTIVE 1
+/* Stage-exclusive sectors beyond the SMKSYNTH pattern slots. Never erase foreign data. */
+#define STAGE_STORE_A 0x000E8000u
+#define STAGE_STORE_B 0x000E9000u
+#define STAGE_EXTRA_RANGE(off,n) (FL_IN(off,n,STAGE_STORE_A,STAGE_STORE_B+0x1000u))
 /* Give keyboard events priority while the LCD DMA is in flight. */
 static void keys_tick(void);
 #define LCD_IDLE() keys_tick()
@@ -14,15 +18,23 @@ static void keys_tick(void);
 #include "organ_tab.h"
 /* Keep Leslie/reverb delay lines in the large .pool, not 96 KiB system RAM. */
 #define ORGAN_POOL __attribute__((section(".pool")))
+#define STAGE_PLATE 1
+static uint8_t stage_plate_size=77u,stage_plate_tone=69u,stage_plate_pre=10u;
+#include "smkstage_plate.h"
 #define ORGAN_C1_RUN(fn,arg) fm1_mc_run((fn),(arg))
 #define ORGAN_C1_WAIT() fm1_mc_wait()
 static volatile uint8_t stage_les_bypass;
 #include "organ_core.h"
 static uint8_t stage_manual, stage_bank, stage_page, stage_f1_caught;
+static uint8_t stage_store_dirty,stage_save_now,stage_store_status,stage_data_locked;
+static uint32_t stage_store_change_ms,stage_store_last_ms,stage_store_seq,stage_store_sector=STAGE_STORE_B;
+static uint8_t stage_restore_done;
 static uint8_t held_manual[37], held_active[37], pad_down[16];
 static uint32_t pad_start[16], draw_ms, leds_ms;
 static uint8_t favorites[2][8][3][9], saved[2][8], chosen;
 static uint8_t full[8][12];
+static uint16_t favorite_les[8][8],favorite_ton[8][2],favorite_eq[8][6];
+static uint8_t favorite_plate[8][3],favorite_bypass[8],favorite_chr[8];
 static uint8_t *db(void){return stage_manual==0?(uint8_t*)P.db:stage_manual==1?(uint8_t*)P.dbl:(uint8_t*)P.dbp;}
 static uint32_t clamp(int32_t v,uint32_t max){return v<0?0:(uint32_t)v>max?max:(uint32_t)v;}
 static void stage_slot_save(uint32_t p){
@@ -32,7 +44,13 @@ static void stage_slot_save(uint32_t p){
  saved[stage_bank][p]=1;chosen=(uint8_t)p;
  if(stage_bank){full[p][0]=P.perc;full[p][1]=P.perc3;full[p][2]=P.soft;full[p][3]=P.fast;
  full[p][4]=P.vup;full[p][5]=P.vlo;full[p][6]=P.vtype;full[p][7]=P.od;full[p][8]=P.drv;
- full[p][9]=P.rev;full[p][10]=P.swell;full[p][11]=stage_manual;}
+ full[p][9]=P.rev;full[p][10]=P.swell;full[p][11]=stage_manual;
+ for(uint32_t i=0;i<8;i++)favorite_les[p][i]=les_p[i];
+ for(uint32_t i=0;i<2;i++)favorite_ton[p][i]=ton_p[i];
+ for(uint32_t i=0;i<6;i++)favorite_eq[p][i]=eq_p[i];
+ favorite_plate[p][0]=stage_plate_size;favorite_plate[p][1]=stage_plate_tone;favorite_plate[p][2]=stage_plate_pre;
+ favorite_bypass[p]=stage_les_bypass;favorite_chr[p]=P.chr;}
+ stage_store_dirty=1;stage_store_change_ms=fm1_ms;
 }
 static void stage_slot_load(uint32_t p){
  if(p>7||!saved[stage_bank][p])return;chosen=(uint8_t)p;
@@ -40,8 +58,16 @@ static void stage_slot_load(uint32_t p){
  uint8_t v=favorites[1][p][m][i];if(m==0)P.db[i]=v;else if(m==1)P.dbl[i]=v;else if(i<2)P.dbp[i]=v;}
  P.perc=full[p][0];P.perc3=full[p][1];P.soft=full[p][2];P.fast=full[p][3];P.vup=full[p][4];P.vlo=full[p][5];
  P.vtype=full[p][6];P.od=full[p][7];P.drv=full[p][8];P.rev=full[p][9];P.swell=full[p][10];stage_manual=full[p][11];
- }else{uint8_t *d=db();for(uint32_t i=0;i<(stage_manual==2?2u:9u);i++)d[i]=favorites[0][p][stage_manual][i];}
- stage_f1_caught=0;
+ P.chr=favorite_chr[p];stage_les_bypass=favorite_bypass[p];
+ for(uint32_t i=0;i<8;i++)les_set(i,favorite_les[p][i]);
+ for(uint32_t i=0;i<2;i++)ton_set(i,favorite_ton[p][i]);
+ eq_set(favorite_eq[p]);
+ stage_plate_size=favorite_plate[p][0];stage_plate_tone=favorite_plate[p][1];stage_plate_pre=favorite_plate[p][2];
+ ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
+ }else{for(uint32_t m=0;m<3;m++)for(uint32_t i=0;i<(m==2?2u:9u);i++){
+ uint8_t v=favorites[0][p][m][i];if(m==0)P.db[i]=v;else if(m==1)P.dbl[i]=v;else P.dbp[i]=v;
+ }}
+ stage_f1_caught=0;stage_store_dirty=1;stage_store_change_ms=fm1_ms;
 }
 static void pad_press(uint32_t p){
  switch(p){
@@ -58,24 +84,31 @@ static void controls(void){
  if(b&(1u<<BTN_LEFT)){stage_manual=(stage_manual+2u)%3u;stage_f1_caught=0;}
  if(b&(1u<<BTN_RIGHT)){stage_manual=(stage_manual+1u)%3u;stage_f1_caught=0;}
  if(b&(1u<<BTN_KNOB_BANK))stage_bank^=1;
- if(b&(1u<<BTN_EDIT))stage_page=(stage_page+1u)%4u;
+ if(b&(1u<<BTN_EDIT))stage_page=(stage_page+1u)%9u;
  if(b&(1u<<BTN_HOME))stage_page=0;
+ if(b&(1u<<BTN_SAVE)){stage_save_now=1;stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  for(uint32_t i=0;i<8;i++){int32_t v=fm1_enc_take(i);if(!v)continue;
  if(stage_page==0){uint8_t *d=db();if(stage_manual!=2||i<2)d[i]=(uint8_t)clamp((int32_t)d[i]+v,8);}
- else if(stage_page==1)les_set(i,clamp((int32_t)les_p[i]+v*(i<4?5:25),i<4?9000:10000));
- else if(stage_page==2){if(i==0)P.drv=(uint8_t)clamp((int32_t)P.drv+v,20);else if(i==1)P.chr=(uint8_t)clamp((int32_t)P.chr+v,127);}
- else if(stage_page==3){if(i==0)P.vtype=(uint8_t)clamp((int32_t)P.vtype+v,5);}
+ else if(stage_page==1&&i<4u)les_set(i,clamp((int32_t)les_p[i]+v*5,(uint32_t)LES_MAX[i]));
+ else if(stage_page==2&&i<4u)les_set(i+4u,clamp((int32_t)les_p[i+4u]+v*25,(uint32_t)LES_MAX[i+4u]));
+ else if(stage_page==3){if(i==0)ton_set(0,clamp((int32_t)ton_p[0]+v*10u,4500));else if(i==1)ton_set(1,clamp((int32_t)ton_p[1]+v*10u,1000));}
+ else if(stage_page==4){if(i==0)P.drv=(uint8_t)clamp((int32_t)P.drv+v,20);else if(i==1)P.chr=(uint8_t)clamp((int32_t)P.chr+v,127);}
+ else if(stage_page==5){if(i==0)stage_plate_size=(uint8_t)clamp((int32_t)stage_plate_size+v,100);else if(i==1)stage_plate_tone=(uint8_t)clamp((int32_t)stage_plate_tone+v,100);else if(i==2)stage_plate_pre=(uint8_t)clamp((int32_t)stage_plate_pre+v,100);else if(i==3)P.rev=(uint8_t)clamp((int32_t)P.rev+v,127);ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);}
+ else if(stage_page==6&&i<6u){uint16_t p[6];for(uint32_t j=0;j<6;j++)p[j]=eq_p[j];p[i]=(uint16_t)clamp((int32_t)p[i]+v*(i&1u? (i==5u?100:20):1),EQ_MAX[i]);if(p[i]<EQ_MIN[i])p[i]=EQ_MIN[i];eq_set(p);}
+ else if(stage_page==7){if(i==0)P.vtype=(uint8_t)clamp((int32_t)P.vtype+v,5);else if(i==1)P.vup^=1u;else if(i==2)P.vlo^=1u;else if(i==3)P.perc^=1u;}
+ if(stage_page!=8u){stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  }
  static uint8_t last[4];
- for(uint32_t i=0;i<4;i++){uint8_t f=fm1_in.fader[i];if(last[i]==f)continue;last[i]=f;
- if(i==0){uint8_t *d=db(),at=stage_manual==2?1:8,val=(uint8_t)((f*8u+63u)/127u);
-  if(!stage_f1_caught){if(val==d[at])stage_f1_caught=1;else continue;} d[at]=val;
- }else if(i==1)P.swell=f;else if(i==2)P.drv=(uint8_t)((f*20u+63u)/127u);else P.rev=f;}
+ for(uint32_t i=0;i<4;i++){uint8_t f=fm1_in.fader[i],prev=last[i];if(last[i]==f)continue;last[i]=f;
+ if(i==0){uint8_t *d=db(),at=stage_manual==2?1:8,val=(uint8_t)(8u-(f*8u+63u)/127u);
+  if(!stage_f1_caught){uint8_t was=(uint8_t)(8u-(prev*8u+63u)/127u);if(val==d[at]||(was<=d[at]&&val>=d[at])||(was>=d[at]&&val<=d[at]))stage_f1_caught=1;else continue;}d[at]=val;
+ }else if(i==1)P.swell=f;else if(i==2)P.drv=(uint8_t)((f*20u+63u)/127u);else P.rev=f;
+ stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
  int32_t event;while((event=smk_pad_take())>=0){
  uint32_t p=((uint32_t)event>>8)&15u,on=(uint32_t)event&255u;
- if(on){pad_down[p]=1;pad_start[p]=fm1_ms;if(p>=8&&p!=9)pad_press(p);}
+ if(on){pad_down[p]=1;pad_start[p]=fm1_ms;if(p>=8&&p!=9){pad_press(p);stage_store_dirty=1;stage_store_change_ms=fm1_ms;}}
  else if(pad_down[p]){uint32_t duration=fm1_ms-pad_start[p];pad_down[p]=0;
-  if(p==9){if(duration>=500u)P.les=0;else P.les=P.les==0?1:P.les==1?2:1;}
+  if(p==9){if(duration>=500u)P.les=0;else P.les=P.les==0?1:P.les==1?2:1;stage_store_dirty=1;stage_store_change_ms=fm1_ms;}
   else if(p<8){if(duration>=600u)stage_slot_save(p);else stage_slot_load(p);}
  }}
 }
@@ -90,9 +123,9 @@ static void leds(void){
  for(uint32_t i=0;i<16;i++){uint32_t r=0,g=0,b=0;
  if(i<8){r=saved[stage_bank][i]?90:8;g=chosen==i?50:0;}
  else switch(i){
- case 8:if(!stage_les_bypass)r=g=b=100;break;
- case 9:if(!stage_les_bypass){uint32_t speed=P.les==2?220u:P.les==1?65u:2u;
- uint32_t phase=(fm1_ms*speed/1000u)%256u,v=phase<128?phase:255-phase;r=g=b=P.les==0?15:18+v/2;}break;
+ case 8:if(!stage_les_bypass)r=g=b=255;break;
+ case 9:if(!stage_les_bypass){/* Real rotor phase: same principle as the SMKTRON indicator, never a slow fake timer. */
+ uint32_t phase=ls_hph>>24,v=phase<128u?phase:255u-phase;r=g=b=P.les==0?40u:25u+v*230u/127u;}break;
  case 10:if(P.perc){r=P.perc3?20:140;g=P.perc3?30:70;b=P.perc3?140:0;}break;
  case 11:if(P.perc)r=g=b=P.soft?20:100;break;
  case 12:if(P.perc)r=g=b=P.fast?100:20;break;
@@ -115,8 +148,9 @@ static uint32_t stage_sig(void){
  STAGE_MIX(P.perc);STAGE_MIX(P.perc3);STAGE_MIX(P.fast);STAGE_MIX(P.soft);
  STAGE_MIX(P.vtype);STAGE_MIX(P.vup);STAGE_MIX(P.vlo);STAGE_MIX(P.les);
  STAGE_MIX(P.od);STAGE_MIX(P.drv);STAGE_MIX(P.chr);STAGE_MIX(P.rev);STAGE_MIX(P.swell);STAGE_MIX(stage_les_bypass);
- if(stage_page==1u)for(uint32_t i=0;i<8;i++)STAGE_MIX(les_p[i]);
- if(stage_page==3u)for(uint32_t i=0;i<6;i++)STAGE_MIX(eq_p[i]);
+ if(stage_page==1u||stage_page==2u)for(uint32_t i=0;i<8;i++)STAGE_MIX(les_p[i]);
+ STAGE_MIX(ton_p[0]);STAGE_MIX(ton_p[1]);STAGE_MIX(stage_plate_size);STAGE_MIX(stage_plate_tone);STAGE_MIX(stage_plate_pre);STAGE_MIX(stage_store_status);
+ if(stage_page==6u)for(uint32_t i=0;i<6;i++)STAGE_MIX(eq_p[i]);
  #undef STAGE_MIX
  return h;
 }
