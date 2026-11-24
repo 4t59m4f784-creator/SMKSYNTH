@@ -51,10 +51,13 @@
 #define MIDI_MAP_AT 0x000B3000u
 #define FL_RANGE_OK(off,n) (VOICE_DATA_WRITE_OK(off,n)||FL_IN(off,n,MIDI_MAP_AT,MIDI_MAP_AT+0x2000u)||FL_IN(off,n,FL_OTA_LO,FL_OTA_HI))
 #else
+#ifndef STAGE_EXTRA_RANGE
+#define STAGE_EXTRA_RANGE(off,n) 0
+#endif
 #define FL_RANGE_OK(off, n) (FL_IN(off, n, FL_OTA_LO, FL_OTA_HI) || FL_IN(off, n, SETTINGS_AT, SETTINGS_AT + 0x1000u) || \
                              FL_IN(off, n, BLOBS_AT, BLOBS_AT + NBLOB * 0x1000u) || \
                              FL_IN(off, n, PSECT_AT, PSECT_AT + NPSECT * 0x1000u) || FL_IN(off,n,PFAV_AT,PFAV_AT+0x2000u) || FL_IN(off, n, OWNER_AT, OWNER_AT + 0x1000u) || \
-                             FL_IN(off, n, SLOTS_AT, SLOTS_AT + NBLOB * SLOT_SECT * 0x1000u))
+                             FL_IN(off, n, SLOTS_AT, SLOTS_AT + NBLOB * SLOT_SECT * 0x1000u) || STAGE_EXTRA_RANGE(off,n))
 #endif
 #include "fm1_flash_map.h"
 
