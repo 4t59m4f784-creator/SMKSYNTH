@@ -9,10 +9,14 @@
 \name:
 	[--sp] = {psr, rets, reti}
 	[--sp] = {r3-r0}
-	/* The far XIP C handler is ~4 MiB from RAM and cannot use a
-	 * relative 23-bit call; form its 32-bit address and call indirectly. */
+	.ifc \name,isr_timer5
+	/* The far XIP C handler is ~4 MiB from RAM: use an absolute 32-bit
+	 * pointer call. The audio ISR wrapper remains byte-identical to D2. */
 	r0 = \body
 	call r0
+	.else
+	call \body
+	.endif
 	{r3-r0} = [sp++]
 	{psr, rets, reti} = [sp++]
 	csync
