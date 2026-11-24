@@ -376,6 +376,9 @@ static uint32_t block_limit(lim_t *s, int32_t *x, int32_t *y, uint32_t n)
 
 static void app_audio(int32_t *out, uint32_t n)
 {
+#if STAGE_PLATE
+    if (!stage_audio_ready) return; /* zeroed DMA half remains silent until plate initialized */
+#endif
     /* setBfree scanner.modulation.v1..v3: the delay is 1 + A + A sin(phase) samples, A = 3, 6, 9, at 48 kHz (the Pi it was measured on);
      * here in samples of 44.1 kHz (x 44100 / 48000), Q8 */
     static const int32_t VIBA[3] = {706, 1411, 2117};
