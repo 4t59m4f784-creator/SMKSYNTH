@@ -1,11 +1,14 @@
-name: SMKSTAGE B3 hardware alpha
+name: SMKSTAGE B3 D2 full-feature alpha
 on:
   push:
-    branches: [smkstage-b3-alpha]
+    branches: [smkstage-b3-d2-complete-alpha]
     paths:
       - 'firmware/src/smkstage.c'
       - 'firmware/src/organ_*.h'
       - 'firmware/src/platform.c'
+      - 'firmware/hal/fm1_irq.h'
+      - 'firmware/src/smkstage_plate.h'
+      - 'firmware/src/smk_store.h'
       - 'tools/build_stage.py'
       - '.github/workflows/smkstage-alpha.yml'
   workflow_dispatch:
@@ -38,19 +41,19 @@ jobs:
         run: |
           export JIELI_TOOLCHAIN="$HOME/.jieli/toolchain"
           export AC79_SDK="$HOME/fw-AC79_AIoT_SDK"
-          python3 tools/build_stage.py --board smk37 --model pro --experimental-id 19703 --release 0.1.2-b3
+          python3 tools/build_stage.py --board smk37 --model pro --experimental-id 19703 --release 0.1.3-d2
       - name: Record SHA-256 and identity
         run: |
-          sha256sum build/smkstage-0.1.2-b3-smk37.fwsc > build/SMKSTAGE-B3-ALPHA-SHA256.txt
+          sha256sum build/smkstage-0.1.3-d2-smk37.fwsc > build/SMKSTAGE-B3-ALPHA-SHA256.txt
           echo "UNTESTED HARDWARE ALPHA — NOT A PUBLIC RELEASE" > build/READ-BEFORE-FLASHING.txt
           echo "SMK-37 Pro only; experimental identity SMK-37 Pro_19703." >> build/READ-BEFORE-FLASHING.txt
           echo "Do not install without verifying rescue, backups and target identity." >> build/READ-BEFORE-FLASHING.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: SMKSTAGE-B3-ALPHA-UNTESTED
+          name: SMKSTAGE-B3-D2-FULL-UNTESTED
           retention-days: 14
           path: |
-            build/smkstage-0.1.2-b3-smk37.fwsc
+            build/smkstage-0.1.3-d2-smk37.fwsc
             build/SMKSTAGE-B3-ALPHA-SHA256.txt
             build/READ-BEFORE-FLASHING.txt
           if-no-files-found: error
