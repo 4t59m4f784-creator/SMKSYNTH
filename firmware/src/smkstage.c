@@ -28,7 +28,7 @@ static volatile uint8_t stage_les_bypass;
 static uint8_t stage_manual, stage_bank, stage_page, stage_f1_caught;
 static uint8_t stage_store_dirty,stage_save_now,stage_store_status,stage_data_locked;
 static uint32_t stage_store_change_ms,stage_store_last_ms,stage_store_seq,stage_store_sector=STAGE_STORE_B;
-static uint8_t stage_restore_done;
+/* The pending indicator stays visible until flash verification succeeds. */
 static uint8_t held_manual[37], held_active[37], pad_down[16];
 static uint32_t pad_start[16], draw_ms, leds_ms;
 static uint8_t favorites[2][8][3][9], saved[2][8], chosen;
@@ -319,7 +319,7 @@ static void screen_draw(void){
  }
  cv_blit(0,68);
  draw_text_box(0,204,240,&FONT_S,stage_page==0?"K1-8 BARS / F1=9":stage_page==1?"0.1 RPM / HORN+DRUM":stage_page==2?"ACC/DEC = MILLISECONDS":stage_page==3?"LEAKAGE MODEL FIXED":stage_page==4?"PAD16=OVERDRIVE":stage_page==5?"DATTORRO / F4 MIX":stage_page==6?"GAIN 18=FLAT  (+/-9DB)":"PERC: PAD11",RGB(190,198,211),1);
- draw_text_box(0,222,240,&FONT_S,stage_store_status==3u?"FLASH LOCKED - NO SAVE":stage_store_status==1u?"BT:SAVE  STORED":"BT:SAVE / PARA:NEXT",stage_store_status==3u?RGB(255,110,90):C_WHITE,1);
+ draw_text_box(0,222,240,&FONT_S,stage_store_status==3u?"FLASH LOCKED - NO SAVE":stage_store_status==2u?"UNSAVED  BT:SAVE":stage_store_status==1u?"SAVED  BT:SAVE":"BT:SAVE / PARA:NEXT",stage_store_status==3u?RGB(255,110,90):C_WHITE,1);
 }
 static void app_main(void){
  uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
@@ -329,6 +329,7 @@ static void app_main(void){
  while(midi_get(&st,&a,&b)){uint32_t ch=st&15u;
  switch(st&0xF0u){case 0x90u:organ_midi_note(ch,a,b!=0);break;case 0x80u:organ_midi_note(ch,a,0);break;
  case 0xB0u:organ_cc_ch(ch,a,b);break;case 0xC0u:organ_pc(a);break;}}
+ if(stage_store_dirty && !stage_data_locked)stage_store_status=2u;
  if(stage_store_dirty && !fm1_in.keys && quiet() && (stage_save_now || fm1_ms-stage_store_change_ms>=10000u) && (stage_save_now || !stage_store_last_ms || fm1_ms-stage_store_last_ms>=30000u))stage_store_commit();
  if(fm1_ms-leds_ms>=40u){leds_ms=fm1_ms;leds();}
  if(first_draw || (fm1_ms-draw_ms>=75u && stage_sig()!=last_sig)){draw_ms=fm1_ms;last_sig=stage_sig();first_draw=0;screen_draw();}
