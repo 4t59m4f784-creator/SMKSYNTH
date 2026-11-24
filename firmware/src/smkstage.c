@@ -203,6 +203,28 @@ static void pad_press(uint32_t p){
  case 14:P.vtype=(P.vtype+1u)%6u;break;
  case 15:P.od^=1u;break;
  }}
+/* Physical SMK-37 mod wheel, as calibrated in SMKSYNTH:
+ * up = smaller ADC number, down = larger ADC number.
+ * Leslie only uses SLOW/FAST; hysteresis avoids chattering at mid travel.
+ * No STOP here: pad 10 remains responsible for STOP.
+ */
+static void stage_mod_leslie(void){
+ static uint8_t initialized;
+ static uint8_t mode;
+ uint16_t raw;
+ if(fm1_in.frames<300u)return; /* settle the ADC, same as SMKSYNTH */
+ raw=fm1_in.wheel[1];
+ if(!initialized){
+  mode=raw<550u?2u:1u;
+  initialized=1;
+ }else if(mode==1u&&raw<520u)mode=2u;
+ else if(mode==2u&&raw>580u)mode=1u;
+ if(P.les!=mode){
+  P.les=mode;
+  stage_store_dirty=1;
+  stage_store_change_ms=fm1_ms;
+ }
+}
 static void controls(void){
  uint32_t rel=0,b=fm1_input_edges(&rel);
  if(b&(1u<<BTN_LEFT)){stage_manual=(stage_manual+2u)%3u;stage_f1_caught=0;}
@@ -351,7 +373,7 @@ static void app_main(void){
  uint8_t st,a,b;uint32_t last_sig=0;uint8_t first_draw=1;smk_pad_events=1;smk_pad_grid=1;palette_set(3);lcd_fill(0,0,240,240,C_BLACK);
  organ_program(5u);P.les=1;P.rev=32;ovp_plate_init();ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
  stage_factory_slots();stage_store_boot();
- for(;;){platform_poll();keys_tick();controls();
+ for(;;){platform_poll();keys_tick();controls();stage_mod_leslie();
  while(midi_get(&st,&a,&b)){uint32_t ch=st&15u;
  switch(st&0xF0u){case 0x90u:organ_midi_note(ch,a,b!=0);break;case 0x80u:organ_midi_note(ch,a,0);break;
  case 0xB0u:organ_cc_ch(ch,a,b);break;case 0xC0u:organ_pc(a);break;}}
