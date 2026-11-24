@@ -1,0 +1,52 @@
+name: SMKSTAGE B3 forensic symbols 0.1.1
+on:
+  push:
+    branches: [smkstage-b3-alpha]
+    paths: ['.github/workflows/smkstage-crash-symbols.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d8a86ef44fd396886d38b629477cb779be35d3f1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m pip install Pillow
+      - name: Fetch Jieli compiler and SDK
+        run: |
+          tools/get_toolchain.sh
+          T=AC79NN_SDK_V1.2.1_2023-12-13
+          D="$HOME/fw-AC79_AIoT_SDK/cpu/wl82/tools"
+          mkdir -p "$D/cfg"
+          for f in uboot.boot cfg_tool.bin cfg/eq_cfg_hw.bin; do
+            curl --fail --location --retry 3 --connect-timeout 15 --max-time 90 \
+              "https://raw.githubusercontent.com/amitv87/fw-AC79_AIoT_SDK/$T/cpu/wl82/tools/$f" -o "$D/$f"
+          done
+          echo '4e3b4c220dc96641cb5a723f41e68ce41d5261ae9434bb33fbd7f2c59976ded4  '"$D/uboot.boot" | sha256sum --check
+          echo '276579954f076886a6a7694f65dc71c034a63a2c204b76749065c0ac7b010d1b  '"$D/cfg_tool.bin" | sha256sum --check
+          echo '41167491bffed4651750719c973d2758adeb9021a5670d02d6a53c85ed80ea7d  '"$D/cfg/eq_cfg_hw.bin" | sha256sum --check
+      - name: Compile and verify bounds
+        run: |
+          export JIELI_TOOLCHAIN="$HOME/.jieli/toolchain"
+          export AC79_SDK="$HOME/fw-AC79_AIoT_SDK"
+          python3 tools/build_stage.py --board smk37 --model pro --experimental-id 19703 --release 0.1.1-b3
+      - name: Verify firmware identity and print crash-nearby disassembly
+        run: |
+          sha256sum build/smkstage-0.1.1-b3-smk37.fwsc
+          grep -n -i -B 65 -A 65 '^ *203188:' build/smkstage.dis > build/crash-nearby.txt || true
+          sed -n '1,160p' build/crash-nearby.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SMKSTAGE-011-FORENSIC-SYMBOLS-NOT-FIRMWARE
+          retention-days: 14
+          path: |
+            build/smkstage.dis
+            build/smkstage.elf
+            build/crash-nearby.txt
+          if-no-files-found: error
