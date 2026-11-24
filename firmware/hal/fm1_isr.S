@@ -9,7 +9,10 @@
 \name:
 	[--sp] = {psr, rets, reti}
 	[--sp] = {r3-r0}
-	call \body
+	/* The far XIP C handler is ~4 MiB from RAM and cannot use a
+	 * relative 23-bit call; form its 32-bit address and call indirectly. */
+	r0 = #\body
+	call r0
 	{r3-r0} = [sp++]
 	{psr, rets, reti} = [sp++]
 	csync
