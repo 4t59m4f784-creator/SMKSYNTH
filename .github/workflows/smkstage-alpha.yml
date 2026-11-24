@@ -1,11 +1,12 @@
-name: SMKSTAGE B3 hardware alpha
+name: SMKSTAGE B3 crash diagnostic compile
 on:
   push:
-    branches: [smkstage-b3-alpha]
+    branches: [smkstage-b3-crash-diag-011]
     paths:
       - 'firmware/src/smkstage.c'
       - 'firmware/src/organ_*.h'
       - 'firmware/src/platform.c'
+      - 'firmware/hal/fm1_irq.h'
       - 'tools/build_stage.py'
       - '.github/workflows/smkstage-alpha.yml'
   workflow_dispatch:
@@ -47,11 +48,11 @@ jobs:
           echo "Do not install without verifying rescue, backups and target identity." >> build/READ-BEFORE-FLASHING.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: SMKSTAGE-B3-ALPHA-UNTESTED
+          name: SMKSTAGE-011-CRASH-DIAGNOSTIC-DO-NOT-FLASH
           retention-days: 14
           path: |
-            build/smkstage-0.1.1-b3-smk37.fwsc
+            build/smkstage.dis
+            build/smkstage.elf
             build/SMKSTAGE-B3-ALPHA-SHA256.txt
-            build/READ-BEFORE-FLASHING.txt
           if-no-files-found: error
       # No public release or installer deployment before physical validation.
