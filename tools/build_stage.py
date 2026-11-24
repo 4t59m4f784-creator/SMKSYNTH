@@ -237,7 +237,7 @@ def check(img, syms, dis, rt):
     # flash writes run with global IRQs disabled (fm1_flash.h irq_save()),
     # so TIMER5 can never make this far-call while flash is unavailable.
     # All true flash-driver routines in RAM remain prohibited from calling.
-    timer_m = re.search(r"^([0-9a-f]+) .*\\sisr_timer5$", syms, re.M)
+    timer_m = re.search(r"^([0-9a-f]+) .*\sisr_timer5$", syms, re.M)
     timer_addr = int(timer_m.group(1), 16) if timer_m else None
     timer_calls, prohibited = [], []
     for ln in rt_calls:
