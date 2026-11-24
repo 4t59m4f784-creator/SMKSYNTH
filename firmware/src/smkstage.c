@@ -385,7 +385,7 @@ static void app_main(void){
  organ_program(5u);P.les=1;P.rev=32;ovp_plate_init();ovp_plate_params(stage_plate_size,stage_plate_tone,stage_plate_pre);
  stage_factory_slots();stage_store_boot();
  /* Publish ready only after every audio dependency is initialized. */
- __asm__ volatile("csync" ::: "memory");stage_audio_ready=1u;
+ stage_audio_ready=1u; /* volatile publish: audio ISR sees fully initialized state */
  for(;;){platform_poll();keys_tick();controls();stage_mod_leslie();
  while(midi_get(&st,&a,&b)){uint32_t ch=st&15u;
  switch(st&0xF0u){case 0x90u:organ_midi_note(ch,a,b!=0);break;case 0x80u:organ_midi_note(ch,a,0);break;
