@@ -487,10 +487,26 @@ static void app_audio(int32_t *out, uint32_t n)
         for (i = 0; i < n; i++) lbuf[i] = rbuf[i] = mono[i];
         t3 = t2;
     } else {
-        reverb_run(mono, n, P.rev);             /* setBfree's order: overdrive, reverb, Leslie */
+#if !STAGE_PLATE
+        reverb_run(mono, n, P.rev);             /* original setBfree reverb */
+#endif
         t3 = fm1_ticks();
         if(stage_les_bypass){for(i=0;i<n;i++)lbuf[i]=rbuf[i]=mono[i];}else leslie_run(mono,lbuf,rbuf,n,les);
     }
+#if STAGE_PLATE
+    /* Stereo Dattorro plate comes after the rotary: retain the Leslie image and
+     * add a stereo return, without reducing its dry input level. */
+    {
+        uint32_t mix = P.rev, wet = (mix * 180u) >> 7;
+        ovp_plate_block(n, mix);
+        if (ovp_rev_active) for (i = 0; i < n; i++) {
+            int32_t in = ((lbuf[i] + rbuf[i]) >> 1);
+            ovp_rev_tick(mix ? ovp_sat16(in) : 0);
+            lbuf[i] += (int32_t)(((int64_t)ovp_rv_yl * wet) >> 8);
+            rbuf[i] += (int32_t)(((int64_t)ovp_rv_yr * wet) >> 8);
+        }
+    }
+#endif
     eq_run(lbuf, rbuf, n);                      /* the output equalizer (flat: nothing) */
     t4 = fm1_ticks();
     opk = block_limit(&lim_out, lbuf, rbuf, n);      /* the output, after reverb and Leslie (they add gain too): the same limiter, over both channels */
